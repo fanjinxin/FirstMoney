@@ -1,0 +1,136 @@
+import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import ProgressBar from '../../components/ProgressBar'
+import QuestionOverview from '../../components/QuestionOverview'
+import QuestionView from '../../components/QuestionView'
+import SectionHeader from '../../components/SectionHeader'
+import { rpiTest } from '../../data/rpi'
+import { loadAnswers, saveAnswers } from '../../utils/storage'
+
+type Perspective = 'self' | 'partner'
+
+const perspectiveLabels: Record<Perspective, string> = {
+  self: '自我视角',
+  partner: '伴侣视角',
+}
+
+export default function RPITest() {
+  const navigate = useNavigate()
+  const [perspective, setPerspective] = useState<Perspective>('self')
+
+  const answers = useMemo(() => {
+    return loadAnswers(`${rpiTest.id}-${perspective}`) ?? {}
+  }, [perspective])
+
+  const [current, setCurrent] = useState(0)
+  const [stateAnswers, setStateAnswers] = useState<Record<string, number>>(answers)
+
+  const questions = rpiTest.questions.filter((q) => q.id.startsWith(`${perspective}-`))
+  const total = questions.length
+  const currentQuestion = questions[current]
+  const answeredCount = questions.filter((q) => stateAnswers[q.id] !== undefined).length
+  const progress = (answeredCount / total) * 100
+
+  const handleSelect = (value: number) => {
+    const next = { ...stateAnswers, [currentQuestion.id]: value }
+    setStateAnswers(next)
+    saveAnswers(`${rpiTest.id}-${perspective}`, next)
+  }
+
+  const goNext = () => setCurrent((prev) => Math.min(total - 1, prev + 1))
+  const goPrev = () => setCurrent((prev) => Math.max(0, prev - 1))
+
+  const canSubmit = answeredCount === total
+
+  const switchPerspective = (next: Perspective) => {
+    setPerspective(next)
+    setCurrent(0)
+    const stored = loadAnswers(`${rpiTest.id}-${next}`) ?? {}
+    setStateAnswers(stored)
+  }
+
+  return (
+    <div className="space-y-8 animate-fade-in">
+      <div className="space-y-4">
+        <SectionHeader title={rpiTest.title} description={rpiTest.subtitle} />
+        <p className="text-sm text-slate-600">{rpiTest.description}</p>
+      </div>
+
+      <div className="flex flex-wrap gap-3">
+        {(['self', 'partner'] as Perspective[]).map((key) => (
+          <button
+            key={key}
+            onClick={() => switchPerspective(key)}
+            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+              perspective === key
+                ? 'bg-slate-900 text-white'
+                : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+            }`}
+          >
+            {perspectiveLabels[key]}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
+        <div className="space-y-6">
+          <ProgressBar value={progress} />
+          <QuestionView
+            question={currentQuestion}
+            index={current}
+            total={total}
+            options={rpiTest.options}
+            value={stateAnswers[currentQuestion.id]}
+            onChange={handleSelect}
+          />
+          <div className="flex items-center justify-between">
+            <button
+              onClick={goPrev}
+              className="rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:border-slate-300"
+              disabled={current === 0}
+            >
+              上一题
+            </button>
+            <div className="text-sm text-slate-500">
+              已完成 {answeredCount}/{total}
+            </div>
+            <button
+              onClick={goNext}
+              className="rounded-full border border-slate-900 bg-slate-900 px-4 py-2 text-sm text-white hover:bg-slate-800"
+              disabled={current === total - 1}
+            >
+              下一题
+            </button>
+          </div>
+          <button
+            onClick={() => navigate('/rpi/result')}
+            className={`w-full rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+              canSubmit
+                ? 'bg-slate-900 text-white hover:bg-slate-800'
+                : 'cursor-not-allowed bg-slate-200 text-slate-400'
+            }`}
+            disabled={!canSubmit}
+          >
+            查看分析结果
+          </button>
+        </div>
+
+        <aside className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="text-sm font-semibold text-slate-900">作答提示</div>
+          <ul className="space-y-2 text-sm text-slate-600">
+            {rpiTest.instructions.map((tip) => (
+              <li key={tip}>• {tip}</li>
+            ))}
+          </ul>
+        </aside>
+        <QuestionOverview
+          title={`${perspectiveLabels[perspective]}题目总览`}
+          questions={questions}
+          answers={stateAnswers}
+          currentIndex={current}
+          onSelect={setCurrent}
+        />
+      </div>
+    </div>
+  )
+}
