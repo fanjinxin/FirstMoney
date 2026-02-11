@@ -324,36 +324,118 @@ export default function SCL90Result() {
 
         {/* ── Report Body ── */}
         <div className="px-4 py-6 sm:px-8 sm:py-8 md:px-12">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-indigo-50/60 p-5 shadow-sm">
-              <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">总分</div>
-              <div className="mt-2 text-2xl font-bold text-slate-900">{summary.basic.totalScore}</div>
-              <div className="mt-1 text-sm text-slate-500">范围 90–450</div>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-indigo-50/60 p-5 shadow-sm">
-              <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">综合结论</div>
-              <div className="mt-2 text-xl font-bold text-slate-900">{summary.basic.totalLevel}</div>
-              <div className="mt-1 text-sm text-slate-500">总均分 {summary.basic.avgTotal.toFixed(2)}</div>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-indigo-50/60 p-5 shadow-sm">
-              <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">阳性项目</div>
-              <div className="mt-2 text-xl font-bold text-slate-900">{summary.basic.positiveCount}</div>
-              <div className="mt-1 text-sm text-slate-500">占比 {positiveRatio}%</div>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-indigo-50/60 p-5 shadow-sm">
-              <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">最高因子</div>
-              <div className="mt-2 text-base font-semibold text-slate-900">{topFactor?.name ?? '暂无'}</div>
-              <div className="mt-1 text-sm text-slate-500">
-                {topFactor ? `均分 ${topFactor.score.toFixed(2)} · ${topFactor.levelLabel}` : '等待完成'}
+          <div className="relative mb-10">
+            <div className="pointer-events-none absolute -right-24 -top-20 h-48 w-48 rounded-full bg-xia-sky/35 blur-3xl" />
+            <div className="pointer-events-none absolute -left-20 top-24 h-36 w-36 rounded-full bg-xia-aqua/40 blur-3xl" />
+            <div className="pointer-events-none absolute right-10 top-36 h-28 w-28 rounded-full bg-xia-cream/80 blur-2xl" />
+            <div className="relative z-10 space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="relative overflow-hidden rounded-[28px] border border-xia-haze bg-gradient-to-br from-xia-sky via-xia-aqua to-xia-mint p-6 text-xia-deep shadow-[0_20px_45px_rgba(104,212,219,0.35),_0_6px_0_rgba(255,255,255,0.6)] sm:p-7">
+                  <div className="pointer-events-none absolute -right-16 -top-12 h-40 w-40 rounded-full bg-white/35 blur-3xl" />
+                  <div className="pointer-events-none absolute -left-10 bottom-0 h-24 w-24 rounded-full bg-xia-cream/70 blur-2xl" />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent" />
+                  <div className="relative space-y-3">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.35em] text-xia-deep/70">
+                      人格类型
+                    </div>
+                    <div className="text-3xl font-bold">{summary.basic.totalLevel}</div>
+                    <div className="text-sm text-xia-deep/80">综合结论 · {summary.basic.totalLevel}型</div>
+                    <div className="mt-4 inline-flex items-center rounded-full bg-xia-cream px-3 py-1 text-xs font-semibold text-xia-teal shadow-[0_6px_16px_rgba(44,111,122,0.15)]">
+                      核心结论：{top3Factors.map((f) => f.name).join('、')}
+                    </div>
+                  </div>
+                </div>
+                <div className="relative overflow-hidden rounded-[28px] border border-xia-haze bg-gradient-to-br from-xia-aqua via-xia-sky to-xia-mint p-6 text-xia-deep shadow-[0_20px_45px_rgba(127,191,225,0.35),_0_6px_0_rgba(255,255,255,0.6)] sm:p-7">
+                  <div className="pointer-events-none absolute -right-12 top-0 h-32 w-32 rounded-full bg-white/35 blur-2xl" />
+                  <div className="pointer-events-none absolute -left-12 bottom-2 h-24 w-24 rounded-full bg-xia-cream/70 blur-2xl" />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/25 via-white/10 to-transparent" />
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.35em] text-xia-deep/70">
+                    测试总分
+                  </div>
+                  <div className="mt-3 flex items-center justify-between gap-4">
+                    <div className="text-4xl font-bold tracking-tight">{summary.basic.totalScore}</div>
+                    <div className="flex h-16 w-16 flex-col items-center justify-center rounded-full border border-white/60 bg-white/40 text-center shadow-[0_10px_20px_rgba(15,76,92,0.2)]">
+                      <div className="text-sm font-bold">{summary.basic.avgTotal.toFixed(2)}</div>
+                      <div className="text-[10px] text-xia-deep/70">总均分</div>
+                    </div>
+                  </div>
+                  <div className="mt-3 text-sm text-xia-deep/70">范围 90–450</div>
+                </div>
+              </div>
+              <div className="rounded-3xl border border-xia-haze bg-white/90 p-5 shadow-[0_18px_35px_rgba(104,212,219,0.18)] backdrop-blur sm:p-6">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="space-y-2">
+                    <div className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                      核心结论
+                    </div>
+                    <div className="text-xl font-bold text-slate-900 sm:text-2xl">
+                      综合结论：{summary.basic.totalLevel}
+                    </div>
+                    <p className="text-sm leading-relaxed text-slate-600">
+                      {summary.basic.totalLevel === '正常'
+                        ? '当前整体心理状态较为稳定，可继续保持规律作息与情绪管理。'
+                        : `当前存在${summary.basic.totalLevel}表现，${top3Factors.map((f) => f.name).join('、')}维度尤为突出。`}
+                    </p>
+                  </div>
+                  <div className="flex justify-center">
+                    <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-xia-cream shadow-[0_12px_24px_rgba(44,111,122,0.18)] sm:h-28 sm:w-28">
+                      <img
+                        src="https://twemoji.maxcdn.com/v/latest/72x72/1f9d1.png"
+                        alt="人物插画"
+                        className="h-14 w-14 sm:h-16 sm:w-16"
+                        loading="lazy"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="rounded-2xl border border-xia-haze bg-gradient-to-br from-white via-white to-xia-mint/30 p-4 shadow-[0_14px_28px_rgba(104,212,219,0.18)]">
+                  <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">阳性项目</div>
+                  <div className="mt-2 text-xl font-bold text-slate-900">{summary.basic.positiveCount}</div>
+                  <div className="mt-1 text-sm text-slate-500">占比 {positiveRatio}%</div>
+                </div>
+                <div className="rounded-2xl border border-xia-haze bg-gradient-to-br from-white via-white to-xia-mint/30 p-4 shadow-[0_14px_28px_rgba(104,212,219,0.18)]">
+                  <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">总均分</div>
+                  <div className="mt-2 text-xl font-bold text-slate-900">{summary.basic.avgTotal.toFixed(2)}</div>
+                  <div className="mt-1 text-sm text-slate-500">1–5 量表均值</div>
+                </div>
+                <div className="rounded-2xl border border-xia-haze bg-gradient-to-br from-white via-white to-xia-mint/30 p-4 shadow-[0_14px_28px_rgba(104,212,219,0.18)]">
+                  <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">最高因子</div>
+                  <div className="mt-2 text-base font-semibold text-slate-900">{topFactor?.name ?? '暂无'}</div>
+                  <div className="mt-1 text-sm text-slate-500">
+                    {topFactor ? `均分 ${topFactor.score.toFixed(2)} · ${topFactor.levelLabel}` : '等待完成'}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+          <div className="my-10 h-px bg-slate-100" />
+          <section>
+            <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">
+                1
+              </span>
+              可视化分析
+            </h2>
+            <div className="mt-4 h-px bg-slate-200" />
+            <p className="mt-5 text-sm leading-relaxed text-slate-700">
+              通过图表快速了解十因子整体轮廓、症状分布与因子强弱排序。
+            </p>
+            <div className="mt-6 grid gap-5 lg:grid-cols-[1.5fr,1fr]">
+              <FactorRadarChart data={radarData} />
+              <SymptomPieChart data={summary.symptomDist} />
+            </div>
+            <div className="mt-5">
+              <FactorBarChart data={barChartData} />
+            </div>
+          </section>
           <div className="my-10 h-px bg-slate-100" />
           {/* Section 1: 总体评价 */}
           <section>
             <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
               <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">
-                1
+                3
               </span>
               总体评价
             </h2>
@@ -522,36 +604,6 @@ export default function SCL90Result() {
               </table>
             </div>
           </section>
-
-          {/* Divider */}
-          <div className="my-10 h-px bg-slate-100" />
-
-          {/* Section 3: 图表分析 */}
-          <section>
-            <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">
-                3
-              </span>
-              可视化分析
-            </h2>
-            <div className="mt-4 h-px bg-slate-200" />
-
-            <p className="mt-5 text-sm leading-relaxed text-slate-700">
-              以下图表从不同角度呈现测评结果。雷达图展示十因子症状轮廓（虚线分别为 2
-              分和 3 分参考线），饼图展示 90 项评分的严重程度分布，柱状图按因子得分从高到低排序。
-            </p>
-
-            <div className="mt-6 grid gap-5 lg:grid-cols-[1.5fr,1fr]">
-              <FactorRadarChart data={radarData} />
-              <SymptomPieChart data={summary.symptomDist} />
-            </div>
-            <div className="mt-5">
-              <FactorBarChart data={barChartData} />
-            </div>
-          </section>
-
-          {/* Divider */}
-          <div className="my-10 h-px bg-slate-100" />
 
           {/* Section 4: 主要困扰维度 */}
           <section>

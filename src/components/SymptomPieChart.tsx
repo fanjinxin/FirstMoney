@@ -20,7 +20,7 @@ export default function SymptomPieChart({ data }: SymptomPieChartProps) {
           分布
         </span>
       </div>
-      <div className="mt-3 h-[calc(100%-2.5rem)] w-full">
+      <div className="mt-3 h-[calc(100%-5rem)] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Tooltip
@@ -36,6 +36,10 @@ export default function SymptomPieChart({ data }: SymptomPieChartProps) {
               paddingAngle={2}
               stroke="#ffffff"
               strokeWidth={2}
+              label={({ name, percent }) =>
+                `${name} ${Math.round((percent ?? 0) * 100)}%`
+              }
+              labelLine={false}
             >
               {data.map((entry, index) => (
                 <Cell key={entry.name} fill={pieColors[index % pieColors.length]} />
@@ -43,6 +47,17 @@ export default function SymptomPieChart({ data }: SymptomPieChartProps) {
             </Pie>
           </PieChart>
         </ResponsiveContainer>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-slate-500">
+        {data.map((item, index) => (
+          <div key={item.name} className="inline-flex items-center gap-1.5">
+            <span
+              className="h-2 w-2 rounded-full"
+              style={{ backgroundColor: pieColors[index % pieColors.length] }}
+            />
+            <span>{item.name}</span>
+          </div>
+        ))}
       </div>
     </div>
   )

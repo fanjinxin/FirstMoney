@@ -245,9 +245,88 @@ export default function SRIResult() {
         </div>
 
         <div className="px-4 py-6 sm:px-8 sm:py-8 md:px-12">
+          <div className="relative mb-10">
+            <div className="pointer-events-none absolute -right-24 -top-16 h-44 w-44 rounded-full bg-xia-sky/35 blur-3xl" />
+            <div className="pointer-events-none absolute -left-16 top-24 h-32 w-32 rounded-full bg-xia-aqua/40 blur-3xl" />
+            <div className="pointer-events-none absolute right-10 top-36 h-24 w-24 rounded-full bg-xia-cream/80 blur-2xl" />
+            <div className="relative z-10">
+              <div className="relative overflow-hidden rounded-[28px] border border-xia-haze bg-gradient-to-br from-xia-sky via-xia-aqua to-xia-mint p-6 text-xia-deep shadow-[0_20px_45px_rgba(104,212,219,0.35),_0_6px_0_rgba(255,255,255,0.6)] sm:p-8">
+                <div className="pointer-events-none absolute -right-16 -top-12 h-40 w-40 rounded-full bg-white/35 blur-3xl" />
+                <div className="pointer-events-none absolute -left-10 bottom-0 h-24 w-24 rounded-full bg-xia-cream/70 blur-2xl" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent" />
+                <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-4">
+                <div className="text-xs font-semibold uppercase tracking-[0.3em] text-xia-deep/70">
+                  核心结论卡
+                </div>
+                <div className="text-2xl font-bold sm:text-3xl">
+                  综合结论：{summary.levelLabel}
+                </div>
+                <p className="text-sm leading-relaxed text-xia-deep/80">
+                  当前性压抑指数为 {summary.totalIndex} 分，主要影响集中在
+                  {topDimension?.name ?? '核心维度'}。
+                </p>
+                <div className="flex flex-wrap gap-2 text-xs font-semibold text-xia-deep/90">
+                  <span className="rounded-full border border-white/40 bg-xia-cream px-3 py-1 text-xia-teal shadow-[0_6px_16px_rgba(44,111,122,0.15)]">
+                    人格类型：{summary.levelLabel}型
+                  </span>
+                  <span className="rounded-full border border-white/50 bg-white/40 px-3 py-1 text-xia-deep">
+                    核心结论：{topDimension?.name ?? '待完成'}
+                  </span>
+                </div>
+              </div>
+              <div className="flex justify-center">
+                <div className="flex h-28 w-28 items-center justify-center rounded-3xl bg-xia-cream shadow-[0_12px_24px_rgba(44,111,122,0.18)] sm:h-32 sm:w-32">
+                  <img
+                    src="https://twemoji.maxcdn.com/v/latest/72x72/1f9d1.png"
+                    alt="人物插画"
+                    className="h-16 w-16 sm:h-20 sm:w-20"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="my-10 h-px bg-slate-100" />
           <section>
             <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
               <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">1</span>
+              可视化概览
+            </h2>
+            <div className="mt-4 h-px bg-slate-200" />
+            <p className="mt-5 text-sm leading-relaxed text-slate-700">
+              通过图表直观看到四维度得分分布与压抑程度。
+            </p>
+            <div className="mt-6 w-full overflow-hidden rounded-2xl border border-xia-haze bg-gradient-to-br from-white via-white to-xia-mint/30 p-4 shadow-[0_14px_28px_rgba(104,212,219,0.18)]">
+              <div className="mb-2 flex items-center justify-between text-sm font-semibold text-slate-900">
+                四维度均分（1–5，越高越压抑）
+                <span className="rounded-full bg-xia-cream px-2.5 py-0.5 text-[11px] font-semibold text-xia-teal">
+                  柱状图
+                </span>
+              </div>
+              <div className="h-[200px] w-full sm:h-[240px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 8 }} barSize={28}>
+                    <CartesianGrid strokeDasharray="4 4" stroke="#E2E8F0" />
+                    <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                    <YAxis domain={[1, 5]} tick={{ fontSize: 11 }} />
+                    <Tooltip contentStyle={{ borderRadius: 12, borderColor: '#E2E8F0' }} labelStyle={{ fontWeight: 600 }} />
+                    <Bar dataKey="score" radius={[6, 6, 0, 0]}>
+                      {chartData.map((entry) => (
+                        <Cell key={entry.name} fill={levelColors[entry.level] ?? '#64748B'} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </section>
+          <div className="my-10 h-px bg-slate-100" />
+          <section>
+            <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">2</span>
               总体结论
             </h2>
             <div className="mt-4 h-px bg-slate-200" />
@@ -269,24 +348,24 @@ export default function SRIResult() {
               </div>
             </div>
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-amber-50/60 p-5 shadow-sm">
+              <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-5 shadow-md backdrop-blur">
                 <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">总体指数</div>
                 <div className="mt-2 text-xl font-bold text-slate-900">{summary.totalIndex}</div>
                 <div className="mt-1 text-sm text-slate-500">0–100（越高越压抑）</div>
               </div>
-              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-amber-50/60 p-5 shadow-sm">
+              <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-5 shadow-md backdrop-blur">
                 <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">等级</div>
                 <div className="mt-2 text-xl font-bold text-slate-900">{summary.levelLabel}</div>
                 <div className="mt-1 text-sm text-slate-500">五等级评估</div>
               </div>
-              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-amber-50/60 p-5 shadow-sm">
+              <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-5 shadow-md backdrop-blur">
                 <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">最高维度</div>
                 <div className="mt-2 text-base font-semibold text-slate-900">{topDimension?.name ?? '暂无'}</div>
                 <div className="mt-1 text-sm text-slate-500">
                   {topDimension ? `均分 ${topDimension.score.toFixed(2)} · ${topDimension.levelLabel}` : '等待完成'}
                 </div>
               </div>
-              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-amber-50/60 p-5 shadow-sm">
+              <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-5 shadow-md backdrop-blur">
                 <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">完成度</div>
                 <div className="mt-2 text-base font-semibold text-slate-900">{answeredCount}/48</div>
                 <div className="mt-1 text-sm text-slate-500">全部题目已完成</div>
@@ -298,7 +377,7 @@ export default function SRIResult() {
 
           <section>
             <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">2</span>
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">3</span>
               四维度得分
             </h2>
             <div className="mt-4 h-px bg-slate-200" />
@@ -307,36 +386,13 @@ export default function SRIResult() {
                 <DimensionRow key={d.id} d={d} />
               ))}
             </div>
-            <div className="mt-6 w-full overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-amber-50/60 p-4 shadow-sm">
-              <div className="mb-2 flex items-center justify-between text-sm font-semibold text-slate-900">
-                四维度均分（1–5，越高越压抑）
-                <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-semibold text-amber-700">
-                  柱状图
-                </span>
-              </div>
-              <div className="h-[200px] w-full sm:h-[240px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 8 }} barSize={28}>
-                    <CartesianGrid strokeDasharray="4 4" stroke="#E2E8F0" />
-                    <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                    <YAxis domain={[1, 5]} tick={{ fontSize: 11 }} />
-                    <Tooltip contentStyle={{ borderRadius: 12, borderColor: '#E2E8F0' }} labelStyle={{ fontWeight: 600 }} />
-                    <Bar dataKey="score" radius={[6, 6, 0, 0]}>
-                      {chartData.map((entry) => (
-                        <Cell key={entry.name} fill={levelColors[entry.level] ?? '#64748B'} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
           </section>
 
           <div className="my-10 h-px bg-slate-100" />
 
           <section>
             <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">3</span>
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">4</span>
               多角度解读
             </h2>
             <div className="mt-4 h-px bg-slate-200" />
@@ -395,7 +451,7 @@ export default function SRIResult() {
 
           <section>
             <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">4</span>
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">5</span>
               建议方向
             </h2>
             <div className="mt-4 h-px bg-slate-200" />
