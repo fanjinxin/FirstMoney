@@ -16,24 +16,24 @@ export default function QuestionOverview({
   onSelect,
 }: QuestionOverviewProps) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-      <div className="flex items-center justify-between text-sm font-semibold text-slate-900">
+    <div className="rounded-2xl border border-xia-haze bg-white p-4 shadow-sm sm:p-5">
+      <div className="flex items-center justify-between text-sm font-semibold text-xia-deep">
         <span>{title}</span>
-        <span className="text-xs font-medium text-slate-500">
+        <span className="text-xs font-medium text-xia-deep/60">
           已答 {Object.keys(answers).length}/{questions.length}
         </span>
       </div>
-      <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-slate-500">
+      <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-xia-deep/60">
         <span className="inline-flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full bg-emerald-400" />
+          <span className="h-2 w-2 rounded-full bg-xia-teal" />
           已作答
         </span>
         <span className="inline-flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full bg-slate-200" />
+          <span className="h-2 w-2 rounded-full bg-xia-haze/50" />
           未作答
         </span>
         <span className="inline-flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full bg-slate-900" />
+          <span className="h-2 w-2 rounded-full bg-xia-deep" />
           当前题
         </span>
       </div>
@@ -44,10 +44,10 @@ export default function QuestionOverview({
           const base =
             'flex h-8 items-center justify-center rounded-lg border text-xs font-semibold transition'
           const stateClass = isCurrent
-            ? 'border-slate-900 bg-slate-900 text-white'
+            ? 'border-xia-deep bg-xia-deep text-white'
             : answered
-              ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:border-emerald-300'
-              : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
+              ? 'border-xia-mint/50 bg-xia-mint/20 text-xia-teal hover:border-xia-mint'
+              : 'border-xia-haze bg-white text-xia-deep/50 hover:border-xia-teal/50'
 
           return (
             <button

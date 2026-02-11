@@ -34,7 +34,7 @@ export default function SCL90Test() {
     <div className="space-y-8 animate-fade-in">
       <div className="space-y-4">
         <SectionHeader title={scl90Test.title} description={scl90Test.subtitle} />
-        <p className="text-sm text-slate-600">{scl90Test.description}</p>
+        <p className="text-sm text-xia-deep/80">{scl90Test.description}</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
@@ -51,17 +51,17 @@ export default function SCL90Test() {
           <div className="flex items-center justify-between">
             <button
               onClick={goPrev}
-              className="rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:border-slate-300"
+              className="rounded-full border border-xia-haze px-4 py-2 text-sm text-xia-deep/80 hover:border-xia-teal/50"
               disabled={current === 0}
             >
               上一题
             </button>
-            <div className="text-sm text-slate-500">
+            <div className="text-sm text-xia-teal/80">
               已完成 {answeredCount}/{total}
             </div>
             <button
               onClick={goNext}
-              className="rounded-full border border-slate-900 bg-slate-900 px-4 py-2 text-sm text-white hover:bg-slate-800"
+              className="rounded-full border border-xia-deep bg-xia-deep px-4 py-2 text-sm text-white hover:bg-xia-deep/90"
               disabled={current === total - 1}
             >
               下一题
@@ -71,8 +71,8 @@ export default function SCL90Test() {
             onClick={() => navigate('/scl90/result')}
             className={`w-full rounded-2xl px-4 py-3 text-sm font-semibold transition ${
               canSubmit
-                ? 'bg-slate-900 text-white hover:bg-slate-800'
-                : 'cursor-not-allowed bg-slate-200 text-slate-400'
+                ? 'bg-xia-deep text-white hover:bg-xia-deep/90'
+                : 'cursor-not-allowed bg-xia-haze/30 text-xia-haze'
             }`}
             disabled={!canSubmit}
           >
@@ -80,9 +80,9 @@ export default function SCL90Test() {
           </button>
         </div>
 
-        <aside className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="text-sm font-semibold text-slate-900">作答提示</div>
-          <ul className="space-y-2 text-sm text-slate-600">
+        <aside className="space-y-4 rounded-2xl border border-xia-haze bg-white p-6 shadow-sm">
+          <div className="text-sm font-semibold text-xia-deep">作答提示</div>
+          <ul className="space-y-2 text-sm text-xia-deep/80">
             {scl90Test.instructions.map((tip) => (
               <li key={tip}>• {tip}</li>
             ))}

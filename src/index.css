@@ -2,12 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Default Theme: Summer Mint (薄荷苏打) */
+  --xia-sky: 127 191 225;   /* #7FBFE1 */
+  --xia-aqua: 104 212 219;  /* #68D4DB */
+  --xia-mint: 152 230 226;  /* #98E6E2 */
+  --xia-cream: 248 244 225; /* #F8F4E1 */
+  --xia-haze: 207 239 240;  /* #CFEFF0 */
+  --xia-deep: 15 76 92;     /* #0F4C5C */
+  --xia-teal: 44 111 122;   /* #2C6F7A */
+}
+
 body {
   font-family: 'Noto Sans SC', system-ui, sans-serif;
-  background-color: #F8F9FA;
-  color: #1A202C;
+  background: linear-gradient(135deg, rgba(var(--xia-cream), 0.3) 0%, #FFFFFF 40%, rgba(var(--xia-haze), 0.3) 100%);
+  background-attachment: fixed;
+  color: rgb(var(--xia-deep));
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background 0.5s ease, color 0.5s ease;
 }
 
 ::-webkit-scrollbar {

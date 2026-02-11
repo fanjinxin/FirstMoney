@@ -22,24 +22,24 @@ const PERSPECTIVE_LABELS: Record<string, string> = { self: '自我视角', partn
 function getLevelBg(level: string) {
   switch (level) {
     case 'low':
-      return 'bg-emerald-50 text-emerald-700 border-emerald-200'
+      return 'bg-xia-mint/20 text-xia-teal border-xia-mint'
     case 'moderate':
-      return 'bg-blue-50 text-blue-700 border-blue-200'
+      return 'bg-xia-sky/20 text-xia-deep border-xia-sky'
     case 'high':
-      return 'bg-amber-50 text-amber-700 border-amber-200'
+      return 'bg-xia-aqua/20 text-xia-deep border-xia-aqua'
     case 'veryHigh':
-      return 'bg-red-50 text-red-700 border-red-200'
+      return 'bg-xia-deep/10 text-xia-deep border-xia-deep'
     default:
-      return 'bg-slate-50 text-slate-700 border-slate-200'
+      return 'bg-xia-cream text-xia-deep border-xia-haze'
   }
 }
 
 function getTotalLevelStyle(label: string) {
-  if (label.includes('低')) return 'bg-emerald-50 text-emerald-800 border-emerald-200'
-  if (label.includes('适中')) return 'bg-blue-50 text-blue-800 border-blue-200'
-  if (label.includes('偏高')) return 'bg-amber-50 text-amber-800 border-amber-200'
-  if (label.includes('极高')) return 'bg-red-50 text-red-800 border-red-200'
-  return 'bg-slate-50 text-slate-800 border-slate-200'
+  if (label.includes('低')) return 'bg-xia-mint/20 text-xia-teal border-xia-mint'
+  if (label.includes('适中')) return 'bg-xia-sky/20 text-xia-deep border-xia-sky'
+  if (label.includes('偏高')) return 'bg-xia-aqua/20 text-xia-deep border-xia-aqua'
+  if (label.includes('极高')) return 'bg-xia-deep/10 text-xia-deep border-xia-deep'
+  return 'bg-xia-cream text-xia-deep border-xia-haze'
 }
 
 function formatDate() {
@@ -51,32 +51,34 @@ function DimensionRow({ d }: { d: RpiDimensionScore }) {
   const pct = Math.min((d.scoreSum / 25) * 100, 100)
   const barClass =
     d.level === 'low'
-      ? 'from-emerald-400 to-emerald-500'
+      ? 'bg-xia-mint'
       : d.level === 'moderate'
-        ? 'from-blue-400 to-blue-500'
+        ? 'bg-xia-sky'
         : d.level === 'high'
-          ? 'from-amber-400 to-amber-500'
-          : 'from-red-400 to-red-500'
+          ? 'bg-xia-teal'
+          : 'bg-xia-deep'
   return (
-    <div className="flex items-center gap-4 border-b border-slate-100 py-3 last:border-0">
+    <div className="flex flex-col gap-3 border-b border-xia-haze py-3 last:border-0 sm:flex-row sm:items-center sm:gap-4">
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-slate-800">{d.name}</span>
+          <span className="text-sm font-semibold text-xia-deep">{d.name}</span>
           <span className={`inline-flex rounded-full border px-2 py-0.5 text-[11px] font-medium ${getLevelBg(d.level)}`}>
             {d.levelLabel}
           </span>
         </div>
-        <p className="mt-1 text-xs text-slate-500">{d.hint}</p>
+        <p className="mt-1 text-xs text-xia-teal/80">{d.hint}</p>
       </div>
-      <div className="flex items-end gap-3">
-        <span className="text-sm text-slate-400">均分 {d.scoreMean.toFixed(2)}</span>
-        <span className="w-12 text-right text-lg font-bold tabular-nums text-slate-900">{d.scoreSum}</span>
-      </div>
-      <div className="h-2 w-24 overflow-hidden rounded-full bg-slate-100">
-        <div
-          className={`h-full rounded-full bg-gradient-to-r ${barClass}`}
-          style={{ width: `${pct}%` }}
-        />
+      <div className="flex w-full items-center justify-between gap-4 sm:w-auto sm:justify-end">
+        <div className="flex items-end gap-3">
+          <span className="text-sm text-xia-teal/60">均分 {d.scoreMean.toFixed(2)}</span>
+          <span className="w-12 text-right text-lg font-bold tabular-nums text-xia-deep">{d.scoreSum}</span>
+        </div>
+        <div className="h-2 w-24 overflow-hidden rounded-full bg-xia-haze/30">
+          <div
+            className={`h-full rounded-full ${barClass}`}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
       </div>
     </div>
   )
@@ -84,9 +86,9 @@ function DimensionRow({ d }: { d: RpiDimensionScore }) {
 
 function PerspectiveBlock({ title, summary }: { title: string; summary: RpiPerspectiveSummary }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-rose-50/50 p-6 shadow-sm">
-      <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-        <h3 className="text-base font-bold text-slate-900">{title}</h3>
+    <div className="rounded-2xl border border-xia-haze bg-white p-6 shadow-sm">
+      <div className="flex items-center justify-between border-b border-xia-haze pb-4">
+        <h3 className="text-base font-bold text-xia-deep">{title}</h3>
         <div className={`rounded-lg border px-3 py-1.5 text-sm font-bold ${getTotalLevelStyle(summary.levelLabel)}`}>
           {summary.total} 分 · {summary.levelLabel}
         </div>
@@ -134,9 +136,9 @@ export default function RPIResult() {
   if (!hasAny) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center space-y-4">
-        <div className="text-lg font-medium text-slate-700">尚未完成任一视角测评</div>
-        <p className="text-sm text-slate-500">请至少完成「自我视角」或「伴侣视角」全部 20 题后查看结果。</p>
-        <Link className="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800" to="/rpi">
+        <div className="text-lg font-medium text-xia-deep">尚未完成任一视角测评</div>
+        <p className="text-sm text-xia-teal/80">请至少完成「自我视角」或「伴侣视角」全部 20 题后查看结果。</p>
+        <Link className="rounded-lg bg-xia-deep px-4 py-2 text-sm text-white transition hover:bg-xia-deep/90" to="/rpi">
           返回 RPI 测试
         </Link>
       </div>
@@ -203,12 +205,12 @@ export default function RPIResult() {
           aria-modal="true"
           aria-labelledby="rpi-pay-modal-title"
         >
-          <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <h3 id="rpi-pay-modal-title" className="text-lg font-bold text-slate-900">下载报告</h3>
-            <p className="mt-3 text-sm text-slate-600">正式版中，下载完整报告需付费。付费后可下载 PDF 报告并长期保存。</p>
-            <p className="mt-2 text-xs text-slate-400">功能即将上线，敬请期待。</p>
+          <div className="w-full max-w-sm rounded-xl border border-xia-haze bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <h3 id="rpi-pay-modal-title" className="text-lg font-bold text-xia-deep">下载报告</h3>
+            <p className="mt-3 text-sm text-xia-deep/80">正式版中，下载完整报告需付费。付费后可下载 PDF 报告并长期保存。</p>
+            <p className="mt-2 text-xs text-xia-teal/60">功能即将上线，敬请期待。</p>
             <div className="mt-6 flex justify-end">
-              <button type="button" onClick={() => setShowPayModal(false)} className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+              <button type="button" onClick={() => setShowPayModal(false)} className="rounded-lg border border-xia-haze px-4 py-2 text-sm font-medium text-xia-deep hover:bg-xia-cream">
                 关闭
               </button>
             </div>
@@ -216,22 +218,22 @@ export default function RPIResult() {
         </div>
       )}
 
-      <div ref={reportRef} className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
-        <div className="relative overflow-hidden border-b-2 border-slate-800 bg-gradient-to-br from-rose-950 via-slate-900 to-slate-900 px-4 py-6 text-white sm:px-8 sm:py-8 md:px-12">
-          <div className="pointer-events-none absolute -right-16 -top-12 h-40 w-40 rounded-full bg-rose-400/20 blur-3xl" />
-          <div className="pointer-events-none absolute -left-20 top-8 h-32 w-32 rounded-full bg-indigo-400/20 blur-3xl" />
+      <div ref={reportRef} className="relative overflow-hidden rounded-2xl border border-xia-haze bg-white/80 shadow-xl backdrop-blur-sm">
+        <div className="relative overflow-hidden border-b-2 border-xia-deep bg-xia-deep px-4 py-6 text-white sm:px-8 sm:py-8 md:px-12">
+          <div className="pointer-events-none absolute -right-16 -top-12 h-40 w-40 rounded-full bg-xia-sky/20 blur-3xl" />
+          <div className="pointer-events-none absolute -left-20 top-8 h-32 w-32 rounded-full bg-xia-mint/20 blur-3xl" />
           <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <div className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Romantic Possessiveness Index</div>
+              <div className="text-xs font-medium uppercase tracking-[0.2em] text-xia-haze">Romantic Possessiveness Index</div>
               <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">RPI 恋爱占有欲指数测试</h1>
-              <div className="mt-1 text-sm text-slate-400">40 题双视角完整版 · 评估报告</div>
+              <div className="mt-1 text-sm text-xia-haze">40 题双视角完整版 · 评估报告</div>
             </div>
             <div className="flex flex-shrink-0 flex-col items-start gap-3 sm:items-end">
               <button
                 type="button"
                 onClick={handleDownloadReport}
                 disabled={exportingPdf}
-                className="flex items-center gap-2 rounded-lg border border-slate-600 bg-slate-800 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 rounded-lg border border-xia-haze bg-xia-deep/50 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-xia-deep disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {exportingPdf ? (
                   <>
@@ -247,28 +249,28 @@ export default function RPIResult() {
                   </>
                 )}
               </button>
-              <div className="hidden rounded-md border border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-300 sm:block">仅供参考</div>
+              <div className="hidden rounded-md border border-xia-haze px-3 py-1.5 text-xs font-medium text-xia-haze sm:block">仅供参考</div>
             </div>
           </div>
         </div>
 
-        <div className="border-b border-slate-200 bg-gradient-to-b from-slate-50/80 to-white px-4 py-5 sm:px-8 md:px-12">
+        <div className="border-b border-xia-haze bg-xia-cream/20 px-4 py-5 sm:px-8 md:px-12">
           <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">报告日期</div>
-              <div className="mt-1 font-medium text-slate-800">{formatDate()}</div>
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-xia-teal/80">报告日期</div>
+              <div className="mt-1 font-medium text-xia-deep">{formatDate()}</div>
             </div>
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">题数</div>
-              <div className="mt-1 font-medium text-slate-800">40 题（双视角各 20 题）</div>
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-xia-teal/80">题数</div>
+              <div className="mt-1 font-medium text-xia-deep">40 题（双视角各 20 题）</div>
             </div>
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">维度</div>
-              <div className="mt-1 font-medium text-slate-800">控制 / 嫉妒 / 依赖 / 安全感</div>
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-xia-teal/80">维度</div>
+              <div className="mt-1 font-medium text-xia-deep">控制 / 嫉妒 / 依赖 / 安全感</div>
             </div>
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">计分</div>
-              <div className="mt-1 font-medium text-slate-800">每维度 5–25 分，总分 20–100</div>
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-xia-teal/80">计分</div>
+              <div className="mt-1 font-medium text-xia-deep">每维度 5–25 分，总分 20–100</div>
             </div>
           </div>
         </div>
@@ -279,10 +281,9 @@ export default function RPIResult() {
             <div className="pointer-events-none absolute -left-16 top-24 h-32 w-32 rounded-full bg-xia-aqua/40 blur-3xl" />
             <div className="pointer-events-none absolute right-10 top-36 h-24 w-24 rounded-full bg-xia-cream/80 blur-2xl" />
             <div className="relative z-10">
-              <div className="relative overflow-hidden rounded-[28px] border border-xia-haze bg-gradient-to-br from-xia-sky via-xia-aqua to-xia-mint p-6 text-xia-deep shadow-[0_20px_45px_rgba(104,212,219,0.35),_0_6px_0_rgba(255,255,255,0.6)] sm:p-8">
+              <div className="relative overflow-hidden rounded-[28px] border border-xia-haze bg-xia-sky/10 p-6 text-xia-deep shadow-[0_20px_45px_rgba(104,212,219,0.35),_0_6px_0_rgba(255,255,255,0.6)] sm:p-8">
                 <div className="pointer-events-none absolute -right-16 -top-12 h-40 w-40 rounded-full bg-white/35 blur-3xl" />
                 <div className="pointer-events-none absolute -left-10 bottom-0 h-24 w-24 rounded-full bg-xia-cream/70 blur-2xl" />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent" />
                 <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="space-y-4">
                     <div className="text-xs font-semibold uppercase tracking-[0.3em] text-xia-deep/70">
@@ -321,18 +322,18 @@ export default function RPIResult() {
               </div>
             </div>
           </div>
-          <div className="my-10 h-px bg-slate-100" />
+          <div className="my-10 h-px bg-xia-haze/30" />
           <section>
-            <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">1</span>
+            <h2 className="flex items-center gap-2 text-lg font-bold text-xia-deep">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-xia-deep text-xs font-bold text-white">1</span>
               可视化概览
             </h2>
-            <div className="mt-4 h-px bg-slate-200" />
-            <p className="mt-5 text-sm leading-relaxed text-slate-700">
+            <div className="mt-4 h-px bg-xia-haze/50" />
+            <p className="mt-5 text-sm leading-relaxed text-xia-deep/80">
               图表展示四个维度的占有欲强度，便于一眼对比。
             </p>
-            <div className="mt-6 w-full overflow-hidden rounded-2xl border border-xia-haze bg-gradient-to-br from-white via-white to-xia-mint/30 p-4 shadow-[0_14px_28px_rgba(104,212,219,0.18)]">
-              <div className="mb-2 flex items-center justify-between text-sm font-semibold text-slate-900">
+            <div className="mt-6 w-full overflow-hidden rounded-2xl border border-xia-haze bg-white p-4 shadow-[0_14px_28px_rgba(104,212,219,0.18)]">
+              <div className="mb-2 flex items-center justify-between text-sm font-semibold text-xia-deep">
                 四维度得分（5–25 分）
                 <span className="rounded-full bg-xia-cream px-2.5 py-0.5 text-[11px] font-semibold text-xia-teal">
                   柱状图
@@ -341,43 +342,45 @@ export default function RPIResult() {
               <div className="h-[220px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData} layout="vertical" margin={{ top: 8, right: 24, left: 4, bottom: 8 }} barSize={12}>
-                    <CartesianGrid strokeDasharray="4 4" stroke="#E2E8F0" />
-                    <XAxis type="number" domain={[0, 25]} tick={{ fontSize: 11 }} />
-                    <YAxis type="category" dataKey="name" width={90} tick={{ fontSize: 11 }} />
+                    <CartesianGrid strokeDasharray="4 4" stroke="#CFEFF0" />
+                    <XAxis type="number" domain={[0, 25]} tick={{ fontSize: 11, fill: '#2C6F7A' }} tickLine={{ stroke: '#CFEFF0' }} axisLine={{ stroke: '#CFEFF0' }} />
+                    <YAxis type="category" dataKey="name" width={90} tick={{ fontSize: 11, fill: '#2C6F7A' }} tickLine={{ stroke: '#CFEFF0' }} axisLine={{ stroke: '#CFEFF0' }} />
                     <Tooltip
-                      contentStyle={{ borderRadius: 12, borderColor: '#E2E8F0' }}
-                      labelStyle={{ fontWeight: 600 }}
+                      contentStyle={{ borderRadius: 12, borderColor: '#CFEFF0', backgroundColor: 'rgba(255, 255, 255, 0.95)', color: '#2C6F7A' }}
+                      labelStyle={{ fontWeight: 600, color: '#2C6F7A' }}
+                      itemStyle={{ color: '#2C6F7A' }}
+                      cursor={{ fill: 'rgba(104, 212, 219, 0.1)' }}
                       formatter={(value, name) => [
                         `${value} 分`,
                         name === 'self' ? '自我视角' : '伴侣视角',
                       ]}
                     />
                     <Legend
-                      formatter={(value) => (value === 'self' ? '自我视角' : '伴侣视角')}
+                      formatter={(value) => <span className="text-xia-deep/80">{value === 'self' ? '自我视角' : '伴侣视角'}</span>}
                     />
                     {chartMode !== 'partner' && (
-                      <Bar dataKey="self" fill="#f43f5e" radius={[6, 6, 6, 6]} />
+                      <Bar dataKey="self" fill="#2C6F7A" radius={[6, 6, 6, 6]} />
                     )}
                     {chartMode !== 'self' && (
-                      <Bar dataKey="partner" fill="#6366f1" radius={[6, 6, 6, 6]} />
+                      <Bar dataKey="partner" fill="#68D4DB" radius={[6, 6, 6, 6]} />
                     )}
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
           </section>
-          <div className="my-10 h-px bg-slate-100" />
+          <div className="my-10 h-px bg-xia-haze/30" />
           <section>
-            <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">2</span>
+            <h2 className="flex items-center gap-2 text-lg font-bold text-xia-deep">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-xia-deep text-xs font-bold text-white">2</span>
               总体结论
             </h2>
-            <div className="mt-4 h-px bg-slate-200" />
-            <p className="mt-5 text-sm leading-relaxed text-slate-700">
+            <div className="mt-4 h-px bg-xia-haze/50" />
+            <p className="mt-5 text-sm leading-relaxed text-xia-deep/80">
               RPI 从四个维度评估恋爱占有欲：控制欲望、嫉妒强度、情感依赖、关系不安全感。每维度 5 题，维度分为 5 题之和（5–25 分），总分为四维度之和（20–100 分）。等级划分：1–25 低占有欲、26–50 适中、51–75 偏高、76–100 极高。
             </p>
             {!hasSelf || !hasPartner ? (
-              <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50/70 px-5 py-4 text-sm text-amber-800">
+              <div className="mt-6 rounded-2xl border border-xia-sky/30 bg-xia-sky/10 px-5 py-4 text-sm text-xia-deep/80">
                 {hasSelf
                   ? `伴侣视角已作答 ${partnerAnswered}/20，完成后可生成对比报告。`
                   : `自我视角已作答 ${selfAnswered}/20，完成后可生成对比报告。`}
@@ -386,56 +389,56 @@ export default function RPIResult() {
             <div className="mt-6 flex flex-wrap gap-4">
               {hasSelf && summary.self && (
                 <div className={`rounded-2xl border px-5 py-4 shadow-sm ${getTotalLevelStyle(summary.self.levelLabel)}`}>
-                  <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">自我视角</div>
+                  <div className="text-xs font-semibold uppercase tracking-wider text-xia-deep/60">自我视角</div>
                   <div className="mt-1 text-xl font-bold">{summary.self.total} 分 · {summary.self.levelLabel}</div>
                 </div>
               )}
               {hasPartner && summary.partner && (
                 <div className={`rounded-2xl border px-5 py-4 shadow-sm ${getTotalLevelStyle(summary.partner.levelLabel)}`}>
-                  <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">伴侣视角</div>
+                  <div className="text-xs font-semibold uppercase tracking-wider text-xia-deep/60">伴侣视角</div>
                   <div className="mt-1 text-xl font-bold">{summary.partner.total} 分 · {summary.partner.levelLabel}</div>
                 </div>
               )}
             </div>
             <div className="mt-6 grid gap-4 lg:grid-cols-3">
-              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-rose-50/60 p-5 shadow-sm">
-                <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">自我视角突出维度</div>
-                <div className="mt-2 text-base font-semibold text-slate-900">
+              <div className="rounded-2xl border border-xia-haze bg-white p-5 shadow-sm">
+                <div className="text-xs font-semibold uppercase tracking-wider text-xia-deep/50">自我视角突出维度</div>
+                <div className="mt-2 text-base font-semibold text-xia-deep">
                   {selfTop ? selfTop.name : '暂无数据'}
                 </div>
-                <div className="mt-1 text-sm text-slate-500">
+                <div className="mt-1 text-sm text-xia-deep/70">
                   {selfTop ? `得分 ${selfTop.scoreSum} · ${selfTop.levelLabel}` : `完成度 ${selfAnswered}/20`}
                 </div>
               </div>
-              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-rose-50/60 p-5 shadow-sm">
-                <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">伴侣视角突出维度</div>
-                <div className="mt-2 text-base font-semibold text-slate-900">
+              <div className="rounded-2xl border border-xia-haze bg-white p-5 shadow-sm">
+                <div className="text-xs font-semibold uppercase tracking-wider text-xia-deep/50">伴侣视角突出维度</div>
+                <div className="mt-2 text-base font-semibold text-xia-deep">
                   {partnerTop ? partnerTop.name : '暂无数据'}
                 </div>
-                <div className="mt-1 text-sm text-slate-500">
+                <div className="mt-1 text-sm text-xia-deep/70">
                   {partnerTop ? `得分 ${partnerTop.scoreSum} · ${partnerTop.levelLabel}` : `完成度 ${partnerAnswered}/20`}
                 </div>
               </div>
-              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-rose-50/60 p-5 shadow-sm">
-                <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">视角差异最大</div>
-                <div className="mt-2 text-base font-semibold text-slate-900">
+              <div className="rounded-2xl border border-xia-haze bg-white p-5 shadow-sm">
+                <div className="text-xs font-semibold uppercase tracking-wider text-xia-deep/50">视角差异最大</div>
+                <div className="mt-2 text-base font-semibold text-xia-deep">
                   {maxDiff ? maxDiff.name : '需完成双视角'}
                 </div>
-                <div className="mt-1 text-sm text-slate-500">
+                <div className="mt-1 text-sm text-xia-deep/70">
                   {maxDiff ? `差异 ${maxDiff.diff > 0 ? `+${maxDiff.diff}` : maxDiff.diff}` : '完成双视角后计算'}
                 </div>
               </div>
             </div>
           </section>
 
-          <div className="my-10 h-px bg-slate-100" />
+          <div className="my-10 h-px bg-xia-haze/30" />
 
           <section>
-            <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">3</span>
+            <h2 className="flex items-center gap-2 text-lg font-bold text-xia-deep">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-xia-deep text-xs font-bold text-white">3</span>
               维度得分
             </h2>
-            <div className="mt-4 h-px bg-slate-200" />
+            <div className="mt-4 h-px bg-xia-haze/50" />
 
             <div className="mt-5 flex flex-wrap gap-3 print:hidden">
               {hasSelf && hasPartner && (
@@ -443,21 +446,21 @@ export default function RPIResult() {
                   <button
                     type="button"
                     onClick={() => setView('both')}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition ${view === 'both' ? 'bg-gradient-to-r from-slate-900 to-slate-700 text-white shadow-sm' : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition ${view === 'both' ? 'bg-xia-deep text-white shadow-sm' : 'border border-xia-haze bg-white text-xia-deep/60 hover:border-xia-teal/50'}`}
                   >
                     双视角
                   </button>
                   <button
                     type="button"
                     onClick={() => setView('self')}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition ${view === 'self' ? 'bg-gradient-to-r from-slate-900 to-slate-700 text-white shadow-sm' : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition ${view === 'self' ? 'bg-xia-deep text-white shadow-sm' : 'border border-xia-haze bg-white text-xia-deep/60 hover:border-xia-teal/50'}`}
                   >
                     自我视角
                   </button>
                   <button
                     type="button"
                     onClick={() => setView('partner')}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition ${view === 'partner' ? 'bg-gradient-to-r from-slate-900 to-slate-700 text-white shadow-sm' : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition ${view === 'partner' ? 'bg-xia-deep text-white shadow-sm' : 'border border-xia-haze bg-white text-xia-deep/60 hover:border-xia-teal/50'}`}
                   >
                     伴侣视角
                   </button>
@@ -477,31 +480,31 @@ export default function RPIResult() {
 
           {summary.comparison && hasSelf && hasPartner && (
             <>
-              <div className="my-10 h-px bg-slate-100" />
+              <div className="my-10 h-px bg-xia-haze/30" />
               <section>
-                <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">4</span>
+                <h2 className="flex items-center gap-2 text-lg font-bold text-xia-deep">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-xia-deep text-xs font-bold text-white">4</span>
                   双视角对比
                 </h2>
-                <div className="mt-4 h-px bg-slate-200" />
-                <p className="mt-5 text-sm leading-relaxed text-slate-700">{summary.comparison.summary}</p>
-                <div className="mt-5 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+                <div className="mt-4 h-px bg-xia-haze/50" />
+                <p className="mt-5 text-sm leading-relaxed text-xia-deep/80">{summary.comparison.summary}</p>
+                <div className="mt-5 overflow-x-auto rounded-xl border border-xia-haze bg-white shadow-sm">
                   <table className="min-w-[520px] w-full text-sm">
                     <thead>
-                      <tr className="bg-slate-50">
-                        <th className="px-4 py-2.5 text-left font-semibold text-slate-600">维度</th>
-                        <th className="px-4 py-2.5 text-right font-semibold text-slate-600">自我</th>
-                        <th className="px-4 py-2.5 text-right font-semibold text-slate-600">伴侣</th>
-                        <th className="px-4 py-2.5 text-right font-semibold text-slate-600">差异</th>
+                      <tr className="bg-xia-cream/50">
+                        <th className="px-4 py-2.5 text-left font-semibold text-xia-deep/70">维度</th>
+                        <th className="px-4 py-2.5 text-right font-semibold text-xia-deep/70">自我</th>
+                        <th className="px-4 py-2.5 text-right font-semibold text-xia-deep/70">伴侣</th>
+                        <th className="px-4 py-2.5 text-right font-semibold text-xia-deep/70">差异</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-xia-haze/30">
                       {summary.comparison.dimensionDiffs.map((row) => (
                         <tr key={row.id}>
-                          <td className="px-4 py-2.5 font-medium text-slate-800">{row.name}</td>
-                          <td className="px-4 py-2.5 text-right tabular-nums text-slate-700">{row.selfSum}</td>
-                          <td className="px-4 py-2.5 text-right tabular-nums text-slate-700">{row.partnerSum}</td>
-                          <td className="px-4 py-2.5 text-right tabular-nums text-slate-700">{row.diff > 0 ? `+${row.diff}` : row.diff}</td>
+                          <td className="px-4 py-2.5 font-medium text-xia-deep">{row.name}</td>
+                          <td className="px-4 py-2.5 text-right tabular-nums text-xia-deep/80">{row.selfSum}</td>
+                          <td className="px-4 py-2.5 text-right tabular-nums text-xia-deep/80">{row.partnerSum}</td>
+                          <td className="px-4 py-2.5 text-right tabular-nums text-xia-deep/80">{row.diff > 0 ? `+${row.diff}` : row.diff}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -511,14 +514,14 @@ export default function RPIResult() {
             </>
           )}
 
-          <div className="my-10 h-px bg-slate-100" />
+          <div className="my-10 h-px bg-xia-haze/30" />
           <section>
-            <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">5</span>
+            <h2 className="flex items-center gap-2 text-lg font-bold text-xia-deep">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-xia-deep text-xs font-bold text-white">5</span>
               沟通与关系建议
             </h2>
-            <div className="mt-4 h-px bg-slate-200" />
-            <div className="mt-5 space-y-4 text-sm leading-relaxed text-slate-700">
+            <div className="mt-4 h-px bg-xia-haze/50" />
+            <div className="mt-5 space-y-4 text-sm leading-relaxed text-xia-deep/80">
               <p>· 使用「我感到…」而非「你总是…」的表达方式，减少指责感。</p>
               <p>· 对安全感与边界需求给出可执行的具体约定（如回复频率、与异性相处的底线）。</p>
               <p>· 若双方在控制、嫉妒或依赖维度上差异较大，可共同讨论各自舒适区与底线。</p>
@@ -527,14 +530,14 @@ export default function RPIResult() {
           </section>
         </div>
 
-        <div className="border-t border-slate-200 bg-gradient-to-b from-slate-50/80 to-white px-8 py-6 sm:px-12">
-          <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">声明</div>
-          <div className="mt-3 space-y-1.5 text-xs leading-relaxed text-slate-500">
+        <div className="border-t border-xia-haze bg-xia-cream/20 px-8 py-6 sm:px-12">
+          <div className="text-xs font-semibold uppercase tracking-wider text-xia-deep/50">声明</div>
+          <div className="mt-3 space-y-1.5 text-xs leading-relaxed text-xia-deep/60">
             <p>本报告依据自评/为伴侣评结果生成，仅供关系沟通与自我觉察参考，不构成任何临床诊断。数据在本地处理，不上传服务器。</p>
           </div>
-          <div className="mt-5 flex items-center justify-between border-t border-slate-200 pt-4">
-            <div className="text-[11px] text-slate-400">报告生成时间：{formatDate()} · RPI 恋爱占有欲指数</div>
-            <Link to="/rpi" className="text-xs font-medium text-slate-500 underline decoration-slate-300 underline-offset-2 hover:text-slate-800">
+          <div className="mt-5 flex items-center justify-between border-t border-xia-haze pt-4">
+            <div className="text-[11px] text-xia-deep/50">报告生成时间：{formatDate()} · RPI 恋爱占有欲指数</div>
+            <Link to="/rpi" className="text-xs font-medium text-xia-deep/60 underline decoration-xia-haze underline-offset-2 hover:text-xia-deep">
               返回测试
             </Link>
           </div>

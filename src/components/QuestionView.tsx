@@ -18,11 +18,11 @@ export default function QuestionView({
   onChange,
 }: QuestionViewProps) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
-      <div className="text-xs text-slate-400">
+    <div className="rounded-2xl border border-xia-haze bg-white p-4 shadow-sm sm:p-6">
+      <div className="text-xs text-xia-deep/50">
         题目 {index + 1}/{total}
       </div>
-      <div className="mt-2 text-base font-medium text-slate-900 sm:text-lg">
+      <div className="mt-2 text-base font-medium text-xia-deep sm:text-lg">
         {question.text}
       </div>
       <div className="mt-4 grid gap-3 md:grid-cols-5">
@@ -34,8 +34,8 @@ export default function QuestionView({
               onClick={() => onChange(option.value)}
               className={`rounded-xl border px-3 py-2 text-sm transition ${
                 checked
-                  ? 'border-slate-900 bg-slate-900 text-white'
-                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                  ? 'border-xia-deep bg-xia-deep text-white'
+                  : 'border-xia-haze bg-white text-xia-deep/70 hover:border-xia-teal/50'
               }`}
             >
               {option.label}

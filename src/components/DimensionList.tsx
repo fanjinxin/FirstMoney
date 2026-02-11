@@ -17,16 +17,16 @@ export default function DimensionList({ data }: DimensionListProps) {
       {data.map((item) => (
         <div
           key={item.id}
-          className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+          className="rounded-2xl border border-xia-haze bg-white p-5 shadow-sm"
         >
           <div className="flex items-center justify-between">
-            <div className="text-sm font-semibold text-slate-900">{item.name}</div>
-            <div className="text-sm text-slate-500">
+            <div className="text-sm font-semibold text-xia-deep">{item.name}</div>
+            <div className="text-sm text-xia-deep/60">
               均值 {item.score.toFixed(2)}
               {item.level ? ` · ${levelLabels[item.level]}` : ''}
             </div>
           </div>
-          <div className="mt-2 text-sm text-slate-600">{item.hint}</div>
+          <div className="mt-2 text-sm text-xia-deep/80">{item.hint}</div>
         </div>
       ))}
     </div>
