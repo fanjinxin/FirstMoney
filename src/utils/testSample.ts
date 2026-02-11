@@ -7,13 +7,22 @@ function randomBetween(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-export function fillSampleAnswers(testId: 'scl90' | 'rpi' | 'sri'): void {
+export function fillSampleAnswers(testId: 'scl90' | 'rpi' | 'sri' | 'animal'): void {
   if (testId === 'scl90') {
     const answers: Record<string, number> = {}
     for (let i = 1; i <= 90; i++) {
       answers[`s${i}`] = randomBetween(1, 4)
     }
     saveAnswers('scl90', answers)
+    return
+  }
+
+  if (testId === 'animal') {
+    const answers: Record<number, number> = {}
+    for (let i = 1; i <= 60; i++) {
+      answers[i] = randomBetween(0, 2)
+    }
+    saveAnswers('animal-sculpture', answers)
     return
   }
 

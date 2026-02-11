@@ -51,6 +51,21 @@ export default function Home() {
       questionCount: sriTest.questions.length,
       backgroundClass: 'bg-gradient-to-br from-xia-cream/30 via-white to-xia-haze/20',
     },
+    {
+      title: '人格动物塑测试',
+      subtitle: '精神动物原型',
+      description:
+        '通过 60 道情境选择题，探索你内心深处的动物原型。基于五大性格特质（FFM）模型，揭示你的主导动物形态与潜在特质，发现真实的自己。',
+      to: '/animal',
+      resultTo: '/animal/result',
+      testId: 'animal' as const,
+      iconUrl: 'https://twemoji.maxcdn.com/v/latest/72x72/1f981.png',
+      iconAlt: '狮子图标',
+      iconBg: 'bg-xia-cream/20',
+      duration: '约10-15分钟',
+      questionCount: 60,
+      backgroundClass: 'bg-gradient-to-br from-xia-cream/20 via-white to-xia-sky/10',
+    },
   ]
 
   return (

@@ -23,6 +23,35 @@ export default function SRITest() {
     const next = { ...answers, [currentQuestion.id]: value }
     setAnswers(next)
     saveAnswers(sriTest.id, next)
+
+    // Find next unanswered question
+    const nextUnansweredIndex = questions.findIndex(
+      (q, index) => index > current && next[q.id] === undefined
+    )
+
+    if (nextUnansweredIndex !== -1) {
+      setTimeout(() => {
+        setCurrent(nextUnansweredIndex)
+      }, 200)
+    } else if (current < total - 1) {
+       // If all subsequent questions are answered, but we are not at the end, just go to next
+       // Or we can check if there are ANY unanswered questions from the beginning
+       const firstUnansweredIndex = questions.findIndex(
+        (q) => next[q.id] === undefined
+      )
+      if (firstUnansweredIndex !== -1) {
+         setTimeout(() => {
+            setCurrent(firstUnansweredIndex)
+          }, 200)
+      } else {
+         // All answered, stay or maybe go to next if not last
+         if (current < total - 1) {
+            setTimeout(() => {
+                setCurrent(current + 1)
+              }, 200)
+         }
+      }
+    }
   }
 
   const goNext = () => setCurrent((prev) => Math.min(total - 1, prev + 1))

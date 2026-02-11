@@ -11,6 +11,7 @@ const navItems = [
   { name: 'SCL-90', path: '/scl90' },
   { name: 'RPI', path: '/rpi' },
   { name: 'SRI', path: '/sri' },
+  { name: '动物塑', path: '/animal' },
 ]
 
 export default function Layout({ children }: LayoutProps) {

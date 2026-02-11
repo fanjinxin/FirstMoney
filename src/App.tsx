@@ -7,6 +7,8 @@ import RPITest from './pages/rpi/RPITest'
 import RPIResult from './pages/rpi/RPIResult'
 import SRITest from './pages/sri/SRITest'
 import SRIResult from './pages/sri/SRIResult'
+import AnimalTest from './pages/animal/AnimalTest'
+import AnimalResult from './pages/animal/AnimalResult'
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
         <Route path="/rpi/result" element={<RPIResult />} />
         <Route path="/sri" element={<SRITest />} />
         <Route path="/sri/result" element={<SRIResult />} />
+        <Route path="/animal" element={<AnimalTest />} />
+        <Route path="/animal/result" element={<AnimalResult />} />
       </Routes>
     </Layout>
   )

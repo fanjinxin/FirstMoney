@@ -15,7 +15,7 @@ type TestCardProps = {
   /** 测试阶段：结果页路径，与 testId 同时传入时显示「测试：直接看结果」按钮 */
   resultTo?: string
   /** 测试阶段：测评 id，用于填充示例答案 */
-  testId?: 'scl90' | 'rpi' | 'sri'
+  testId?: 'scl90' | 'rpi' | 'sri' | 'animal'
 }
 
 export default function TestCard({
