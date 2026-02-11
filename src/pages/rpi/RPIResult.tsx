@@ -39,6 +39,14 @@ function formatDate() {
 
 function DimensionRow({ d }: { d: RpiDimensionScore }) {
   const pct = Math.min((d.scoreSum / 25) * 100, 100)
+  const barClass =
+    d.level === 'low'
+      ? 'from-emerald-400 to-emerald-500'
+      : d.level === 'moderate'
+        ? 'from-blue-400 to-blue-500'
+        : d.level === 'high'
+          ? 'from-amber-400 to-amber-500'
+          : 'from-red-400 to-red-500'
   return (
     <div className="flex items-center gap-4 border-b border-slate-100 py-3 last:border-0">
       <div className="min-w-0 flex-1">
@@ -56,9 +64,7 @@ function DimensionRow({ d }: { d: RpiDimensionScore }) {
       </div>
       <div className="h-2 w-24 overflow-hidden rounded-full bg-slate-100">
         <div
-          className={`h-full rounded-full ${
-            d.level === 'low' ? 'bg-emerald-400' : d.level === 'moderate' ? 'bg-blue-400' : d.level === 'high' ? 'bg-amber-400' : 'bg-red-400'
-          }`}
+          className={`h-full rounded-full bg-gradient-to-r ${barClass}`}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -68,7 +74,7 @@ function DimensionRow({ d }: { d: RpiDimensionScore }) {
 
 function PerspectiveBlock({ title, summary }: { title: string; summary: RpiPerspectiveSummary }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-rose-50/50 p-6 shadow-sm">
       <div className="flex items-center justify-between border-b border-slate-100 pb-4">
         <h3 className="text-base font-bold text-slate-900">{title}</h3>
         <div className={`rounded-lg border px-3 py-1.5 text-sm font-bold ${getTotalLevelStyle(summary.levelLabel)}`}>
@@ -186,9 +192,11 @@ export default function RPIResult() {
         </div>
       )}
 
-      <div ref={reportRef} className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
-        <div className="border-b-2 border-slate-800 bg-slate-900 px-4 py-6 text-white sm:px-8 sm:py-8 md:px-12">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div ref={reportRef} className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+        <div className="relative overflow-hidden border-b-2 border-slate-800 bg-gradient-to-br from-rose-950 via-slate-900 to-slate-900 px-4 py-6 text-white sm:px-8 sm:py-8 md:px-12">
+          <div className="pointer-events-none absolute -right-16 -top-12 h-40 w-40 rounded-full bg-rose-400/20 blur-3xl" />
+          <div className="pointer-events-none absolute -left-20 top-8 h-32 w-32 rounded-full bg-indigo-400/20 blur-3xl" />
+          <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <div className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Romantic Possessiveness Index</div>
               <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">RPI 恋爱占有欲指数测试</h1>
@@ -220,7 +228,7 @@ export default function RPIResult() {
           </div>
         </div>
 
-        <div className="border-b border-slate-200 bg-slate-50/50 px-4 py-5 sm:px-8 md:px-12">
+        <div className="border-b border-slate-200 bg-gradient-to-b from-slate-50/80 to-white px-4 py-5 sm:px-8 md:px-12">
           <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">报告日期</div>
@@ -252,7 +260,7 @@ export default function RPIResult() {
               RPI 从四个维度评估恋爱占有欲：控制欲望、嫉妒强度、情感依赖、关系不安全感。每维度 5 题，维度分为 5 题之和（5–25 分），总分为四维度之和（20–100 分）。等级划分：1–25 低占有欲、26–50 适中、51–75 偏高、76–100 极高。
             </p>
             {!hasSelf || !hasPartner ? (
-              <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50/60 px-5 py-4 text-sm text-amber-800">
+              <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50/70 px-5 py-4 text-sm text-amber-800">
                 {hasSelf
                   ? `伴侣视角已作答 ${partnerAnswered}/20，完成后可生成对比报告。`
                   : `自我视角已作答 ${selfAnswered}/20，完成后可生成对比报告。`}
@@ -260,20 +268,20 @@ export default function RPIResult() {
             ) : null}
             <div className="mt-6 flex flex-wrap gap-4">
               {hasSelf && summary.self && (
-                <div className={`rounded-lg border px-5 py-4 ${getTotalLevelStyle(summary.self.levelLabel)}`}>
+                <div className={`rounded-2xl border px-5 py-4 shadow-sm ${getTotalLevelStyle(summary.self.levelLabel)}`}>
                   <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">自我视角</div>
                   <div className="mt-1 text-xl font-bold">{summary.self.total} 分 · {summary.self.levelLabel}</div>
                 </div>
               )}
               {hasPartner && summary.partner && (
-                <div className={`rounded-lg border px-5 py-4 ${getTotalLevelStyle(summary.partner.levelLabel)}`}>
+                <div className={`rounded-2xl border px-5 py-4 shadow-sm ${getTotalLevelStyle(summary.partner.levelLabel)}`}>
                   <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">伴侣视角</div>
                   <div className="mt-1 text-xl font-bold">{summary.partner.total} 分 · {summary.partner.levelLabel}</div>
                 </div>
               )}
             </div>
             <div className="mt-6 grid gap-4 lg:grid-cols-3">
-              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-rose-50/60 p-5 shadow-sm">
                 <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">自我视角突出维度</div>
                 <div className="mt-2 text-base font-semibold text-slate-900">
                   {selfTop ? selfTop.name : '暂无数据'}
@@ -282,7 +290,7 @@ export default function RPIResult() {
                   {selfTop ? `得分 ${selfTop.scoreSum} · ${selfTop.levelLabel}` : `完成度 ${selfAnswered}/20`}
                 </div>
               </div>
-              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-rose-50/60 p-5 shadow-sm">
                 <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">伴侣视角突出维度</div>
                 <div className="mt-2 text-base font-semibold text-slate-900">
                   {partnerTop ? partnerTop.name : '暂无数据'}
@@ -291,7 +299,7 @@ export default function RPIResult() {
                   {partnerTop ? `得分 ${partnerTop.scoreSum} · ${partnerTop.levelLabel}` : `完成度 ${partnerAnswered}/20`}
                 </div>
               </div>
-              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-rose-50/60 p-5 shadow-sm">
                 <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">视角差异最大</div>
                 <div className="mt-2 text-base font-semibold text-slate-900">
                   {maxDiff ? maxDiff.name : '需完成双视角'}
@@ -318,21 +326,21 @@ export default function RPIResult() {
                   <button
                     type="button"
                     onClick={() => setView('both')}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition ${view === 'both' ? 'bg-slate-900 text-white' : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition ${view === 'both' ? 'bg-gradient-to-r from-slate-900 to-slate-700 text-white shadow-sm' : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}
                   >
                     双视角
                   </button>
                   <button
                     type="button"
                     onClick={() => setView('self')}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition ${view === 'self' ? 'bg-slate-900 text-white' : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition ${view === 'self' ? 'bg-gradient-to-r from-slate-900 to-slate-700 text-white shadow-sm' : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}
                   >
                     自我视角
                   </button>
                   <button
                     type="button"
                     onClick={() => setView('partner')}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition ${view === 'partner' ? 'bg-slate-900 text-white' : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition ${view === 'partner' ? 'bg-gradient-to-r from-slate-900 to-slate-700 text-white shadow-sm' : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}
                   >
                     伴侣视角
                   </button>
@@ -360,7 +368,7 @@ export default function RPIResult() {
                 </h2>
                 <div className="mt-4 h-px bg-slate-200" />
                 <p className="mt-5 text-sm leading-relaxed text-slate-700">{summary.comparison.summary}</p>
-                <div className="mt-5 overflow-x-auto rounded-lg border border-slate-200">
+                <div className="mt-5 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
                   <table className="min-w-[520px] w-full text-sm">
                     <thead>
                       <tr className="bg-slate-50">
@@ -402,7 +410,7 @@ export default function RPIResult() {
           </section>
         </div>
 
-        <div className="border-t border-slate-200 bg-slate-50/80 px-8 py-6 sm:px-12">
+        <div className="border-t border-slate-200 bg-gradient-to-b from-slate-50/80 to-white px-8 py-6 sm:px-12">
           <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">声明</div>
           <div className="mt-3 space-y-1.5 text-xs leading-relaxed text-slate-500">
             <p>本报告依据自评/为伴侣评结果生成，仅供关系沟通与自我觉察参考，不构成任何临床诊断。数据在本地处理，不上传服务器。</p>

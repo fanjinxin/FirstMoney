@@ -50,6 +50,16 @@ function formatDate() {
 
 function DimensionRow({ d }: { d: SriDimensionScore }) {
   const pct = Math.min((d.score / 5) * 100, 100)
+  const barClass =
+    d.level === 'veryLow'
+      ? 'from-emerald-400 to-emerald-500'
+      : d.level === 'low'
+        ? 'from-blue-400 to-blue-500'
+        : d.level === 'mid'
+          ? 'from-slate-400 to-slate-500'
+          : d.level === 'high'
+            ? 'from-amber-400 to-amber-500'
+            : 'from-red-400 to-red-500'
   return (
     <div className="flex items-center gap-4 border-b border-slate-100 py-3 last:border-0">
       <div className="min-w-0 flex-1">
@@ -69,9 +79,7 @@ function DimensionRow({ d }: { d: SriDimensionScore }) {
       </div>
       <div className="h-2 w-24 overflow-hidden rounded-full bg-slate-100">
         <div
-          className={`h-full rounded-full ${
-            d.level === 'veryLow' ? 'bg-emerald-400' : d.level === 'low' ? 'bg-blue-400' : d.level === 'mid' ? 'bg-slate-400' : d.level === 'high' ? 'bg-amber-400' : 'bg-red-400'
-          }`}
+          className={`h-full rounded-full bg-gradient-to-r ${barClass}`}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -179,9 +187,11 @@ export default function SRIResult() {
         </div>
       )}
 
-      <div ref={reportRef} className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
-        <div className="border-b-2 border-slate-800 bg-slate-900 px-4 py-6 text-white sm:px-8 sm:py-8 md:px-12">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div ref={reportRef} className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+        <div className="relative overflow-hidden border-b-2 border-slate-800 bg-gradient-to-br from-amber-950 via-slate-900 to-slate-900 px-4 py-6 text-white sm:px-8 sm:py-8 md:px-12">
+          <div className="pointer-events-none absolute -right-16 -top-12 h-40 w-40 rounded-full bg-amber-400/20 blur-3xl" />
+          <div className="pointer-events-none absolute -left-20 top-8 h-32 w-32 rounded-full bg-sky-400/20 blur-3xl" />
+          <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <div className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Sexual Repression Index</div>
               <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">SRI 性压抑指数测试</h1>
@@ -213,7 +223,7 @@ export default function SRIResult() {
           </div>
         </div>
 
-        <div className="border-b border-slate-200 bg-slate-50/50 px-4 py-5 sm:px-8 md:px-12">
+        <div className="border-b border-slate-200 bg-gradient-to-b from-slate-50/80 to-white px-4 py-5 sm:px-8 md:px-12">
           <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">报告日期</div>
@@ -244,39 +254,39 @@ export default function SRIResult() {
             <p className="mt-5 text-sm leading-relaxed text-slate-700">
               SRI 从四个维度评估性压抑程度：欲望表达（能否自然表达需求与界限）、观念冲突（内心“应该”与“想要”的冲突）、情绪紧张（羞耻与焦虑）、行为抑制（回避与压抑行为）。指数 0–100，越高表示压抑程度越高。等级：0–20 很低、20–40 偏低、40–60 中等、60–80 偏高、80–100 很高。
             </p>
-            <div className={`mt-6 rounded-lg border px-5 py-4 ${getTotalLevelStyle(summary.levelLabel)}`}>
+            <div className={`mt-6 rounded-2xl border px-5 py-4 shadow-sm ${getTotalLevelStyle(summary.levelLabel)}`}>
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">性压抑指数</div>
                   <div className="mt-1 text-2xl font-bold">{summary.totalIndex} 分 · {summary.levelLabel}</div>
                 </div>
-                <div className="h-12 w-32 overflow-hidden rounded-full bg-white/60">
+                <div className="h-12 w-32 overflow-hidden rounded-full bg-white/70">
                   <div
-                    className="h-full rounded-full bg-slate-800 transition-all"
+                    className="h-full rounded-full bg-gradient-to-r from-amber-500 via-rose-500 to-pink-500 transition-all"
                     style={{ width: `${summary.totalIndex}%` }}
                   />
                 </div>
               </div>
             </div>
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-amber-50/60 p-5 shadow-sm">
                 <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">总体指数</div>
                 <div className="mt-2 text-xl font-bold text-slate-900">{summary.totalIndex}</div>
                 <div className="mt-1 text-sm text-slate-500">0–100（越高越压抑）</div>
               </div>
-              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-amber-50/60 p-5 shadow-sm">
                 <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">等级</div>
                 <div className="mt-2 text-xl font-bold text-slate-900">{summary.levelLabel}</div>
                 <div className="mt-1 text-sm text-slate-500">五等级评估</div>
               </div>
-              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-amber-50/60 p-5 shadow-sm">
                 <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">最高维度</div>
                 <div className="mt-2 text-base font-semibold text-slate-900">{topDimension?.name ?? '暂无'}</div>
                 <div className="mt-1 text-sm text-slate-500">
                   {topDimension ? `均分 ${topDimension.score.toFixed(2)} · ${topDimension.levelLabel}` : '等待完成'}
                 </div>
               </div>
-              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-amber-50/60 p-5 shadow-sm">
                 <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">完成度</div>
                 <div className="mt-2 text-base font-semibold text-slate-900">{answeredCount}/48</div>
                 <div className="mt-1 text-sm text-slate-500">全部题目已完成</div>
@@ -292,16 +302,21 @@ export default function SRIResult() {
               四维度得分
             </h2>
             <div className="mt-4 h-px bg-slate-200" />
-            <div className="mt-5 overflow-hidden rounded-lg border border-slate-200">
+            <div className="mt-5 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
               {summary.dimensionScores.map((d) => (
                 <DimensionRow key={d.id} d={d} />
               ))}
             </div>
-            <div className="mt-6 w-full overflow-hidden rounded-xl border border-slate-200 bg-white p-4">
-              <div className="mb-2 text-sm font-semibold text-slate-900">四维度均分（1–5，越高越压抑）</div>
+            <div className="mt-6 w-full overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-amber-50/60 p-4 shadow-sm">
+              <div className="mb-2 flex items-center justify-between text-sm font-semibold text-slate-900">
+                四维度均分（1–5，越高越压抑）
+                <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-semibold text-amber-700">
+                  柱状图
+                </span>
+              </div>
               <div className="h-[200px] w-full sm:h-[240px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
+                  <BarChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 8 }} barSize={28}>
                     <CartesianGrid strokeDasharray="4 4" stroke="#E2E8F0" />
                     <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                     <YAxis domain={[1, 5]} tick={{ fontSize: 11 }} />
@@ -330,7 +345,7 @@ export default function SRIResult() {
             </p>
 
             <div className="mt-6 space-y-6">
-              <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-5">
+              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-amber-50/60 p-5 shadow-sm">
                 <h3 className="text-sm font-bold text-slate-800">突出维度（得分最高的 3 个）</h3>
                 <ul className="mt-2 space-y-2 text-sm text-slate-600">
                   {summary.top3Dimensions.map((d, i) => (
@@ -341,7 +356,7 @@ export default function SRIResult() {
                 </ul>
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-5">
+              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-amber-50/60 p-5 shadow-sm">
                 <h3 className="text-sm font-bold text-slate-800">观念与表达</h3>
                 <p className="mt-2 text-sm text-slate-600">
                   {conflictHigh && expressionHigh
@@ -354,7 +369,7 @@ export default function SRIResult() {
                 </p>
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-5">
+              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-amber-50/60 p-5 shadow-sm">
                 <h3 className="text-sm font-bold text-slate-800">情绪与行为</h3>
                 <p className="mt-2 text-sm text-slate-600">
                   {anxietyInhibitionHigh
@@ -363,7 +378,7 @@ export default function SRIResult() {
                 </p>
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-5">
+              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-amber-50/60 p-5 shadow-sm">
                 <h3 className="text-sm font-bold text-slate-800">综合视角</h3>
                 <p className="mt-2 text-sm text-slate-600">
                   {summary.totalIndex >= 60
@@ -393,7 +408,7 @@ export default function SRIResult() {
           </section>
         </div>
 
-        <div className="border-t border-slate-200 bg-slate-50/80 px-4 py-6 sm:px-8 md:px-12">
+        <div className="border-t border-slate-200 bg-gradient-to-b from-slate-50/80 to-white px-4 py-6 sm:px-8 md:px-12">
           <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">声明</div>
           <div className="mt-3 space-y-1.5 text-xs leading-relaxed text-slate-500">
             <p>本报告依据自评结果生成，仅供自我探索与沟通参考，不构成任何临床诊断。数据在本地处理，不上传服务器。</p>

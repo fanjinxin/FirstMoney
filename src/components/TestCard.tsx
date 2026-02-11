@@ -59,7 +59,7 @@ export default function TestCard({
     >
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white via-white/60 to-slate-50 opacity-0 transition duration-300 group-hover:opacity-100" />
       <Link to={to} className="relative flex flex-1 flex-col focus:outline-none">
-        <div className="relative mb-5 flex items-center justify-between">
+        <div className="relative mb-4 flex items-center justify-between sm:mb-5">
           <div
             className={`flex h-11 w-11 items-center justify-center rounded-2xl ${iconBg} shadow-sm transition duration-300 group-hover:scale-105 sm:h-12 sm:w-12`}
           >
@@ -70,19 +70,19 @@ export default function TestCard({
               loading="lazy"
             />
           </div>
-          <div className="rounded-full bg-slate-900/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+          <div className="rounded-full bg-slate-900/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500 sm:px-3 sm:text-[11px]">
             {subtitle}
           </div>
         </div>
-        <div className="relative text-lg font-semibold text-slate-900 sm:text-xl">{title}</div>
-        <p className="mt-3 text-sm leading-relaxed text-slate-600">{description}</p>
+        <div className="relative text-base font-semibold text-slate-900 sm:text-xl">{title}</div>
+        <p className="mt-2 text-sm leading-relaxed text-slate-600 sm:mt-3">{description}</p>
         {metaText ? (
-          <div className="mt-4 inline-flex items-center rounded-full bg-slate-900/5 px-3 py-1 text-xs font-semibold text-slate-600">
+          <div className="mt-3 inline-flex items-center rounded-full bg-slate-900/5 px-3 py-1 text-xs font-semibold text-slate-600 sm:mt-4">
             {metaText}
           </div>
         ) : null}
       </Link>
-      <div className="relative mt-auto flex flex-wrap items-center gap-3 pt-6">
+      <div className="relative mt-auto flex flex-wrap items-center gap-2 pt-5 sm:gap-3 sm:pt-6">
         <Link
           to={to}
           className="text-sm font-medium text-slate-900 underline-offset-2 hover:underline"

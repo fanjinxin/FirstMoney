@@ -237,11 +237,13 @@ export default function SCL90Result() {
       {/* ===== Report Paper ===== */}
       <div
         ref={reportRef}
-        className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg"
+        className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
       >
         {/* ── Report Header ── */}
-        <div className="border-b-2 border-slate-800 bg-slate-900 px-4 py-6 text-white sm:px-8 sm:py-8 md:px-12">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="relative overflow-hidden border-b-2 border-slate-800 bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-900 px-4 py-6 text-white sm:px-8 sm:py-8 md:px-12">
+          <div className="pointer-events-none absolute -right-16 -top-12 h-40 w-40 rounded-full bg-indigo-400/20 blur-3xl" />
+          <div className="pointer-events-none absolute -left-20 top-8 h-32 w-32 rounded-full bg-sky-400/20 blur-3xl" />
+          <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <div className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
                 Psychological Assessment Report
@@ -291,7 +293,7 @@ export default function SCL90Result() {
         </div>
 
         {/* ── Report Meta ── */}
-        <div className="border-b border-slate-200 bg-slate-50/50 px-4 py-5 sm:px-8 md:px-12">
+        <div className="border-b border-slate-200 bg-gradient-to-b from-slate-50/80 to-white px-4 py-5 sm:px-8 md:px-12">
           <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
@@ -323,22 +325,22 @@ export default function SCL90Result() {
         {/* ── Report Body ── */}
         <div className="px-4 py-6 sm:px-8 sm:py-8 md:px-12">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-indigo-50/60 p-5 shadow-sm">
               <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">总分</div>
               <div className="mt-2 text-2xl font-bold text-slate-900">{summary.basic.totalScore}</div>
               <div className="mt-1 text-sm text-slate-500">范围 90–450</div>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-indigo-50/60 p-5 shadow-sm">
               <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">综合结论</div>
               <div className="mt-2 text-xl font-bold text-slate-900">{summary.basic.totalLevel}</div>
               <div className="mt-1 text-sm text-slate-500">总均分 {summary.basic.avgTotal.toFixed(2)}</div>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-indigo-50/60 p-5 shadow-sm">
               <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">阳性项目</div>
               <div className="mt-2 text-xl font-bold text-slate-900">{summary.basic.positiveCount}</div>
               <div className="mt-1 text-sm text-slate-500">占比 {positiveRatio}%</div>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-indigo-50/60 p-5 shadow-sm">
               <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">最高因子</div>
               <div className="mt-2 text-base font-semibold text-slate-900">{topFactor?.name ?? '暂无'}</div>
               <div className="mt-1 text-sm text-slate-500">
@@ -377,7 +379,7 @@ export default function SCL90Result() {
               </p>
 
               <div
-                className={`mt-4 rounded-lg border px-5 py-4 ${getTotalLevelStyle(summary.basic.totalLevel)}`}
+                className={`mt-4 rounded-2xl border px-5 py-4 shadow-sm ${getTotalLevelStyle(summary.basic.totalLevel)}`}
               >
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-bold">综合评估结论：</span>
@@ -392,7 +394,7 @@ export default function SCL90Result() {
             </div>
 
             {/* 核心指标表格 */}
-            <div className="mt-6 overflow-x-auto rounded-lg border border-slate-200">
+            <div className="mt-6 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
               <table className="min-w-[520px] w-full text-sm">
                 <thead>
                   <tr className="bg-slate-50">
@@ -475,7 +477,7 @@ export default function SCL90Result() {
             </p>
 
             {/* 因子得分表 */}
-            <div className="mt-5 overflow-x-auto rounded-lg border border-slate-200">
+            <div className="mt-5 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
               <table className="min-w-[640px] w-full text-sm">
                 <thead>
                   <tr className="bg-slate-50">
@@ -697,7 +699,7 @@ export default function SCL90Result() {
         </div>
 
         {/* ── Report Footer ── */}
-        <div className="border-t border-slate-200 bg-slate-50/80 px-4 py-6 sm:px-8 md:px-12">
+        <div className="border-t border-slate-200 bg-gradient-to-b from-slate-50/80 to-white px-4 py-6 sm:px-8 md:px-12">
           <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">
             重要声明
           </div>

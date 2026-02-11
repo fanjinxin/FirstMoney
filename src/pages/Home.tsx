@@ -54,46 +54,46 @@ export default function Home() {
   ]
 
   return (
-    <div className="space-y-12 animate-fade-in">
-      <section className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50 p-10 shadow-sm">
+    <div className="space-y-8 animate-fade-in sm:space-y-12">
+      <section className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50 p-6 shadow-sm sm:p-10">
         <div className="pointer-events-none absolute -right-12 top-6 h-40 w-40 rounded-full bg-sky-400/20 blur-3xl animate-glow" />
         <div className="pointer-events-none absolute -left-16 -top-20 h-48 w-48 rounded-full bg-rose-400/20 blur-3xl animate-glow" />
         <div className="relative grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="max-w-2xl space-y-5">
-            <div className="inline-flex items-center gap-2 rounded-full bg-slate-900/5 px-4 py-2 text-xs font-semibold tracking-widest text-slate-500">
+            <div className="inline-flex items-center gap-2 rounded-full bg-slate-900/5 px-3 py-1.5 text-[11px] font-semibold tracking-widest text-slate-500 sm:px-4 sm:py-2 sm:text-xs">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
               轻量心理测评 · 即开即测
             </div>
-            <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">
+            <h1 className="text-2xl font-semibold leading-tight text-slate-900 sm:text-4xl">
               更酷的测评体验，快速获得多维度洞察
             </h1>
             <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
               更直观的流程、更清晰的反馈、更有节奏的体验感，帮助你专注于真实感受。
               测试结果将以图表与建议结合的方式呈现。
             </p>
-            <div className="flex flex-wrap gap-3 text-xs font-medium text-slate-600">
+            <div className="flex flex-wrap gap-2 text-[11px] font-medium text-slate-600 sm:gap-3 sm:text-xs">
               <span className="rounded-full bg-white/70 px-3 py-1 shadow-sm">即时解析</span>
               <span className="rounded-full bg-white/70 px-3 py-1 shadow-sm">多维度雷达</span>
               <span className="rounded-full bg-white/70 px-3 py-1 shadow-sm">隐私友好</span>
             </div>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-            <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-sm backdrop-blur">
+          <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-1">
+            <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-4 shadow-sm backdrop-blur sm:p-5">
               <div className="text-xs font-semibold uppercase tracking-widest text-slate-400">
                 测评亮点
               </div>
-              <div className="mt-3 text-lg font-semibold text-slate-900">
+              <div className="mt-2 text-base font-semibold text-slate-900 sm:mt-3 sm:text-lg">
                 自动生成个性化建议
               </div>
               <p className="mt-2 text-sm text-slate-600">
                 根据作答节奏与内容趋势，输出更贴合的提示与行动建议。
               </p>
             </div>
-            <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-sm backdrop-blur">
+            <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-4 shadow-sm backdrop-blur sm:p-5">
               <div className="text-xs font-semibold uppercase tracking-widest text-slate-400">
                 报告格式
               </div>
-              <div className="mt-3 flex items-center gap-3 text-sm font-medium text-slate-700">
+              <div className="mt-2 flex items-center gap-3 text-sm font-medium text-slate-700 sm:mt-3">
                 <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900/5 text-base">
                   📊
                 </span>
@@ -107,7 +107,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-3">
+      <section className="grid gap-4 sm:gap-6 md:grid-cols-3">
         {tests.map((test) => (
           <TestCard key={test.to} {...test} />
         ))}
