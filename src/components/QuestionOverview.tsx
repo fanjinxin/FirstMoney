@@ -16,7 +16,7 @@ export default function QuestionOverview({
   onSelect,
 }: QuestionOverviewProps) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
       <div className="flex items-center justify-between text-sm font-semibold text-slate-900">
         <span>{title}</span>
         <span className="text-xs font-medium text-slate-500">

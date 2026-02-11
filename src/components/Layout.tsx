@@ -16,13 +16,13 @@ export default function Layout({ children }: LayoutProps) {
   const location = useLocation()
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    <div className="app-layout min-h-screen bg-slate-50">
+      <header className="border-b border-slate-200 bg-white print:hidden">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <Link to="/" className="text-lg font-semibold tracking-tight text-slate-900">
             心理测评中心
           </Link>
-          <nav className="flex items-center gap-4 text-sm text-slate-600">
+          <nav className="flex flex-wrap items-center gap-2 text-sm text-slate-600 sm:gap-4">
             {navItems.map((item) => {
               const active = location.pathname === item.path
               return (
@@ -42,9 +42,11 @@ export default function Layout({ children }: LayoutProps) {
           </nav>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-6xl px-6 py-10">{children}</main>
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto max-w-6xl px-6 py-6 text-xs text-slate-500">
+      <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10 print:max-w-none print:px-0 print:py-0">
+        {children}
+      </main>
+      <footer className="border-t border-slate-200 bg-white print:hidden">
+        <div className="mx-auto max-w-6xl px-4 py-6 text-xs text-slate-500 sm:px-6">
           提示：本项目为演示版，量表题库需替换为授权内容。
         </div>
       </footer>

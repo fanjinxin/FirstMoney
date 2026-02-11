@@ -4,12 +4,16 @@ import { scl90Test } from '../data/scl90'
 import { sriTest } from '../data/sri'
 
 export default function Home() {
+  // 首页测评卡片：统一结构（title / subtitle / description / to / iconUrl / iconAlt / iconBg / duration / questionCount / backgroundClass），新测评按此格式添加即可
   const tests = [
     {
       title: 'SCL-90 心理健康自评量表',
       subtitle: '综合心理评估',
-      description: '覆盖情绪、躯体与人际等多维指标，适合自我了解与压力觉察。',
+      description:
+        '评估最近一周的身心症状与心理困扰程度，涵盖躯体化、焦虑、抑郁、强迫、人际敏感、敌对、恐怖、偏执等 10 个因子，帮助了解情绪与压力状态，适合自我筛查与觉察。',
       to: '/scl90',
+      resultTo: '/scl90/result',
+      testId: 'scl90' as const,
       iconUrl: 'https://twemoji.maxcdn.com/v/latest/72x72/1f9e0.png',
       iconAlt: '大脑图标',
       iconBg: 'bg-sky-500/10',
@@ -20,24 +24,30 @@ export default function Home() {
     {
       title: 'RPI 恋爱占有欲指数测试',
       subtitle: '双视角关系评估',
-      description: '支持自我视角与伴侣视角，帮助理解亲密关系中的安全感与边界。',
+      description:
+        '评估亲密关系中的占有欲与安全感，支持自我视角与伴侣视角，帮助理解边界与依赖程度，适合情侣或对关系质量有好奇的个体。',
       to: '/rpi',
+      resultTo: '/rpi/result',
+      testId: 'rpi' as const,
       iconUrl: 'https://twemoji.maxcdn.com/v/latest/72x72/2764-fe0f.png',
       iconAlt: '爱心图标',
       iconBg: 'bg-rose-500/10',
-      duration: '约6-8分钟',
+      duration: '约10-15分钟',
       questionCount: rpiTest.questions.length,
       backgroundClass: 'bg-gradient-to-br from-rose-50 via-white to-amber-50',
     },
     {
       title: 'SRI 性压抑指数测试',
       subtitle: '亲密表达评估',
-      description: '关注表达与自我接纳，适用于亲密沟通与自我理解。',
+      description:
+        '评估在性与亲密表达上的压抑程度与自我接纳水平，关注态度、表达与舒适度，适用于想了解自身亲密表达与自我理解的成年人。',
       to: '/sri',
+      resultTo: '/sri/result',
+      testId: 'sri' as const,
       iconUrl: 'https://twemoji.maxcdn.com/v/latest/72x72/1f511.png',
       iconAlt: '钥匙图标',
       iconBg: 'bg-amber-500/15',
-      duration: '约6-8分钟',
+      duration: '约15-25分钟',
       questionCount: sriTest.questions.length,
       backgroundClass: 'bg-gradient-to-br from-amber-50 via-white to-emerald-50',
     },

@@ -70,3 +70,22 @@ body {
 .animate-glow {
   animation: glow 6s ease-in-out infinite;
 }
+
+/* 报告打印样式：仅打印报告内容，可“另存为 PDF” */
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .app-layout main {
+    padding: 0;
+  }
+
+  .scl90-report-page .print\\:hidden {
+    display: none !important;
+  }
+
+  .scl90-report-page a[href*="/scl90"] {
+    display: none;
+  }
+}

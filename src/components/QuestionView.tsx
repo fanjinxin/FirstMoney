@@ -18,11 +18,11 @@ export default function QuestionView({
   onChange,
 }: QuestionViewProps) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
       <div className="text-xs text-slate-400">
         题目 {index + 1}/{total}
       </div>
-      <div className="mt-2 text-base font-medium text-slate-900">
+      <div className="mt-2 text-base font-medium text-slate-900 sm:text-lg">
         {question.text}
       </div>
       <div className="mt-4 grid gap-3 md:grid-cols-5">
