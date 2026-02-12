@@ -12,6 +12,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+import { User } from 'lucide-react'
 import { reportDownloadRequiresPayment } from '../../config/feature'
 import { sriReverseScoreIds, sriTest } from '../../data/sri'
 import { calculateSriScores, SriDimensionScore } from '../../utils/scoring'
@@ -276,12 +277,7 @@ export default function SRIResult() {
               </div>
               <div className="flex justify-center">
                 <div className="flex h-28 w-28 items-center justify-center rounded-3xl bg-xia-cream shadow-[0_12px_24px_rgba(44,111,122,0.18)] sm:h-32 sm:w-32">
-                  <img
-                    src="https://twemoji.maxcdn.com/v/latest/72x72/1f9d1.png"
-                    alt="人物插画"
-                    className="h-16 w-16 sm:h-20 sm:w-20"
-                    loading="lazy"
-                  />
+                  <User className="h-16 w-16 text-xia-teal/80 sm:h-20 sm:w-20" aria-hidden />
                 </div>
               </div>
                 </div>
@@ -468,9 +464,12 @@ export default function SRIResult() {
           <div className="mt-3 space-y-1.5 text-xs leading-relaxed text-xia-teal/80">
             <p>本报告依据自评结果生成，仅供自我探索与沟通参考，不构成任何临床诊断。数据在本地处理，不上传服务器。</p>
           </div>
-          <div className="mt-5 flex items-center justify-between border-t border-xia-haze pt-4">
+          <div className="mt-5 flex flex-col gap-3 border-t border-xia-haze pt-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="text-[11px] text-xia-teal/60">报告生成时间：{formatDate()} · SRI 性压抑指数</div>
-            <Link to="/sri" className="text-xs font-medium text-xia-teal underline decoration-xia-haze underline-offset-2 hover:text-xia-deep">返回测试</Link>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+              <Link to="/sri" className="text-xs font-medium text-xia-teal underline decoration-xia-haze underline-offset-2 hover:text-xia-deep">返回测试</Link>
+              <Link to="/" className="text-xs font-medium text-xia-teal underline decoration-xia-haze underline-offset-2 hover:text-xia-deep">返回首页</Link>
+            </div>
           </div>
         </div>
       </div>

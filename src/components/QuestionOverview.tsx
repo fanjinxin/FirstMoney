@@ -25,11 +25,11 @@ export default function QuestionOverview({
       </div>
       <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-xia-deep/60">
         <span className="inline-flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full bg-xia-teal" />
+          <span className="h-2 w-2 rounded-full bg-xia-sky" />
           已作答
         </span>
         <span className="inline-flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full bg-xia-haze/50" />
+          <span className="h-2 w-2 rounded-full bg-xia-haze" />
           未作答
         </span>
         <span className="inline-flex items-center gap-1">
@@ -46,8 +46,8 @@ export default function QuestionOverview({
           const stateClass = isCurrent
             ? 'border-xia-deep bg-xia-deep text-white'
             : answered
-              ? 'border-xia-mint/50 bg-xia-mint/20 text-xia-teal hover:border-xia-mint'
-              : 'border-xia-haze bg-white text-xia-deep/50 hover:border-xia-teal/50'
+              ? 'border-xia-sky/50 bg-xia-sky/20 text-xia-sky hover:border-xia-sky'
+              : 'border-xia-haze bg-white text-xia-deep/50 hover:border-xia-sky/50'
 
           return (
             <button

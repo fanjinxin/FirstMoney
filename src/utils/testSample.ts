@@ -7,7 +7,7 @@ function randomBetween(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-export function fillSampleAnswers(testId: 'scl90' | 'rpi' | 'sri' | 'animal'): void {
+export function fillSampleAnswers(testId: 'scl90' | 'rpi' | 'sri' | 'animal' | 'mbti' | 'aat' | 'psych-age' | 'apt' | 'hit' | 'dth' | 'tla' | 'fft' | 'ybt' | 'rvt' | 'lbt' | 'mpt' | 'vbt' | 'city'): void {
   if (testId === 'scl90') {
     const answers: Record<string, number> = {}
     for (let i = 1; i <= 90; i++) {
@@ -44,6 +44,110 @@ export function fillSampleAnswers(testId: 'scl90' | 'rpi' | 'sri' | 'animal'): v
       answers[`sri-${i}`] = randomBetween(1, 5)
     }
     saveAnswers('sri', answers)
+    return
+  }
+
+  if (testId === 'mbti') {
+    const answers: Record<string, number> = {}
+    for (let i = 1; i <= 90; i++) {
+      answers[`mbti-${i}`] = randomBetween(0, 4) // 5点量表
+    }
+    saveAnswers('mbti', answers)
+    return
+  }
+
+  if (testId === 'aat') {
+    const answers: Record<string, number> = {}
+    for (let i = 1; i <= 118; i++) {
+      answers[String(i)] = randomBetween(0, 2) // 三选一
+    }
+    saveAnswers('aat', answers)
+    return
+  }
+
+  if (testId === 'psych-age') {
+    const answers: Record<string, number> = {}
+    for (let i = 1; i <= 30; i++) {
+      answers[String(i)] = randomBetween(0, 2) // 是/吃不准/否
+    }
+    saveAnswers('psych-age', answers)
+    return
+  }
+
+  if (testId === 'apt') {
+    const answers: Record<string, number> = {}
+    for (let i = 1; i <= 60; i++) answers[String(i)] = randomBetween(1, 5)
+    saveAnswers('apt', answers)
+    return
+  }
+
+  if (testId === 'hit') {
+    const answers: Record<string, number> = {}
+    for (let i = 1; i <= 90; i++) answers[String(i)] = randomBetween(0, 1) // 是/否
+    saveAnswers('hit', answers)
+    return
+  }
+
+  if (testId === 'dth') {
+    const answers: Record<string, number> = {}
+    for (let i = 1; i <= 70; i++) answers[String(i)] = randomBetween(1, 5)
+    saveAnswers('dth', answers)
+    return
+  }
+
+  if (testId === 'tla') {
+    const answers: Record<string, number> = {}
+    for (let i = 1; i <= 52; i++) answers[String(i)] = randomBetween(1, 5)
+    saveAnswers('tla', answers)
+    return
+  }
+
+  if (testId === 'fft') {
+    const answers: Record<string, number> = {}
+    for (let i = 1; i <= 54; i++) answers[String(i)] = randomBetween(0, 2)
+    saveAnswers('fft', answers)
+    return
+  }
+
+  if (testId === 'ybt') {
+    const answers: Record<string, number> = {}
+    for (let i = 1; i <= 40; i++) answers[String(i)] = randomBetween(1, 5)
+    saveAnswers('ybt', answers)
+    return
+  }
+
+  if (testId === 'rvt') {
+    const answers: Record<string, number> = {}
+    for (let i = 1; i <= 36; i++) answers[String(i)] = randomBetween(1, 5)
+    saveAnswers('rvt', answers)
+    return
+  }
+
+  if (testId === 'lbt') {
+    const answers: Record<string, number> = {}
+    for (let i = 1; i <= 20; i++) answers[String(i)] = randomBetween(1, 5)
+    saveAnswers('lbt', answers)
+    return
+  }
+
+  if (testId === 'mpt') {
+    const answers: Record<string, number> = {}
+    for (let i = 1; i <= 68; i++) answers[String(i)] = randomBetween(1, 5)
+    saveAnswers('mpt', answers)
+    return
+  }
+
+  if (testId === 'vbt') {
+    const answers: Record<string, number> = {}
+    for (let i = 1; i <= 40; i++) answers[String(i)] = randomBetween(1, 5)
+    saveAnswers('vbt', answers)
+    return
+  }
+
+  if (testId === 'city') {
+    const answers: Record<string, number> = {}
+    for (let i = 1; i <= 45; i++) answers[String(i)] = randomBetween(1, 5)
+    saveAnswers('city', answers)
     return
   }
 }

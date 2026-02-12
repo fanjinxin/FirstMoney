@@ -14,7 +14,7 @@ export const sriReverseScoreIds: string[] = [
  * SRI 性压抑指数测试（完整版）
  * 四维度：欲望表达、观念冲突、情绪紧张、行为抑制
  * 每题 1–5 分（部分反向计分），总分换算为 0–100；等级：很低(0–20)、偏低(20–40)、中等(40–60)、偏高(60–80)、很高(80–100)
- * 参考：SIS/SES 双控制模型、性内疚/羞耻相关研究
+ * 性与亲密表达自评工具
  */
 export const sriTest: TestConfig = {
   id: 'sri',

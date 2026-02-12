@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
 import { reportDownloadRequiresPayment } from '../../config/feature'
+import { BarChart2 } from 'lucide-react'
 import FactorBarChart from '../../components/FactorBarChart'
 import FactorRadarChart from '../../components/FactorRadarChart'
 import SymptomPieChart from '../../components/SymptomPieChart'
@@ -387,7 +388,7 @@ export default function SCL90Result() {
                             </div>
                          </div>
                          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
-                            <img src="https://twemoji.maxcdn.com/v/latest/72x72/1f4ca.png" alt="Stats" className="h-6 w-6 opacity-80" />
+                            <BarChart2 className="h-6 w-6 text-xia-deep/80" aria-hidden />
                          </div>
                       </div>
 
@@ -783,16 +784,21 @@ export default function SCL90Result() {
               若出现自伤、自杀想法或严重情绪失控等紧急状况，请立即拨打心理援助热线或前往最近的医疗机构急诊。
             </p>
           </div>
-          <div className="mt-5 flex items-center justify-between border-t border-xia-haze pt-4">
+          <div className="mt-5 flex flex-col gap-3 border-t border-xia-haze pt-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="text-[11px] text-xia-deep/50">
               报告生成时间：{formatDate()} · SCL-90 心理健康筛查评估
             </div>
-            <Link
-              to="/scl90"
-              className="text-xs font-medium text-xia-teal/80 underline decoration-xia-haze/50 underline-offset-2 transition hover:text-xia-deep"
-            >
-              返回测试
-            </Link>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+              <Link
+                to="/scl90"
+                className="text-xs font-medium text-xia-teal/80 underline decoration-xia-haze/50 underline-offset-2 transition hover:text-xia-deep"
+              >
+                返回测试
+              </Link>
+              <Link to="/" className="text-xs font-medium text-xia-teal/80 underline decoration-xia-haze/50 underline-offset-2 transition hover:text-xia-deep">
+                返回首页
+              </Link>
+            </div>
           </div>
         </div>
       </div>

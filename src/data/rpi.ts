@@ -4,7 +4,7 @@ import { TestConfig } from '../types'
  * RPI 恋爱占有欲指数测试（40 题双视角完整版）
  * 四大维度：控制欲望、嫉妒强度、情感依赖、关系不安全感
  * 每维度每视角 5 题，维度分 5–25，总分 20–100；等级：低 1–25、适中 26–50、偏高 51–75、极高 76–100
- * 参考：Bowlby 依恋理论、White/Mullen 浪漫嫉妒研究、Spann/Fischer 共依赖模型
+ * 恋爱占有欲与关系自评工具
  */
 export const rpiTest: TestConfig = {
   id: 'rpi',

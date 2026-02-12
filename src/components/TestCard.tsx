@@ -6,8 +6,8 @@ type TestCardProps = {
   subtitle: string
   description: string
   to: string
-  iconUrl: string
-  iconAlt: string
+  /** Lucide 图标组件（替代原 iconUrl/iconAlt） */
+  icon: React.ReactNode
   iconBg: string
   backgroundClass?: string
   duration?: string
@@ -15,7 +15,7 @@ type TestCardProps = {
   /** 测试阶段：结果页路径，与 testId 同时传入时显示「测试：直接看结果」按钮 */
   resultTo?: string
   /** 测试阶段：测评 id，用于填充示例答案 */
-  testId?: 'scl90' | 'rpi' | 'sri' | 'animal'
+  testId?: 'scl90' | 'rpi' | 'sri' | 'animal' | 'mbti' | 'aat' | 'psych-age' | 'apt' | 'hit' | 'dth' | 'tla' | 'fft' | 'ybt' | 'rvt' | 'lbt' | 'mpt' | 'vbt' | 'city'
 }
 
 export default function TestCard({
@@ -23,8 +23,7 @@ export default function TestCard({
   subtitle,
   description,
   to,
-  iconUrl,
-  iconAlt,
+  icon,
   iconBg,
   backgroundClass,
   duration,
@@ -61,14 +60,9 @@ export default function TestCard({
       <Link to={to} className="relative flex flex-1 flex-col focus:outline-none">
         <div className="relative mb-4 flex items-center justify-between sm:mb-5">
           <div
-            className={`flex h-11 w-11 items-center justify-center rounded-2xl ${iconBg} shadow-sm transition duration-300 group-hover:scale-105 sm:h-12 sm:w-12`}
+            className={`flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl ${iconBg} shadow-sm transition duration-300 group-hover:scale-105 sm:h-12 sm:w-12 [&>svg]:h-6 [&>svg]:w-6 sm:[&>svg]:h-7 sm:[&>svg]:w-7 [&>img]:h-full [&>img]:w-full [&>img]:object-contain`}
           >
-            <img
-              src={iconUrl}
-              alt={iconAlt}
-              className="h-6 w-6 animate-float sm:h-7 sm:w-7"
-              loading="lazy"
-            />
+            {icon}
           </div>
           <div className="rounded-full bg-xia-deep/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-xia-deep/60 sm:px-3 sm:text-[11px]">
             {subtitle}

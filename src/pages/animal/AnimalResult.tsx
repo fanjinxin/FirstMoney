@@ -1,8 +1,8 @@
-
 import { useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
+import AnimalIcon from '../../components/AnimalIcon'
 import {
   PolarAngleAxis,
   PolarGrid,
@@ -145,12 +145,12 @@ export default function AnimalResult() {
       {/* Report Content */}
       <div 
         ref={reportRef} 
-        className="overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-xia-haze/30"
+        className="rounded-3xl bg-white shadow-xl ring-1 ring-xia-haze/30"
       >
         {/* Header */}
-        <div className="bg-gradient-to-br from-xia-sky/20 via-xia-cream/30 to-white px-6 py-10 sm:px-12 sm:py-16 text-center">
-          <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-lg sm:h-32 sm:w-32">
-            <span className="text-6xl sm:text-8xl">{mainAnimal.emoji}</span>
+        <div className="rounded-t-3xl bg-gradient-to-br from-xia-sky/20 via-xia-cream/30 to-white px-6 py-10 sm:px-12 sm:py-16 text-center">
+          <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-white p-3 shadow-lg sm:h-32 sm:w-32 sm:p-4">
+            <AnimalIcon animalId={mainAnimal.id} size="md" className=" shrink-0 text-xia-deep/80" />
           </div>
           <div className="text-sm font-semibold uppercase tracking-[0.3em] text-xia-deep/50">
             您的精神动物是
@@ -271,8 +271,8 @@ export default function AnimalResult() {
           <section className="mb-10">
             <h2 className="mb-6 text-xl font-bold text-xia-deep">潜在特质：第二动物形态</h2>
             <div className="flex items-start gap-6 rounded-2xl border border-xia-haze/50 bg-xia-cream/10 p-6 sm:p-8">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm sm:h-20 sm:w-20">
-                <span className="text-4xl sm:text-5xl">{secondaryAnimal.emoji}</span>
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm overflow-hidden sm:h-20 sm:w-20">
+                <AnimalIcon animalId={secondaryAnimal.id} size="md" className="text-xia-deep/80" />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-xia-deep">{secondaryAnimal.name}</h3>
@@ -341,6 +341,11 @@ export default function AnimalResult() {
         <div className="border-t border-xia-haze bg-xia-cream/20 px-6 py-6 sm:px-12 text-center text-xs text-xia-deep/50">
           <p>报告生成时间：{formatDate()} · 动物塑性格测试</p>
           <p className="mt-2">本测试基于FFM五因素模型与动物心理学趣味映射，结果仅供娱乐与参考。</p>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+            <Link to="/animal" className="text-sm font-medium text-xia-teal underline-offset-2 hover:text-xia-deep">返回测验</Link>
+            <span className="text-xia-haze">·</span>
+            <Link to="/" className="text-sm font-medium text-xia-teal underline-offset-2 hover:text-xia-deep">返回首页</Link>
+          </div>
         </div>
       </div>
     </div>

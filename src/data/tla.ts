@@ -1,0 +1,82 @@
+/**
+ * TLA 年上年下恋爱测试
+ * 共 52 题，4 维度：年上倾向、年下倾向、照顾欲、被照顾欲
+ * 每题 5 点量表
+ */
+
+export const TLA_TEST_ID = 'tla'
+
+export const TLA_DIMENSIONS = [
+  { id: 'older', name: '年上倾向', qStart: 1, qEnd: 13 },
+  { id: 'younger', name: '年下倾向', qStart: 14, qEnd: 26 },
+  { id: 'care', name: '照顾欲', qStart: 27, qEnd: 39 },
+  { id: 'cared', name: '被照顾欲', qStart: 40, qEnd: 52 },
+] as const
+
+export type TLADimensionId = (typeof TLA_DIMENSIONS)[number]['id']
+
+export interface TLAQuestion {
+  id: number
+  text: string
+  dimension: TLADimensionId
+  reverse: boolean
+}
+
+export const tlaQuestions: TLAQuestion[] = [
+  // 1-13 年上倾向
+  { id: 1, text: '我更容易被比自己年长的人吸引。', dimension: 'older', reverse: false },
+  { id: 2, text: '我认为年长的伴侣更有魅力和安全感。', dimension: 'older', reverse: false },
+  { id: 3, text: '我喜欢与人生经验更丰富的人交往。', dimension: 'older', reverse: false },
+  { id: 4, text: '年长的人更能理解我。', dimension: 'older', reverse: false },
+  { id: 5, text: '我倾向于选择比自己大几岁的伴侣。', dimension: 'older', reverse: false },
+  { id: 6, text: '年龄差距不会影响我对一个人的好感。', dimension: 'older', reverse: true },
+  { id: 7, text: '成熟稳重的气质对我很有吸引力。', dimension: 'older', reverse: false },
+  { id: 8, text: '我更愿意与年长的人建立亲密关系。', dimension: 'older', reverse: false },
+  { id: 9, text: '我不在意伴侣是否比我大。', dimension: 'older', reverse: true },
+  { id: 10, text: '年长的人往往更懂得如何经营关系。', dimension: 'older', reverse: false },
+  { id: 11, text: '我容易被有阅历的人吸引。', dimension: 'older', reverse: false },
+  { id: 12, text: '年龄比我小的人很难让我心动。', dimension: 'older', reverse: false },
+  { id: 13, text: '我认为年上恋更有安全感。', dimension: 'older', reverse: false },
+  // 14-26 年下倾向
+  { id: 14, text: '我更容易对比自己年轻的人产生好感。', dimension: 'younger', reverse: false },
+  { id: 15, text: '年轻活力的人对我很有吸引力。', dimension: 'younger', reverse: false },
+  { id: 16, text: '我喜欢与充满朝气的人相处。', dimension: 'younger', reverse: false },
+  { id: 17, text: '年龄比我小的人更能让我放松。', dimension: 'younger', reverse: false },
+  { id: 18, text: '我倾向于选择比自己小几岁的伴侣。', dimension: 'younger', reverse: false },
+  { id: 19, text: '年长的人让我感到有压力。', dimension: 'younger', reverse: false },
+  { id: 20, text: '年轻人的单纯和直率很吸引我。', dimension: 'younger', reverse: false },
+  { id: 21, text: '我更愿意与年轻的人建立亲密关系。', dimension: 'younger', reverse: false },
+  { id: 22, text: '我不介意伴侣比我小很多。', dimension: 'younger', reverse: false },
+  { id: 23, text: '年轻的人往往更有激情和活力。', dimension: 'younger', reverse: false },
+  { id: 24, text: '我容易被青春阳光的人吸引。', dimension: 'younger', reverse: false },
+  { id: 25, text: '年龄比我大的人很难让我心动。', dimension: 'younger', reverse: false },
+  { id: 26, text: '我认为年下恋更有新鲜感。', dimension: 'younger', reverse: false },
+  // 27-39 照顾欲
+  { id: 27, text: '我喜欢照顾伴侣的日常。', dimension: 'care', reverse: false },
+  { id: 28, text: '为对方付出让我有成就感。', dimension: 'care', reverse: false },
+  { id: 29, text: '我乐于在关系中扮演保护者的角色。', dimension: 'care', reverse: false },
+  { id: 30, text: '我不太喜欢被对方照顾。', dimension: 'care', reverse: true },
+  { id: 31, text: '帮助伴侣解决问题让我感到满足。', dimension: 'care', reverse: false },
+  { id: 32, text: '我倾向于主动关心对方的生活。', dimension: 'care', reverse: false },
+  { id: 33, text: '我更愿意做付出更多的那一方。', dimension: 'care', reverse: false },
+  { id: 34, text: '被依赖让我感到被需要。', dimension: 'care', reverse: false },
+  { id: 35, text: '我喜欢给对方提供建议和指导。', dimension: 'care', reverse: false },
+  { id: 36, text: '照顾别人不会让我感到负担。', dimension: 'care', reverse: false },
+  { id: 37, text: '我享受在关系中担任"家长"角色。', dimension: 'care', reverse: false },
+  { id: 38, text: '我希望伴侣能依赖我。', dimension: 'care', reverse: false },
+  { id: 39, text: '付出比索取更能让我满足。', dimension: 'care', reverse: false },
+  // 40-52 被照顾欲
+  { id: 40, text: '我希望伴侣能照顾我的生活。', dimension: 'cared', reverse: false },
+  { id: 41, text: '被对方关心让我感到幸福。', dimension: 'cared', reverse: false },
+  { id: 42, text: '我乐于在关系中扮演被保护的角色。', dimension: 'cared', reverse: false },
+  { id: 43, text: '我不太喜欢照顾对方。', dimension: 'cared', reverse: true },
+  { id: 44, text: '对方为我付出让我感到被爱。', dimension: 'cared', reverse: false },
+  { id: 45, text: '我倾向于期待对方主动关心我。', dimension: 'cared', reverse: false },
+  { id: 46, text: '我更愿意做被呵护的那一方。', dimension: 'cared', reverse: false },
+  { id: 47, text: '被需要让我感到安全。', dimension: 'cared', reverse: false },
+  { id: 48, text: '我喜欢听取对方的建议和指导。', dimension: 'cared', reverse: false },
+  { id: 49, text: '被照顾不会让我感到不自在。', dimension: 'cared', reverse: false },
+  { id: 50, text: '我享受在关系中担任"被宠"角色。', dimension: 'cared', reverse: false },
+  { id: 51, text: '我希望伴侣能包容我。', dimension: 'cared', reverse: false },
+  { id: 52, text: '索取比付出更能让我满足。', dimension: 'cared', reverse: false },
+]
