@@ -1,0 +1,12 @@
+.rpi-bar-wrap {
+  border-radius: 24rpx; border: 2rpx solid rgba(var(--xia-deep-rgb), 0.12);
+  background: rgba(255,255,255,0.95); padding: 32rpx;
+  box-shadow: 0 8rpx 16rpx rgba(var(--xia-deep-rgb), 0.06);
+}
+.rpi-bar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24rpx; flex-wrap: wrap; gap: 16rpx; }
+.rpi-bar-title { font-size: 28rpx; font-weight: 600; color: var(--xia-deep); }
+.rpi-bar-legend { display: flex; gap: 24rpx; font-size: 22rpx; color: var(--xia-deep); }
+.rpi-legend-item { display: flex; align-items: center; gap: 8rpx; }
+.rpi-legend-dot { width: 16rpx; height: 16rpx; border-radius: 50%; }
+.rpi-dot-self { background: var(--xia-teal); }
+.rpi-dot-partner { background: var(--xia-aqua); }

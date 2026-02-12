@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "nav-header": "/components/nav-header/nav-header",
+    "theme-switcher": "/components/theme-switcher/theme-switcher"
+  },
+  "navigationBarTitleText": "SCL-90 心理健康自评"
+}

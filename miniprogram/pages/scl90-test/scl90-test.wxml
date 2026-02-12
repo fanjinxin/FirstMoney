@@ -1,0 +1,109 @@
+<!-- SCL-90 选择页面 - 逐行移植自 src/pages/scl90/SCL90Test.tsx -->
+<view class="page-wrap scl90-page" style="{{themeStyle}}">
+  <nav-header currentPath="/scl90"></nav-header>
+
+  <!-- space-y-8 主容器 -->
+  <view class="scl90-main" wx:if="{{test}}">
+    <!-- space-y-4: SectionHeader + 描述 -->
+    <view class="scl90-header-block">
+      <view class="section-header">
+        <view class="section-header-title">{{test.title}}</view>
+        <view class="section-header-desc" wx:if="{{test.subtitle}}">{{test.subtitle}}</view>
+      </view>
+      <view class="scl90-desc">{{test.description}}</view>
+    </view>
+
+    <!-- grid: 左列 2fr + 右列 1fr，移动端堆叠 -->
+    <view class="scl90-grid">
+      <!-- 左列 space-y-6 -->
+      <view class="scl90-left">
+        <!-- ProgressBar -->
+        <view class="scl90-progress-wrap">
+          <view class="scl90-progress-bar" style="width: {{progress}}%"></view>
+        </view>
+
+        <!-- QuestionView -->
+        <view class="scl90-question-card" wx:if="{{currentQ}}">
+          <view class="scl90-q-meta">题目 {{current + 1}}/{{total}}</view>
+          <view class="scl90-q-text">{{currentQ.text}}</view>
+          <view class="scl90-options-grid">
+            <view
+              wx:for="{{test.options}}"
+              wx:key="value"
+              class="scl90-opt {{answers[currentQ.id] === item.value ? 'scl90-opt-selected' : ''}}"
+              data-value="{{item.value}}"
+              bindtap="onSelect"
+            >{{item.label}}</view>
+          </view>
+        </view>
+
+        <!-- nav: flex items-center justify-between -->
+        <view class="scl90-nav-row">
+          <button
+            class="scl90-btn-prev"
+            disabled="{{current === 0}}"
+            bindtap="goPrev"
+          >上一题</button>
+          <view class="scl90-progress-text">已完成 {{answeredCount}}/{{total}}</view>
+          <button
+            class="scl90-btn-next"
+            disabled="{{current >= total - 1}}"
+            bindtap="goNext"
+          >下一题</button>
+        </view>
+
+        <!-- 查看分析结果 按钮 -->
+        <button
+          class="scl90-btn-submit {{canSubmit ? '' : 'scl90-btn-submit-disabled'}}"
+          disabled="{{!canSubmit}}"
+          bindtap="onSubmit"
+        >查看分析结果</button>
+      </view>
+
+      <!-- 右列 aside: 作答提示 + QuestionOverview -->
+      <view class="scl90-right">
+        <!-- aside: rounded-2xl border border-xia-haze bg-white p-6 shadow-sm -->
+        <view class="scl90-tips-card">
+          <view class="scl90-tips-title">作答提示</view>
+          <view class="scl90-tips-list">
+            <view wx:for="{{test.instructions}}" wx:key="*this" class="scl90-tips-item">• {{item}}</view>
+          </view>
+        </view>
+
+        <!-- QuestionOverview -->
+        <view class="scl90-overview-card">
+          <view class="scl90-overview-header">
+            <text class="scl90-overview-title">题目总览</text>
+            <text class="scl90-overview-count">已答 {{answeredCount}}/{{total}}</text>
+          </view>
+          <view class="scl90-overview-legend">
+            <view class="scl90-legend-item">
+              <view class="scl90-legend-dot scl90-dot-answered"></view>
+              <text>已作答</text>
+            </view>
+            <view class="scl90-legend-item">
+              <view class="scl90-legend-dot scl90-dot-unanswered"></view>
+              <text>未作答</text>
+            </view>
+            <view class="scl90-legend-item">
+              <view class="scl90-legend-dot scl90-dot-current"></view>
+              <text>当前题</text>
+            </view>
+          </view>
+          <view class="scl90-overview-grid">
+            <view
+              wx:for="{{questions}}"
+              wx:for-item="q"
+              wx:key="id"
+              class="scl90-overview-btn {{current === index ? 'scl90-overview-current' : (answers[q.id] !== undefined ? 'scl90-overview-answered' : 'scl90-overview-unanswered')}}"
+              data-index="{{index}}"
+              bindtap="onOverviewTap"
+            >{{index + 1}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <theme-switcher bindthemechange="onThemeChange"></theme-switcher>
+</view>

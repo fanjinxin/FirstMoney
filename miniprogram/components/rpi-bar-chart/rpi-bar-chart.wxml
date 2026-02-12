@@ -1,0 +1,10 @@
+<view class="rpi-bar-wrap">
+  <view class="rpi-bar-header">
+    <text class="rpi-bar-title">四维度得分（5–25 分）</text>
+    <view class="rpi-bar-legend">
+      <view class="rpi-legend-item"><view class="rpi-legend-dot rpi-dot-self"></view><text>自我</text></view>
+      <view class="rpi-legend-item"><view class="rpi-legend-dot rpi-dot-partner"></view><text>伴侣</text></view>
+    </view>
+  </view>
+  <canvas type="2d" class="rpi-bar-canvas" style="width:100%;height:200px;"></canvas>
+</view>

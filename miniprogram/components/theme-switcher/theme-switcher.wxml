@@ -1,0 +1,24 @@
+<view class="theme-switcher">
+  <view wx:if="{{isOpen}}" class="theme-panel">
+    <view class="theme-panel-header">
+      <text class="theme-panel-title">选择主题 (Select Theme)</text>
+      <view class="theme-panel-close" bindtap="onToggle">✕</view>
+    </view>
+    <view class="theme-list">
+      <view 
+        wx:for="{{themes}}" 
+        wx:key="id"
+        class="theme-item {{currentThemeId === item.id ? 'active' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="onSelectTheme"
+      >
+        <view class="theme-preview" style="background: linear-gradient(135deg, {{item.colors.sky}} 0%, {{item.colors.aqua}} 50%, {{item.colors.mint}} 100%);"></view>
+        <text class="theme-name">{{item.name}}</text>
+        <view wx:if="{{currentThemeId === item.id}}" class="theme-check">✓</view>
+      </view>
+    </view>
+  </view>
+  <view class="theme-trigger" bindtap="onToggle">
+    <view class="theme-trigger-icon"></view>
+  </view>
+</view>

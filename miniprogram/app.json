@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/scl90-test/scl90-test","pages/rpi-test/rpi-test","pages/animal-test/animal-test","pages/test/test",
+    "pages/result/result"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "心理测评中心",
+    "navigationBarTextStyle": "black"
+  }
+}

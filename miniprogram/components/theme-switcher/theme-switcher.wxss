@@ -1,0 +1,111 @@
+.theme-switcher {
+  position: fixed;
+  bottom: 48rpx;
+  right: 48rpx;
+  z-index: 999;
+}
+
+.theme-panel {
+  position: absolute;
+  bottom: 120rpx;
+  right: 0;
+  width: 560rpx;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 32rpx;
+  border: 2rpx solid rgba(207, 239, 240, 0.5);
+  padding: 32rpx;
+  box-shadow: 0 16rpx 48rpx rgba(0, 0, 0, 0.12);
+}
+
+.theme-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.theme-panel-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--xia-deep);
+}
+
+.theme-panel-close {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: rgba(15, 76, 92, 0.5);
+}
+
+.theme-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.theme-item {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 24rpx;
+  border-radius: 24rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.2s;
+}
+
+.theme-item.active {
+  border-color: var(--xia-teal);
+  background: rgba(44, 111, 122, 0.05);
+}
+
+.theme-preview {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2rpx solid rgba(0, 0, 0, 0.05);
+}
+
+.theme-name {
+  flex: 1;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--xia-deep);
+}
+
+.theme-check {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: var(--xia-teal);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+}
+
+.theme-trigger {
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 8rpx 24rpx rgba(15, 76, 92, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-trigger-icon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--xia-sky), var(--xia-aqua), var(--xia-mint));
+  border: 4rpx solid #fff;
+  box-shadow: 0 0 0 4rpx var(--xia-haze);
+}

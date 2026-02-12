@@ -1,0 +1,11 @@
+.scl90-bar-wrap {
+  border-radius: 32rpx;
+  border: 2rpx solid rgba(var(--xia-deep-rgb), 0.12);
+  background: rgba(255,255,255,0.9);
+  padding: 32rpx;
+  box-shadow: 0 8rpx 16rpx rgba(var(--xia-deep-rgb), 0.06);
+}
+
+.scl90-bar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24rpx; }
+.scl90-bar-title { font-size: 28rpx; font-weight: 600; color: var(--xia-deep); }
+.scl90-bar-tag { border-radius: 999rpx; background: rgba(var(--xia-deep-rgb), 0.06); padding: 8rpx 20rpx; font-size: 22rpx; font-weight: 600; color: var(--xia-deep); border: 2rpx solid rgba(var(--xia-deep-rgb), 0.15); }
