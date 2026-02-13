@@ -38,12 +38,16 @@ function getDTHDominantDimension(scores) {
   return sorted[0]?.id || 'mach';
 }
 
+/** 说明模块文案（与 web 版一致） */
+const DTH_DISCLAIMER = '黑暗三角为心理学研究概念，用于描述人格中与权谋、自恋、冷漠冲动相关的特质。本测验仅供自我觉察与教育参考，不用于临床诊断。若结果令你困扰，建议咨询专业心理咨询师。';
+
 module.exports = {
   DTH_LEVEL_LABELS,
   DTH_OVERALL_CONCLUSIONS,
   DTH_PROFILE_HINTS,
   DTH_DIMENSION_BY_LEVEL,
   DTH_DIMENSION_INSIGHTS,
+  DTH_DISCLAIMER,
   getDTHOverallLevel,
   getDTHDominantDimension,
 };
