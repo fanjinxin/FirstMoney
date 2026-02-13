@@ -29,11 +29,10 @@ function getCanvasSize(canvasId) {
 
 function drawRadar(page, canvasId, data, colors, maxValue) {
   if (!data || data.length === 0) return;
-  setTimeout(() => {
-    const [w, h] = getCanvasSize(canvasId);
+  const doDraw = (w, h) => {
     const ctx = wx.createCanvasContext(canvasId, page);
     const cx = w / 2, cy = h / 2, n = data.length;
-    const maxR = Math.min(w, h) / 2 - 48;
+    const maxR = Math.min(w, h) / 2 - 24;
     const getPoint = (i, r) => {
       const angle = (Math.PI * 2 / n) * i - Math.PI / 2;
       return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
@@ -84,6 +83,19 @@ function drawRadar(page, canvasId, data, colors, maxValue) {
       ctx.fillText(name, p.x, p.y);
     }
     ctx.draw();
+  };
+  setTimeout(() => {
+    const query = wx.createSelectorQuery().in(page);
+    query.select('.result-radar-canvas').boundingClientRect().exec((res) => {
+      let w, h;
+      if (res && res[0] && res[0].width && res[0].height) {
+        w = res[0].width;
+        h = res[0].height;
+      } else {
+        [w, h] = getCanvasSize(canvasId);
+      }
+      doDraw(w, h);
+    });
   }, 500);
 }
 

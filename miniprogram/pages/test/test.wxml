@@ -1,7 +1,11 @@
 <view class="page-wrap" style="{{themeStyle}}" wx:if="{{config}}">
   <view class="header card">
     <view class="header-row">
-      <view>
+      <view class="test-header-icon-wrap test-icon-{{config.iconBg}}" wx:if="{{config.iconType}}">
+        <image wx:if="{{config.iconType === 'huolande'}}" class="test-header-icon" src="/assets/huolande-icon.png" mode="aspectFit"></image>
+        <image wx:else class="test-header-icon" src="/assets/icons/{{config.iconType}}.svg" mode="aspectFit"></image>
+      </view>
+      <view class="test-header-text">
         <view class="section-title">{{config.title}}</view>
         <view class="section-subtitle">{{config.subtitle}}</view>
       </view>

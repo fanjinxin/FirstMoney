@@ -2,7 +2,37 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: 24rpx;
 }
+
+.test-header-icon-wrap {
+  width: 72rpx;
+  height: 72rpx;
+  flex-shrink: 0;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.test-header-icon {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.test-header-text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 复用首页图标背景色 */
+.test-icon-sky { background: rgba(var(--xia-sky-rgb), 0.2); }
+.test-icon-mint { background: rgba(var(--xia-mint-rgb), 0.2); }
+.test-icon-aqua { background: rgba(var(--xia-aqua-rgb), 0.2); }
+.test-icon-cream { background: rgba(var(--xia-cream-rgb), 0.9); }
+.test-icon-deep { background: rgba(var(--xia-deep-rgb), 0.1); }
+.test-icon-haze { background: rgba(var(--xia-haze-rgb), 0.3); }
 
 .page-wrap {
   min-height: 100vh;

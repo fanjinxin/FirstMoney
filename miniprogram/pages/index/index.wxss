@@ -59,6 +59,7 @@
 }
 
 .hero-divider-top {
+  margin-top: 24rpx;
   margin-bottom: 20rpx;
 }
 

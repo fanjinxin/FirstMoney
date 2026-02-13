@@ -411,8 +411,8 @@
 .scl90-legend-item { display: flex; align-items: center; gap: 12rpx; }
 .scl90-legend-dot { width: 16rpx; height: 16rpx; border-radius: 50%; }
 .scl90-bar-wrap { margin-top: 40rpx; }
-.result-chart-canvas { width: 320px !important; max-width: 100%; display: block; }
-.fft-chart-canvas { width: 320px !important; max-width: 100%; display: block; }
+.result-chart-canvas, .result-radar-canvas { width: 320px !important; max-width: 100%; display: block; margin: 0 auto; }
+.fft-chart-canvas { width: 320px !important; max-width: 100%; display: block; margin: 0 auto; }
 
 /* 全局：图表/卡片容器不超出屏幕 */
 .chart-wrap, .radar-wrap, .bar-wrap,
@@ -822,6 +822,13 @@
   padding: 64rpx 32rpx;
   text-align: center;
 }
+.mbti-avatar-wrap {
+  width: 160rpx; height: 160rpx; margin: 0 auto 32rpx;
+  border-radius: 50%; overflow: hidden; background: #fff;
+  box-shadow: 0 8rpx 24rpx rgba(var(--xia-deep-rgb), 0.12);
+  display: flex; align-items: center; justify-content: center; padding: 16rpx;
+}
+.mbti-avatar-img { width: 100%; height: 100%; }
 .mbti-header-sub { font-size: 26rpx; font-weight: 600; letter-spacing: 0.2em; color: rgba(var(--xia-deep-rgb), 0.5); }
 .mbti-header-title { font-size: 48rpx; font-weight: 700; color: var(--xia-deep); margin-top: 16rpx; }
 .mbti-header-en { font-size: 26rpx; color: rgba(var(--xia-deep-rgb), 0.6); margin-top: 8rpx; }
@@ -1488,7 +1495,7 @@
 .fft-score-cell:not(.fft-score-primary):not(.fft-score-secondary) { background: rgba(var(--xia-haze-rgb), 0.3); color: rgba(var(--xia-deep-rgb), 0.7); }
 .fft-score-emoji { flex-shrink: 0; font-size: 24rpx; }
 .fft-score-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.fft-score-pct { flex-shrink: 0; font-weight: 600; tabular-nums; }
+.fft-score-pct { flex-shrink: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
 
 /* Body 区域 */
 .fft-body { padding: 48rpx 32rpx; overflow: hidden; max-width: 100%; }

@@ -43,6 +43,7 @@ Page({
     mbtiInsight: null,
     mbtiPoleLabels: null,
     mbtiReport: null,
+    mbtiAvatarSrc: '',
     aatReport: null,
     psychAgeReport: null,
     aptReport: null,
@@ -944,7 +945,8 @@ Page({
       };
     }
 
-    this.setData({ testId, result, themeStyle: getThemeStyle(theme) || '', scl90Report, sriReport, rpiReport, lbtReport, animalReport, mbtiInsight, mbtiPoleLabels, mbtiReport, aatReport, psychAgeReport, aptReport, hitReport, dthReport, tlaReport, fftReport, ybtReport, rvtReport, mptReport, vbtReport, cityReport, chartColors: buildChartColors(theme) }, () => {
+    const mbtiAvatarSrc = (testId === 'mbti' && result?.type) ? `/assets/mbti/${result.type.toLowerCase()}.svg` : '';
+    this.setData({ testId, result, mbtiAvatarSrc, themeStyle: getThemeStyle(theme) || '', scl90Report, sriReport, rpiReport, lbtReport, animalReport, mbtiInsight, mbtiPoleLabels, mbtiReport, aatReport, psychAgeReport, aptReport, hitReport, dthReport, tlaReport, fftReport, ybtReport, rvtReport, mptReport, vbtReport, cityReport, chartColors: buildChartColors(theme) }, () => {
       this.scheduleChartsDraw();
     });
   },

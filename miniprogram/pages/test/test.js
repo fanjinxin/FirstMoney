@@ -1,4 +1,5 @@
 const { getTestConfig } = require('../../data/index');
+const { TESTS } = require('../../data/tests');
 const { saveAnswers, loadAnswers, clearAnswers } = require('../../utils/storage');
 const { THEMES, getThemeStyle } = require('../../data/themes');
 
@@ -18,7 +19,11 @@ Page({
   },
   onLoad(options) {
     const testId = options.testId || '';
-    const config = getTestConfig(testId);
+    let config = getTestConfig(testId);
+    const cardMeta = TESTS.find(t => t.id === testId);
+    if (config && cardMeta) {
+      config = { ...config, iconType: cardMeta.iconType, iconBg: cardMeta.iconBg };
+    }
     if (!config) {
       const saved = wx.getStorageSync('app-theme-id') || 'summer-mint';
       const theme = THEMES.find(t => t.id === saved) || THEMES.find(t => t.id === 'summer-mint');

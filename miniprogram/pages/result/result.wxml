@@ -84,7 +84,7 @@
           <view class="scl90-section-title"><view class="scl90-section-num">1</view>可视化分析</view>
           <view class="scl90-section-desc">通过图表快速了解十因子整体轮廓、症状分布与因子强弱排序。</view>
           <view class="scl90-charts-row">
-            <view class="scl90-chart-left"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="scl90-chart-left"><canvas canvas-id="result-radar" class="result-chart-canvas result-radar-canvas" style="width:100%;height:280px;"></canvas></view>
             <view class="scl90-chart-right"><canvas canvas-id="result-pie" class="result-chart-canvas" style="width:100%;height:260px;"></canvas><view class="scl90-pie-legend"><view wx:for="{{scl90Report.symptomDist}}" wx:key="name" class="scl90-legend-item"><view class="scl90-legend-dot" style="background:{{(chartColors && chartColors.palette && chartColors.palette[index % 5]) || ['#7FBFE1','#68D4DB','#98E6E2','#2C6F7A','#0F4C5C'][index % 5]}}"></view><text>{{item.name}}</text></view></view></view>
           </view>
           <view class="scl90-bar-wrap"><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
@@ -228,7 +228,7 @@
         <view class="aat-section">
           <view class="aat-section-title">可视化分析</view>
           <view class="aat-charts-row">
-            <view class="aat-radar-wrap"><view class="aat-chart-title">十二因子雷达图</view><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="aat-radar-wrap"><view class="aat-chart-title">十二因子雷达图</view><canvas canvas-id="result-radar" class="result-chart-canvas result-radar-canvas" style="width:100%;height:280px;"></canvas></view>
             <view class="aat-bar-wrap"><view class="aat-chart-title">因子得分排序（由高到低）</view><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
           </view>
         </view>
@@ -329,7 +329,7 @@
         <view class="psych-age-section">
           <view class="psych-age-section-title">可视化分析</view>
           <view class="psych-age-chart-row">
-            <view class="psych-age-radar-wrap"><view class="psych-age-chart-title">七维雷达图</view><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="psych-age-radar-wrap"><view class="psych-age-chart-title">七维雷达图</view><canvas canvas-id="result-radar" class="result-chart-canvas result-radar-canvas" style="width:100%;height:280px;"></canvas></view>
             <view class="psych-age-bar-wrap"><view class="psych-age-chart-title">维度得分排序</view><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
           </view>
         </view>
@@ -401,7 +401,7 @@
         <view class="apt-section">
           <view class="apt-section-title">可视化分析</view>
           <view class="apt-charts-row">
-            <view class="apt-radar-wrap"><view class="apt-chart-title">六维天赋雷达</view><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="apt-radar-wrap"><view class="apt-chart-title">六维天赋雷达</view><canvas canvas-id="result-radar" class="result-chart-canvas result-radar-canvas" style="width:100%;height:280px;"></canvas></view>
             <view class="apt-bar-wrap"><view class="apt-chart-title">维度得分排序</view><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
           </view>
         </view>
@@ -475,7 +475,7 @@
         <view class="hit-divider"></view>
         <view class="hit-section">
           <view class="hit-section-title">六型雷达</view>
-          <view class="hit-chart-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:320px;"></canvas></view>
+          <view class="hit-chart-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas result-radar-canvas" style="width:100%;height:320px;"></canvas></view>
         </view>
         <view class="hit-divider"></view>
         <view class="hit-section">
@@ -546,7 +546,7 @@
         <view class="dth-divider"></view>
         <view class="dth-section">
           <view class="dth-section-title">三角雷达</view>
-          <view class="dth-chart-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:288px;"></canvas></view>
+          <view class="dth-chart-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas result-radar-canvas" style="width:100%;height:288px;"></canvas></view>
         </view>
         <view class="dth-divider"></view>
         <view class="dth-section">
@@ -609,7 +609,7 @@
         <view class="tla-divider"></view>
         <view class="tla-section">
           <view class="tla-section-title"><image class="tla-section-icon" src="/assets/icons/radar.svg" mode="aspectFit" />恋爱偏好雷达</view>
-          <view class="tla-chart-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:288px;"></canvas></view>
+          <view class="tla-chart-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas result-radar-canvas" style="width:100%;height:288px;"></canvas></view>
         </view>
         <view class="tla-divider"></view>
         <view class="tla-section">
@@ -690,7 +690,7 @@
         <view class="fft-section">
           <view class="fft-section-title">九维雷达</view>
           <view class="fft-radar-wrap">
-            <canvas canvas-id="result-radar" class="fft-chart-canvas" style="width:100%;height:256px;"></canvas>
+            <canvas canvas-id="result-radar" class="fft-chart-canvas result-radar-canvas" style="width:100%;height:256px;"></canvas>
           </view>
         </view>
 
@@ -771,7 +771,7 @@
         <view class="ybt-section">
           <view class="ybt-section-title"><image class="ybt-section-icon" src="/assets/icons/scan.svg" mode="aspectFit" />四维雷达</view>
           <view class="ybt-radar-wrap">
-            <canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:256px;"></canvas>
+            <canvas canvas-id="result-radar" class="result-chart-canvas result-radar-canvas" style="width:100%;height:256px;"></canvas>
           </view>
         </view>
 
@@ -889,7 +889,7 @@
             <text class="rvt-section-title">六维雷达</text>
           </view>
           <view class="rvt-radar-wrap">
-            <canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas>
+            <canvas canvas-id="result-radar" class="result-chart-canvas result-radar-canvas" style="width:100%;height:280px;"></canvas>
           </view>
         </view>
 
@@ -1033,7 +1033,7 @@
             <text class="mpt-section-title">四维雷达</text>
           </view>
           <view class="mpt-radar-wrap">
-            <canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas>
+            <canvas canvas-id="result-radar" class="result-chart-canvas result-radar-canvas" style="width:100%;height:280px;"></canvas>
           </view>
         </view>
 
@@ -1206,7 +1206,7 @@
             <text class="vbt-section-title">四维雷达</text>
           </view>
           <view class="vbt-radar-wrap">
-            <canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas>
+            <canvas canvas-id="result-radar" class="result-chart-canvas result-radar-canvas" style="width:100%;height:280px;"></canvas>
           </view>
         </view>
         <view class="vbt-section">
@@ -1366,7 +1366,7 @@
             <text class="city-section-title">五维雷达</text>
           </view>
           <view class="city-radar-wrap">
-            <canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas>
+            <canvas canvas-id="result-radar" class="result-chart-canvas result-radar-canvas" style="width:100%;height:280px;"></canvas>
           </view>
         </view>
         <view class="city-section">
@@ -1471,7 +1471,7 @@
             <text class="lbt-section-title">三维雷达</text>
           </view>
           <view class="lbt-radar-wrap">
-            <canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas>
+            <canvas canvas-id="result-radar" class="result-chart-canvas result-radar-canvas" style="width:100%;height:280px;"></canvas>
           </view>
         </view>
 
@@ -1530,6 +1530,9 @@
   <view wx:if="{{testId === 'mbti' && result && mbtiReport}}" class="mbti-report-wrap">
     <view class="mbti-report-paper">
       <view class="mbti-header">
+        <view class="mbti-avatar-wrap">
+          <image class="mbti-avatar-img" src="{{mbtiAvatarSrc}}" mode="aspectFit"></image>
+        </view>
         <view class="mbti-header-sub">你的人格类型</view>
         <view class="mbti-header-title">{{result.type}} · {{result.typeInfo.name}}</view>
         <view class="mbti-header-en" wx:if="{{result.typeInfo.nameEn}}">{{result.typeInfo.nameEn}}</view>
@@ -1557,7 +1560,7 @@
         <view class="mbti-section">
           <view class="mbti-section-title">维度雷达图</view>
           <view class="mbti-chart-row">
-            <view class="mbti-radar-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="mbti-radar-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas result-radar-canvas" style="width:100%;height:280px;"></canvas></view>
             <view class="mbti-radar-legend" wx:if="{{mbtiReport.radarLegendItems && mbtiReport.radarLegendItems.length}}">
               <view class="mbti-legend-title">各维度解读</view>
               <view wx:for="{{mbtiReport.radarLegendItems}}" wx:key="subject" class="mbti-legend-item">
@@ -1828,7 +1831,7 @@
           <view class="sri-section-desc">通过图表直观看到四维度得分分布与压抑程度。</view>
           <view class="sri-radar-wrap" wx:if="{{sriReport.radarData && sriReport.radarData.length}}">
             <view class="sri-chart-title">四维雷达图</view>
-            <canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas>
+            <canvas canvas-id="result-radar" class="result-chart-canvas result-radar-canvas" style="width:100%;height:280px;"></canvas>
           </view>
           <view class="sri-chart-wrap">
             <canvas canvas-id="result-sri-bar" class="result-chart-canvas" style="width:100%;height:200px;"></canvas>
@@ -1930,7 +1933,7 @@
           <view class="animal-section-title">雷达图 · 维度解析</view>
           <view class="animal-charts-row">
             <view class="animal-radar-wrap">
-              <canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas>
+              <canvas canvas-id="result-radar" class="result-chart-canvas result-radar-canvas" style="width:100%;height:280px;"></canvas>
             </view>
             <view class="animal-dim-list">
               <view wx:for="{{animalReport.radarData}}" wx:key="name" class="animal-dim-item">
