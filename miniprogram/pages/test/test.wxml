@@ -15,8 +15,23 @@
     <view class="progress-bar" style="width: {{progress}}%"></view>
   </view>
 
+  <!-- 三选项（AAT 等 choice 格式） -->
+  <view class="question-card card" wx:if="{{config.format === 'choice' && currentQ}}">
+    <view class="q-meta">题目 {{current + 1}}/{{total}}</view>
+    <view class="q-text">{{currentQ.text}}</view>
+    <view class="options-grid options-choice">
+      <view 
+        wx:for="{{currentQ.options}}" 
+        wx:key="*this"
+        class="opt-btn {{answers[currentQ.id] === index ? 'selected' : ''}}"
+        data-value="{{index}}"
+        bindtap="onSelect"
+      >{{item}}</view>
+    </view>
+  </view>
+
   <!-- 标准选项（5选1） -->
-  <view class="question-card card" wx:if="{{config.format !== 'mbti' && currentQ}}">
+  <view class="question-card card" wx:if="{{config.format !== 'mbti' && config.format !== 'choice' && currentQ}}">
     <view class="q-meta">题目 {{current + 1}}/{{total}}</view>
     <view class="q-text">{{currentQ.text}}</view>
     <view class="options-grid">

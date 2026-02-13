@@ -1,7 +1,8 @@
 const { loadAnswers, clearAnswers } = require('../../utils/storage');
-const { calculateResult, calculateRpiScores } = require('../../utils/scoring');
+const { calculateResult, calculateRpiScores, MBTI_POLE_LABELS } = require('../../utils/scoring');
 const { sriTest } = require('../../data/sri');
 const { THEMES, getThemeStyle } = require('../../data/themes');
+const { drawRadar, drawBar, drawPie, drawRpiBar, drawSriBar } = require('../../utils/chart-helper');
 
 function hexToRgb(hex) {
   const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -37,7 +38,23 @@ Page({
     scl90Report: null,
     sriReport: null,
     rpiReport: null,
+    lbtReport: null,
     animalReport: null,
+    mbtiInsight: null,
+    mbtiPoleLabels: null,
+    mbtiReport: null,
+    aatReport: null,
+    psychAgeReport: null,
+    aptReport: null,
+    hitReport: null,
+    dthReport: null,
+    tlaReport: null,
+    fftReport: null,
+    ybtReport: null,
+    rvtReport: null,
+    mptReport: null,
+    vbtReport: null,
+    cityReport: null,
     chartColors: null,
   },
   onLoad(options) {
@@ -79,7 +96,9 @@ Page({
         view: hasSelf && hasPartner ? 'both' : hasSelf ? 'self' : 'partner',
         selfLevelClass, partnerLevelClass,
       };
-      this.setData({ testId, result, themeStyle: getThemeStyle(theme) || '', rpiReport, chartColors: buildChartColors(theme) });
+      this.setData({ testId, result, themeStyle: getThemeStyle(theme) || '', rpiReport, chartColors: buildChartColors(theme) }, () => {
+        this.scheduleChartsDraw();
+      });
       return;
     }
 
@@ -89,6 +108,50 @@ Page({
       answers = loadAnswers('animal-sculpture') || answers;
     }
     if (!answers || Object.keys(answers).length === 0) {
+      this.setData({ result: null, testId, themeStyle: getThemeStyle(theme) || '', chartColors: buildChartColors(theme) });
+      return;
+    }
+    if (testId === 'apt' && Object.keys(answers).length < 60) {
+      this.setData({ result: null, testId, themeStyle: getThemeStyle(theme) || '', chartColors: buildChartColors(theme) });
+      return;
+    }
+    if (testId === 'hit' && Object.keys(answers).length < 90) {
+      this.setData({ result: null, testId, themeStyle: getThemeStyle(theme) || '', chartColors: buildChartColors(theme) });
+      return;
+    }
+    if (testId === 'dth' && Object.keys(answers).length < 70) {
+      this.setData({ result: null, testId, themeStyle: getThemeStyle(theme) || '', chartColors: buildChartColors(theme) });
+      return;
+    }
+    if (testId === 'tla' && Object.keys(answers).length < 52) {
+      this.setData({ result: null, testId, themeStyle: getThemeStyle(theme) || '', chartColors: buildChartColors(theme) });
+      return;
+    }
+    if (testId === 'fft' && Object.keys(answers).length < 54) {
+      this.setData({ result: null, testId, themeStyle: getThemeStyle(theme) || '', chartColors: buildChartColors(theme) });
+      return;
+    }
+    if (testId === 'ybt' && Object.keys(answers).length < 40) {
+      this.setData({ result: null, testId, themeStyle: getThemeStyle(theme) || '', chartColors: buildChartColors(theme) });
+      return;
+    }
+    if (testId === 'rvt' && Object.keys(answers).length < 36) {
+      this.setData({ result: null, testId, themeStyle: getThemeStyle(theme) || '', chartColors: buildChartColors(theme) });
+      return;
+    }
+    if (testId === 'mpt' && Object.keys(answers).length < 68) {
+      this.setData({ result: null, testId, themeStyle: getThemeStyle(theme) || '', chartColors: buildChartColors(theme) });
+      return;
+    }
+    if (testId === 'vbt' && Object.keys(answers).length < 40) {
+      this.setData({ result: null, testId, themeStyle: getThemeStyle(theme) || '', chartColors: buildChartColors(theme) });
+      return;
+    }
+    if (testId === 'city' && Object.keys(answers).length < 45) {
+      this.setData({ result: null, testId, themeStyle: getThemeStyle(theme) || '', chartColors: buildChartColors(theme) });
+      return;
+    }
+    if (testId === 'lbt' && Object.keys(answers).length < 20) {
       this.setData({ result: null, testId, themeStyle: getThemeStyle(theme) || '', chartColors: buildChartColors(theme) });
       return;
     }
@@ -146,6 +209,33 @@ Page({
       };
     }
 
+    let lbtReport = null;
+    if (testId === 'lbt' && result && result.dimensionScores) {
+      const { LBT_PROFILES, LBT_LEVEL_LABELS, LBT_DIMENSION_BY_LEVEL, LBT_DIMENSION_INSIGHTS, LBT_RELATIONSHIP_TIPS, getLBTProfileKey } = require('../../data/lbt_insights');
+      const profileKey = getLBTProfileKey(result.levelKey || 'moderate', result.dimensionScores);
+      const profile = LBT_PROFILES[profileKey] || LBT_PROFILES.balanced;
+      const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
+      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
+        id: d.id, name: d.name, score: d.percent, level: d.level === 'high' ? 'moderate' : 'mild'
+      }));
+      const dimensionList = (result.dimensionScores || []).map(d => ({
+        ...d,
+        levelLabel: LBT_LEVEL_LABELS[d.level] || '',
+        levelHint: LBT_DIMENSION_BY_LEVEL[d.id]?.[d.level] || '',
+        dimInsight: LBT_DIMENSION_INSIGHTS[d.id] || '',
+      }));
+      const tips = LBT_RELATIONSHIP_TIPS[profileKey] || [];
+      lbtReport = {
+        formatDate: formatDate(),
+        profile,
+        radarData,
+        barChartData,
+        dimensionList,
+        tips,
+        levelLabel: result.level,
+      };
+    }
+
     let sriReport = null;
     if (testId === 'sri' && result && result.answered >= sriTest.questions.length) {
       const topDim = result.top3Dimensions[0];
@@ -176,9 +266,14 @@ Page({
         index: Math.round(((d.score - 1) / 4) * 100),
         pct: ((d.score || 0) / 5) * 100,
       }));
+      const sriRadarData = (result.dimensionScores || []).map(d => ({
+        name: d.name,
+        score: Math.round(((d.score - 1) / 4) * 100),
+      }));
       sriReport = {
         formatDate: formatDate(),
         chartData,
+        radarData: sriRadarData,
         topDim,
         topDimHint: topDim ? `均分 ${topDim.score.toFixed(2)} · ${topDim.levelLabel}` : '',
         answeredCount: result.answered,
@@ -202,6 +297,349 @@ Page({
           : result.totalIndex >= 40
             ? '整体处于中等水平，部分维度可能仍有提升空间。可针对得分较高的维度做针对性觉察与沟通。'
             : '整体压抑程度较低，在自愿与安全的前提下，表达与行为较一致。可继续维护边界清晰与沟通开放。',
+      };
+    }
+
+    let mbtiInsight = null;
+    let mbtiPoleLabels = null;
+    let mbtiReport = null;
+    if (testId === 'mbti' && result && result.type) {
+      const { mbtiTypeInsights } = require('../../data/mbti_insights');
+      mbtiInsight = mbtiTypeInsights[result.type] || null;
+      mbtiPoleLabels = MBTI_POLE_LABELS;
+      const mbtiRadarData = (result.radarData || []).map(d => ({ name: d.subject || '', score: d.A }));
+      const dimensionDescs = {
+        EI: { title: '能量来源 · E/I', content: '外向(E)者从与人互动中获得能量，内向(I)者从独处与内省中充电。两者无优劣之分，关键在于了解自己的节奏。' },
+        SN: { title: '信息获取 · S/N', content: '实感(S)者关注具体事实与细节，直觉(N)者关注整体模式与可能性。二者在学习和决策中各有优势。' },
+        TF: { title: '决策方式 · T/F', content: '思考(T)者侧重逻辑与公平，情感(F)者侧重感受与和谐。理想的决策往往需要两者的平衡。' },
+        JP: { title: '生活节奏 · J/P', content: '判断(J)者偏好计划与条理，知觉(P)者偏好灵活与开放。了解自己的节奏有助于提高效率与幸福感。' }
+      };
+      const dimensionCards = (result.dimensionScores || []).map(ds => {
+        const info = dimensionDescs[ds.dimension];
+        return { title: info ? info.title : ds.label, content: info ? info.content : '', dominantLabel: ds.dominantLabel, percentage: ds.percentage };
+      });
+      const radarLegendItems = (result.radarData || []).map((rd, i) => {
+        const ds = (result.dimensionScores || [])[i];
+        const val = typeof rd.A === 'number' ? rd.A : 5;
+        return { subject: rd.subject, value: typeof rd.A === 'number' ? rd.A.toFixed(1) : String(rd.A), pct: (val / 10) * 100, dominantLabel: ds ? ds.dominantLabel : '' };
+      });
+      mbtiReport = { formatDate: formatDate(), radarData: mbtiRadarData, dimensionCards, radarMaxValue: 10, radarLegendItems };
+    }
+
+    let aatReport = null;
+    if (testId === 'aat' && result && result.factorScores) {
+      const { AAT_TOTAL_LEVELS, AAT_FACTOR_IMPROVE, AAT_FACTOR_INSIGHTS } = require('../../data/aat_insights');
+      const AAT_GROUPS = [
+        { id: 'drive', name: '学习动力', factors: ['enthusiasm', 'planning'], hint: '学习热情与计划能力' },
+        { id: 'method', name: '学习方法', factors: ['listening', 'reading', 'technique', 'exam'], hint: '听课、读书、技术、应试' },
+        { id: 'environment', name: '环境因素', factors: ['family', 'school', 'friends'], hint: '家庭、学校、朋友关系' },
+        { id: 'trait', name: '个人特质', factors: ['independence', 'perseverance', 'health'], hint: '独立性、毅力、心身健康' },
+      ];
+      const getTotalLevel = (p) => p >= 75 ? AAT_TOTAL_LEVELS.excellent : p >= 60 ? AAT_TOTAL_LEVELS.good : p >= 45 ? AAT_TOTAL_LEVELS.fair : p >= 30 ? AAT_TOTAL_LEVELS.poor : AAT_TOTAL_LEVELS.veryPoor;
+      const totalLevel = getTotalLevel(result.totalPercent);
+      const goodCount = result.factorScores.filter(f => f.level === 'good').length;
+      const poorCount = result.factorScores.filter(f => f.level === 'poor' || f.level === 'veryPoor').length;
+      const top3 = [...result.factorScores].sort((a, b) => b.percent - a.percent).slice(0, 3);
+      const bottom3 = [...result.factorScores].sort((a, b) => a.percent - b.percent).slice(0, 3);
+      const groupScores = AAT_GROUPS.map(g => {
+        const items = result.factorScores.filter(f => g.factors.includes(f.id));
+        const avg = items.length ? Math.round(items.reduce((s, x) => s + x.percent, 0) / items.length) : 0;
+        return { ...g, avg, items };
+      });
+      const radarData = result.factorScores.map(f => ({ name: f.name, score: f.percent }));
+      const barChartData = [...result.factorScores].sort((a, b) => b.percent - a.percent).map(f => ({
+        id: f.id, name: f.name, score: f.percent, hint: f.levelLabel, level: f.level === 'good' ? 'normal' : f.level === 'fair' ? 'mild' : f.level === 'poor' ? 'moderate' : 'severe'
+      }));
+      aatReport = {
+        formatDate: formatDate(),
+        totalLevel,
+        totalLevelClass: totalLevel.label === '优秀' ? 'excellent' : totalLevel.label === '较好' ? 'good' : totalLevel.label === '中等' ? 'fair' : totalLevel.label === '较差' ? 'poor' : 'veryPoor',
+        goodCount,
+        poorCount,
+        top3,
+        bottom3,
+        groupScores,
+        radarData,
+        barChartData,
+        factorInsights: AAT_FACTOR_INSIGHTS,
+        factorImprove: AAT_FACTOR_IMPROVE,
+      };
+    }
+
+    let psychAgeReport = null;
+    if (testId === 'psych-age' && result && result.dimensionScores) {
+      const { PSYCH_AGE_RANGE_INSIGHTS, PSYCH_AGE_DIMENSION_INSIGHTS } = require('../../data/psych_age_insights');
+      const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
+      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
+        id: d.id, name: d.name, score: d.percent, level: d.trend === 'young' ? 'normal' : d.trend === 'balanced' ? 'mild' : 'moderate'
+      }));
+      const youngestDim = [...(result.dimensionScores || [])].sort((a, b) => a.percent - b.percent)[0];
+      const oldestDim = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent)[0];
+      psychAgeReport = {
+        formatDate: formatDate(),
+        rangeInsight: PSYCH_AGE_RANGE_INSIGHTS[result.psychAgeRange] || '暂无解读',
+        dimInsights: PSYCH_AGE_DIMENSION_INSIGHTS,
+        radarData,
+        barChartData,
+        youngestDim,
+        oldestDim,
+      };
+    }
+
+    let aptReport = null;
+    if (testId === 'apt' && result && result.dimensionScores) {
+      const { APT_LEVEL_LABELS, APT_LEVEL_DESC, APT_CAREER_SUGGESTIONS, APT_IMPROVE_TIPS, APT_DIMENSION_INSIGHTS, getCareerSuggestionKey } = require('../../data/apt_insights');
+      const levelKey = result.totalLevel;
+      const levelLabel = APT_LEVEL_LABELS[levelKey] || '中等';
+      const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
+      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
+        id: d.id, name: d.name, score: d.percent, level: d.level === 'excellent' ? 'normal' : d.level === 'good' ? 'mild' : d.level === 'fair' ? 'moderate' : 'severe'
+      }));
+      const careerKey = getCareerSuggestionKey(result.topDimensions);
+      const careerSuggestion = APT_CAREER_SUGGESTIONS[careerKey] || `你的优势组合为「${(result.topDimensions[0]?.name || '')}+${(result.topDimensions[1]?.name || '')}」，可根据兴趣探索分析、创意、人际或管理类方向。`;
+      const weakIds = (result.weakDimensions || []).map(w => w.id);
+      const dimensionList = (result.dimensionScores || []).map(d => ({
+        ...d,
+        isWeak: weakIds.indexOf(d.id) >= 0,
+        improveTip: APT_IMPROVE_TIPS[d.id],
+      }));
+      aptReport = {
+        formatDate: formatDate(),
+        levelKey,
+        levelLabel,
+        levelDesc: APT_LEVEL_DESC[levelKey] || APT_LEVEL_DESC.fair,
+        radarData,
+        barChartData,
+        careerSuggestion,
+        dimInsights: APT_DIMENSION_INSIGHTS,
+        improveTips: APT_IMPROVE_TIPS,
+        dimensionList,
+      };
+    }
+
+    let hitReport = null;
+    if (testId === 'hit' && result && result.dimensionScores) {
+      const { getCodeConsistency, HIT_DIMENSION_INSIGHTS, HOLLAND_CODE_EXAMPLES } = require('../../data/hit_insights');
+      const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
+      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.rawScore - a.rawScore).map(d => ({
+        id: d.id, name: `${d.name}(${d.id})`, score: d.rawScore, level: result.topThree.some(t => t.id === d.id) ? 'normal' : 'mild'
+      }));
+      const codeExamples = HOLLAND_CODE_EXAMPLES[result.hollandCode] || '可根据前三型自行探索适合职业';
+      const consistency = getCodeConsistency(result.topThree);
+      const topThreeIds = (result.topThree || []).map(t => t.id);
+      const dimensionList = (result.dimensionScores || []).map(d => ({
+        ...d,
+        isTop: topThreeIds.indexOf(d.id) >= 0,
+      }));
+      hitReport = {
+        formatDate: formatDate(),
+        radarData,
+        barChartData,
+        codeExamples,
+        consistency,
+        dimInsights: HIT_DIMENSION_INSIGHTS,
+        dimensionList,
+      };
+    }
+
+    let dthReport = null;
+    if (testId === 'dth' && result && result.dimensionScores) {
+      const { DTH_OVERALL_CONCLUSIONS, DTH_PROFILE_HINTS, DTH_DIMENSION_INSIGHTS, DTH_DIMENSION_BY_LEVEL, getDTHOverallLevel, getDTHDominantDimension } = require('../../data/dth_insights');
+      const avgPercent = result.dimensionScores.length ? Math.round(result.dimensionScores.reduce((s, d) => s + d.percent, 0) / result.dimensionScores.length) : 0;
+      const overallLevel = getDTHOverallLevel(avgPercent);
+      const dominantId = getDTHDominantDimension(result.dimensionScores);
+      const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
+      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
+        id: d.id, name: d.name, score: d.percent, level: d.level === 'high' ? 'moderate' : d.level === 'low' ? 'normal' : 'mild'
+      }));
+      const dimensionList = (result.dimensionScores || []).map(d => ({
+        ...d,
+        levelHint: DTH_DIMENSION_BY_LEVEL[d.id]?.[d.level] || '',
+      }));
+      dthReport = {
+        formatDate: formatDate(),
+        overallLevel,
+        overallConclusion: DTH_OVERALL_CONCLUSIONS[overallLevel],
+        profileHint: DTH_PROFILE_HINTS[dominantId],
+        radarData,
+        barChartData,
+        dimInsights: DTH_DIMENSION_INSIGHTS,
+        dimensionList,
+      };
+    }
+
+    let tlaReport = null;
+    if (testId === 'tla' && result && result.dimensionScores) {
+      const { TLA_DIMENSION_CUTE, TLA_PROFILE_SHORT, getTLAProfileKey, TLA_DIMENSION_INSIGHTS } = require('../../data/tla_insights');
+      const topTwo = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).slice(0, 2);
+      const profileKey = getTLAProfileKey(topTwo);
+      const profileShort = TLA_PROFILE_SHORT[profileKey] || TLA_PROFILE_SHORT.default;
+      const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
+      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
+        id: d.id, name: d.name, score: d.percent, level: topTwo.some(t => t.id === d.id) ? 'normal' : 'mild'
+      }));
+      const dimensionList = (result.dimensionScores || []).map(d => {
+        const cute = TLA_DIMENSION_CUTE[d.id] || { label: d.name, emoji: '' };
+        return { ...d, cuteLabel: cute.label, emoji: cute.emoji, isTop: topTwo.some(t => t.id === d.id) };
+      });
+      tlaReport = {
+        formatDate: formatDate(),
+        profileShort,
+        topTwo,
+        radarData,
+        barChartData,
+        dimInsights: TLA_DIMENSION_INSIGHTS,
+        dimensionList,
+      };
+    }
+
+    let fftReport = null;
+    if (testId === 'fft' && result && result.primaryFruit) {
+      const { FFT_FRUIT_EMOJI, FFT_FRUIT_INSIGHTS } = require('../../data/fft_insights');
+      const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
+      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.rawScore - a.rawScore).map(d => ({
+        id: d.id, name: d.name, score: d.rawScore, level: d.id === result.primaryFruit.id ? 'normal' : 'mild'
+      }));
+      const dimensionList = (result.dimensionScores || []).map(d => ({
+        ...d,
+        emoji: FFT_FRUIT_EMOJI[d.id] || '',
+        isPrimary: d.id === result.primaryFruit.id,
+      }));
+      const primaryEmoji = FFT_FRUIT_EMOJI[result.primaryFruit.id] || '';
+      fftReport = {
+        formatDate: formatDate(),
+        primaryFruit: result.primaryFruit,
+        primaryEmoji,
+        radarData,
+        barChartData,
+        dimInsights: FFT_FRUIT_INSIGHTS,
+        dimensionList,
+      };
+    }
+
+    let ybtReport = null;
+    if (testId === 'ybt' && result && result.dimensionScores) {
+      const { YBT_PROFILES, YBT_DIMENSION_INSIGHTS, getYBTProfileKey } = require('../../data/ybt_insights');
+      const profileKey = getYBTProfileKey(result.dimensionScores);
+      const profile = YBT_PROFILES[profileKey] || YBT_PROFILES.balanced;
+      const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
+      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
+        id: d.id, name: d.name, score: d.percent, level: d.level === 'high' ? 'moderate' : d.level === 'low' ? 'normal' : 'mild'
+      }));
+      const dimensionList = (result.dimensionScores || []).map(d => ({ ...d, levelLabel: d.level === 'high' ? '偏高' : d.level === 'low' ? '偏低' : '适中' }));
+      ybtReport = {
+        formatDate: formatDate(),
+        profile,
+        radarData,
+        barChartData,
+        dimInsights: YBT_DIMENSION_INSIGHTS,
+        dimensionList,
+      };
+    }
+
+    let rvtReport = null;
+    if (testId === 'rvt' && result && result.primaryType) {
+      const { RVT_PROFILES, RVT_DIMENSION_INSIGHTS } = require('../../data/rvt_insights');
+      const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
+      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
+        id: d.id, name: d.name, score: d.percent, level: d.id === result.primaryType.id ? 'normal' : 'mild'
+      }));
+      const primaryProfile = RVT_PROFILES[result.primaryType.id] || RVT_PROFILES.balanced;
+      const dimensionList = (result.dimensionScores || []).map(d => ({
+        ...d,
+        isPrimary: d.id === result.primaryType.id,
+        isSecondary: result.secondaryType && d.id === result.secondaryType.id,
+      }));
+      rvtReport = {
+        formatDate: formatDate(),
+        primaryProfile,
+        radarData,
+        barChartData,
+        dimInsights: RVT_DIMENSION_INSIGHTS,
+        dimensionList,
+      };
+    }
+
+    let mptReport = null;
+    if (testId === 'mpt' && result && result.primaryType) {
+      const { MPT_PROFILES, MPT_LEVEL_LABELS, MPT_DIMENSION_BY_LEVEL, MPT_SCORE_PATTERN_INSIGHTS, MPT_DIMENSION_INSIGHTS, getMPTProfileKey } = require('../../data/mpt_insights');
+      const profileKey = getMPTProfileKey(result.primaryType, result.secondaryType);
+      const primaryProfile = MPT_PROFILES[profileKey] || MPT_PROFILES.balanced;
+      const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
+      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
+        id: d.id, name: d.name, score: d.percent, level: d.id === result.primaryType.id ? 'normal' : 'mild'
+      }));
+      const patternInfo = MPT_SCORE_PATTERN_INSIGHTS[result.scorePattern] || MPT_SCORE_PATTERN_INSIGHTS.distinct;
+      const dimensionList = (result.dimensionScores || []).map(d => ({
+        ...d,
+        levelLabel: MPT_LEVEL_LABELS[d.level] || '',
+        levelHint: MPT_DIMENSION_BY_LEVEL[d.id]?.[d.level] || '',
+        dimInsight: MPT_DIMENSION_INSIGHTS[d.id] || '',
+        isPrimary: d.id === result.primaryType.id,
+        isSecondary: result.secondaryType && d.id === result.secondaryType.id,
+      }));
+      mptReport = {
+        formatDate: formatDate(),
+        primaryProfile,
+        patternInfo,
+        radarData,
+        barChartData,
+        dimensionList,
+      };
+    }
+
+    let vbtReport = null;
+    if (testId === 'vbt' && result && result.profileKey) {
+      const { VBT_PROFILES, VBT_DIMENSION_BY_LEVEL, VBT_VULNERABILITY_ZONE_INSIGHTS, VBT_DIMENSION_INSIGHTS, VBT_SELF_PROTECTION_TIPS, getLevelLabel } = require('../../data/vbt_insights');
+      const profile = VBT_PROFILES[result.profileKey] || VBT_PROFILES.robust;
+      const zoneInfo = VBT_VULNERABILITY_ZONE_INSIGHTS[result.vulnerabilityZone] || VBT_VULNERABILITY_ZONE_INSIGHTS.mid;
+      const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
+      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
+        id: d.id, name: d.name, score: d.percent, level: d.id === 'sensitive' ? (d.level === 'high' ? 'moderate' : d.level === 'low' ? 'normal' : 'mild') : (d.level === 'high' ? 'normal' : d.level === 'low' ? 'mild' : 'mild')
+      }));
+      const dimensionList = (result.dimensionScores || []).map(d => ({
+        ...d,
+        levelLabel: getLevelLabel(d.id, d.level),
+        levelHint: VBT_DIMENSION_BY_LEVEL[d.id]?.[d.level] || '',
+        dimInsight: VBT_DIMENSION_INSIGHTS[d.id] || '',
+        isWeakest: result.weakestDimension && d.id === result.weakestDimension.id,
+      }));
+      const tips = VBT_SELF_PROTECTION_TIPS[result.profileKey] || [];
+      vbtReport = {
+        formatDate: formatDate(),
+        profile,
+        zoneInfo,
+        vulnerabilityIndex: result.vulnerabilityIndex,
+        radarData,
+        barChartData,
+        dimensionList,
+        tips,
+      };
+    }
+
+    let cityReport = null;
+    if (testId === 'city' && result && result.topCities) {
+      const { CITY_PROFILES, CITY_LEVEL_LABELS, CITY_DIMENSION_BY_LEVEL, CITY_DIMENSION_INSIGHTS } = require('../../data/city_insights');
+      const profile = CITY_PROFILES[result.profileKey] || CITY_PROFILES.balanced;
+      const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
+      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
+        id: d.id, name: d.name, score: d.percent, level: d.level === 'high' ? 'normal' : 'mild'
+      }));
+      const dimensionList = (result.dimensionScores || []).map(d => ({
+        ...d,
+        levelLabel: CITY_LEVEL_LABELS[d.level] || '',
+        levelHint: CITY_DIMENSION_BY_LEVEL[d.id]?.[d.level] || '',
+        dimInsight: CITY_DIMENSION_INSIGHTS[d.id] || '',
+      }));
+      const topCities = (result.topCities || []).map(m => ({ city: m.city, matchPercent: m.matchPercent, matchReason: m.matchReason }));
+      cityReport = {
+        formatDate: formatDate(),
+        profile,
+        suggestedType: result.suggestedType,
+        topCities,
+        radarData,
+        barChartData,
+        dimensionList,
       };
     }
 
@@ -267,11 +705,89 @@ Page({
       };
     }
 
-    this.setData({ testId, result, themeStyle: getThemeStyle(theme) || '', scl90Report, sriReport, rpiReport, animalReport, chartColors: buildChartColors(theme) });
+    this.setData({ testId, result, themeStyle: getThemeStyle(theme) || '', scl90Report, sriReport, rpiReport, lbtReport, animalReport, mbtiInsight, mbtiPoleLabels, mbtiReport, aatReport, psychAgeReport, aptReport, hitReport, dthReport, tlaReport, fftReport, ybtReport, rvtReport, mptReport, vbtReport, cityReport, chartColors: buildChartColors(theme) }, () => {
+      this.scheduleChartsDraw();
+    });
+  },
+  scheduleChartsDraw() {
+    const { testId, chartColors } = this.data;
+    const page = this;
+    if (testId === 'scl90' && this.data.scl90Report) {
+      const r = this.data.scl90Report;
+      drawRadar(page, 'result-radar', r.radarData, chartColors, 5);
+      drawPie(page, 'result-pie', r.symptomDist, chartColors);
+      drawBar(page, 'result-bar', r.barChartData, chartColors, 5);
+    } else if (testId === 'aat' && this.data.aatReport) {
+      const r = this.data.aatReport;
+      drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
+      drawBar(page, 'result-bar', r.barChartData, chartColors, 100);
+    } else if (testId === 'psych-age' && this.data.psychAgeReport) {
+      const r = this.data.psychAgeReport;
+      drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
+      drawBar(page, 'result-bar', r.barChartData, chartColors, 100);
+    } else if (testId === 'apt' && this.data.aptReport) {
+      const r = this.data.aptReport;
+      drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
+      drawBar(page, 'result-bar', r.barChartData, chartColors, 100);
+    } else if (testId === 'hit' && this.data.hitReport) {
+      const r = this.data.hitReport;
+      drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
+      drawBar(page, 'result-bar', r.barChartData, chartColors, 15);
+    } else if (testId === 'dth' && this.data.dthReport) {
+      const r = this.data.dthReport;
+      drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
+      drawBar(page, 'result-bar', r.barChartData, chartColors, 100);
+    } else if (testId === 'tla' && this.data.tlaReport) {
+      const r = this.data.tlaReport;
+      drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
+      drawBar(page, 'result-bar', r.barChartData, chartColors, 100);
+    } else if (testId === 'fft' && this.data.fftReport) {
+      const r = this.data.fftReport;
+      drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
+      drawBar(page, 'result-bar', r.barChartData, chartColors, 6);
+    } else if (testId === 'ybt' && this.data.ybtReport) {
+      const r = this.data.ybtReport;
+      drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
+      drawBar(page, 'result-bar', r.barChartData, chartColors, 100);
+    } else if (testId === 'rvt' && this.data.rvtReport) {
+      const r = this.data.rvtReport;
+      drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
+      drawBar(page, 'result-bar', r.barChartData, chartColors, 100);
+    } else if (testId === 'mpt' && this.data.mptReport) {
+      const r = this.data.mptReport;
+      drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
+      drawBar(page, 'result-bar', r.barChartData, chartColors, 100);
+    } else if (testId === 'vbt' && this.data.vbtReport) {
+      const r = this.data.vbtReport;
+      drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
+      drawBar(page, 'result-bar', r.barChartData, chartColors, 100);
+    } else if (testId === 'city' && this.data.cityReport) {
+      const r = this.data.cityReport;
+      drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
+      drawBar(page, 'result-bar', r.barChartData, chartColors, 100);
+    } else if (testId === 'lbt' && this.data.lbtReport) {
+      const r = this.data.lbtReport;
+      drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
+      drawBar(page, 'result-bar', r.barChartData, chartColors, 100);
+    } else if (testId === 'mbti' && this.data.mbtiReport) {
+      const r = this.data.mbtiReport;
+      drawRadar(page, 'result-radar', r.radarData, chartColors, r.radarMaxValue || 10);
+    } else if (testId === 'rpi' && this.data.rpiReport) {
+      drawRpiBar(page, 'result-rpi-bar', this.data.rpiReport.chartData, chartColors);
+    } else if (testId === 'sri' && this.data.sriReport) {
+      const r = this.data.sriReport;
+      drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
+      drawSriBar(page, 'result-sri-bar', r.chartData);
+    } else if (testId === 'animal' && this.data.animalReport) {
+      const r = this.data.animalReport;
+      drawRadar(page, 'result-radar', r.radarData, chartColors, 10);
+    }
   },
   onThemeChange(e) {
     const { themeStyle, theme } = e.detail || {};
-    this.setData({ themeStyle: themeStyle || '', chartColors: theme ? buildChartColors(theme) : this.data.chartColors });
+    this.setData({ themeStyle: themeStyle || '', chartColors: theme ? buildChartColors(theme) : this.data.chartColors }, () => {
+      this.scheduleChartsDraw();
+    });
   },
   onRpiViewChange(e) {
     const view = e.currentTarget.dataset.view;

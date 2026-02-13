@@ -4,10 +4,10 @@
 
 ## 已实现功能
 
-- **首页**：测评卡片列表、主题色（薄荷苏打）
-- **测评页**：支持标准 5 选 1 题型、MBTI 的 A/B 5 点量表题型
-- **结果页**：SCL90、LBT、MBTI、RPI 四种测评的结果展示
-- **MBTI 雷达图**：使用 echarts-for-weixin 渲染
+- **首页**：测评卡片列表、主题色切换
+- **测评页**：支持 5 选 1、MBTI A/B 量表、choice 三选一/二选一
+- **结果页**：各测评雷达图、柱状图、维度解读、建议
+- **图表**：echarts-for-weixin 雷达图与柱状图
 
 ## 已移植测评
 
@@ -15,10 +15,22 @@
 |------|--------|------|
 | SCL-90 心理健康自评 | 90 | ✅ 完整 |
 | RPI 恋爱占有欲指数 | 40 | ✅ 双视角 |
-| LBT 恋爱脑测试 | 20 | ✅ 完整 |
-| MBTI 16型人格 | 24 (精简版) | ✅ 含雷达图 |
-
-其他测评（SRI、APT、HIT、DTH、TLA 等）在首页展示，点击会提示「暂无该测评」。
+| SRI 性压抑指数 | 48 | ✅ 完整 |
+| 人格动物塑测试 | 60 | ✅ 完整 |
+| MBTI 16型人格 | 90 | ✅ 完整 |
+| AAT 学习适应性 | 118 | ✅ 完整 |
+| 心理年龄测验 | 35 | ✅ 完整 |
+| APT 天赋潜能 | 60 | ✅ 完整 |
+| HIT 霍兰德职业兴趣 | 90 | ✅ 完整 |
+| DTH 黑暗三角 | 70 | ✅ 完整 |
+| TLA 年上年下恋爱 | 52 | ✅ 完整 |
+| FFT 水果塑形 | 54 | ✅ 完整 |
+| YBT 病娇测试 | 40 | ✅ 完整 |
+| RVT 恋爱观 | 36 | ✅ 完整 |
+| LBT 恋爱脑 | 20 | ✅ 完整 |
+| MPT 麋鹿性偏好 | 68 | ✅ 完整 |
+| VBT 易被欺负 | 40 | ✅ 完整 |
+| City 宜居城市 | 45 | ✅ 完整 |
 
 ## 运行方式
 
@@ -33,23 +45,24 @@ miniprogram/
 ├── app.js / app.json / app.wxss
 ├── data/           # 测评题目与配置
 │   ├── index.js    # getTestConfig
-│   ├── scl90.js
-│   ├── rpi.js
-│   ├── lbt.js
-│   ├── mbti.js
-│   └── tests.js    # 首页测评列表
+│   ├── tests.js    # 首页测评列表
+│   ├── scl90.js, rpi.js, sri.js, mbti.js, aat.js
+│   ├── psych_age.js, apt.js, hit.js, dth.js, tla.js
+│   ├── fft.js, ybt.js, rvt.js, lbt.js, mpt.js, vbt.js, city.js
+│   ├── cities_db.js, animal_sculpture.js
+│   └── *_insights.js  # 各测评解读文案
 ├── utils/
-│   ├── storage.js  # wx.setStorageSync
-│   └── scoring.js  # 计分逻辑
+│   ├── storage.js, testSample.js
+│   ├── scoring.js  # 统一计分入口
+│   └── *_scoring.js  # 各测评计分逻辑
 └── pages/
     ├── index/      # 首页
     ├── test/       # 通用测评页
+    ├── scl90-test/, rpi-test/, animal-test/  # 专用测评页
     └── result/     # 通用结果页
 ```
 
 ## 后续可扩展
 
-- 补充剩余测评的题目数据与计分逻辑
-- MBTI 扩展为 90 题完整版
-- 为 SCL90、LBT、RPI 等增加 echarts 图表
-- 增加主题切换（沿用 Web 版 themes）
+- 主题切换优化
+- 报告分享/保存为图片

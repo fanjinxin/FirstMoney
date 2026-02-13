@@ -14,24 +14,49 @@ Component({
   properties: {
     data: { type: Array, value: [] },
   },
-  lifetimes: { ready() { this.draw(); } },
-  observers: { data() { this.draw(); } },
+  data: { canvasId: '' },
+  lifetimes: {
+    attached() {
+      this.setData({ canvasId: 'sri-bar-' + Math.random().toString(36).slice(2) });
+    },
+    ready() { this.scheduleDraw(); },
+  },
+  observers: { data() { this.scheduleDraw(); } },
   methods: {
-    draw() {
+    scheduleDraw() {
       const data = (this.properties.data || []).slice();
       if (data.length === 0) return;
-      setTimeout(() => {
-        const query = wx.createSelectorQuery().in(this);
-        query.select('.sri-bar-canvas').fields({ node: true, size: true }).exec((res) => {
-          if (!res?.[0]?.node) return;
-          const canvas = res[0].node;
+      this.drawWithRetry(0);
+    },
+    drawWithRetry(attempt) {
+      const self = this;
+      const delay = attempt === 0 ? 250 : 100;
+      setTimeout(function () { self.doDraw(attempt); }, delay);
+    },
+    doDraw(attempt) {
+      const data = (this.properties.data || []).slice();
+      if (data.length === 0) return;
+      const query = wx.createSelectorQuery().in(this);
+      const cid = this.data.canvasId;
+      if (!cid) { if (attempt < 3) this.drawWithRetry(attempt + 1); return; }
+      const selector = '#' + cid;
+      query.select(selector).fields({ node: true, size: true }).exec((res) => {
+        if (!res?.[0]?.node) {
+          if (attempt < 3) this.drawWithRetry(attempt + 1);
+          return;
+        }
+        const w = res[0].width || 0;
+        const h = res[0].height || 0;
+        if (w <= 0 || h <= 0) {
+          if (attempt < 3) this.drawWithRetry(attempt + 1);
+          return;
+        }
+        const canvas = res[0].node;
           const ctx = canvas.getContext('2d');
           const dpr = wx.getSystemInfoSync().pixelRatio;
-          canvas.width = res[0].width * dpr;
-          canvas.height = res[0].height * dpr;
+          canvas.width = w * dpr;
+          canvas.height = h * dpr;
           ctx.scale(dpr, dpr);
-          const w = res[0].width;
-          const h = res[0].height;
           const padLeft = 90;
           const padRight = 30;
           const padTop = 20;
@@ -55,7 +80,6 @@ Component({
             ctx.fillText((d.name || '').slice(0, 8), 4, y + barH / 2 + 4);
           });
         });
-      }, 100);
     },
   },
 });

@@ -3,5 +3,5 @@
     <text class="scl90-bar-title">10 因子横向柱状图</text>
     <view class="scl90-bar-tag">均分</view>
   </view>
-  <canvas type="2d" class="scl90-bar-canvas" style="width:100%;height:400px;"></canvas>
+  <canvas type="2d" id="{{canvasId}}" class="scl90-bar-canvas" style="width:100%;height:400px;"></canvas>
 </view>

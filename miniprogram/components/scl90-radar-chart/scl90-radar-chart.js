@@ -1,6 +1,6 @@
 /**
  * SCL-90 雷达图 - 移植自 FactorRadarChart.tsx
- * 使用 Canvas 绘制 10 因子雷达轮廓
+ * 使用 Canvas 2D 绘制雷达轮廓
  */
 Component({
   properties: {
@@ -8,35 +8,61 @@ Component({
     colors: { type: Object, value: null },
     maxValue: { type: Number, value: 5 },
   },
-  data: {
-    canvasId: 'scl90-radar-' + Date.now(),
-  },
+  data: { canvasId: '' },
   lifetimes: {
+    attached() {
+      this.setData({ canvasId: 'radar-' + Math.random().toString(36).slice(2) });
+    },
     ready() {
-      this.draw();
+      this.scheduleDraw();
     },
   },
   observers: {
-    data() { this.draw(); },
+    'data, colors, maxValue'() { this.scheduleDraw(); },
   },
   methods: {
-    draw() {
+    scheduleDraw() {
       const data = this.properties.data || [];
       if (data.length === 0) return;
-      setTimeout(() => {
+      this.drawWithRetry(0);
+    },
+    drawWithRetry(attempt) {
+      const self = this;
+      const delay = attempt === 0 ? 250 : 100;
+      setTimeout(function () {
+        self.doDraw(attempt);
+      }, delay);
+    },
+    doDraw(attempt) {
+      const data = this.properties.data || [];
+      if (data.length === 0) return;
+      const cid = this.data.canvasId;
+      if (!cid) { if (attempt < 3) this.drawWithRetry(attempt + 1); return; }
       const query = wx.createSelectorQuery().in(this);
-      query.select('.scl90-radar-canvas')
-        .fields({ node: true, size: true })
-        .exec((res) => {
-          if (!res || !res[0] || !res[0].node) return;
-          const canvas = res[0].node;
+      const selector = '#' + cid;
+      query.select(selector).fields({ node: true, size: true }).exec((res) => {
+        if (!res || !res[0] || !res[0].node) {
+          if (attempt < 3) this.drawWithRetry(attempt + 1);
+          return;
+        }
+        const w = res[0].width || 0;
+        const h = res[0].height || 0;
+        if (w <= 0 || h <= 0) {
+          if (attempt < 3) this.drawWithRetry(attempt + 1);
+          return;
+        }
+        this.drawCanvas(res[0], data);
+      });
+    },
+    drawCanvas(res, data) {
+          const canvas = res.node;
           const ctx = canvas.getContext('2d');
           const dpr = wx.getSystemInfoSync().pixelRatio;
-          canvas.width = res[0].width * dpr;
-          canvas.height = res[0].height * dpr;
+          canvas.width = res.width * dpr;
+          canvas.height = res.height * dpr;
           ctx.scale(dpr, dpr);
-          const w = res[0].width;
-          const h = res[0].height;
+          const w = res.width;
+          const h = res.height;
           const cx = w / 2;
           const cy = h / 2;
           const n = data.length;
@@ -96,8 +122,6 @@ Component({
             const p = getPoint(i, maxR + 18);
             ctx.fillText(name, p.x, p.y);
           }
-        });
-      }, 100);
     },
   },
 });

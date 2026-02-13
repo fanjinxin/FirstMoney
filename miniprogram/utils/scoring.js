@@ -6,6 +6,18 @@ const { lbtQuestions, LBT_DIMENSIONS } = require('../data/lbt');
 const { mbtiQuestions, mbtiTypeInfos } = require('../data/mbti');
 const { rpiTest } = require('../data/rpi');
 const { sriTest, sriReverseScoreIds } = require('../data/sri');
+const { calculateAATResult } = require('./aat_scoring');
+const { calculatePsychAgeResult } = require('./psych_age_scoring');
+const { calculateAPTResult } = require('./apt_scoring');
+const { calculateHITResult } = require('./hit_scoring');
+const { calculateDTHResult } = require('./dth_scoring');
+const { calculateTLAResult } = require('./tla_scoring');
+const { calculateFFTResult } = require('./fft_scoring');
+const { calculateYBTResult } = require('./ybt_scoring');
+const { calculateRVTResult } = require('./rvt_scoring');
+const { calculateMPTResult } = require('./mpt_scoring');
+const { calculateVBTResult } = require('./vbt_scoring');
+const { calculateCityResult } = require('./city_scoring');
 
 /* ========== SCL90 ========== - 完整移植自 src/utils/scoring.ts */
 const scl90FactorConfig = [
@@ -84,10 +96,22 @@ function calculateLBTResult(answers) {
     const dimPercent = Math.min(100, Math.round((dimRaw / maxScore) * 100));
     return { id: dim.id, name: dim.name, rawScore: dimRaw, maxScore, percent: dimPercent, level: getLBTLevel(dimPercent) };
   });
-  return { totalScore: raw, maxTotalScore, percent, level: level === 'low' ? '低' : level === 'high' ? '高' : '适中', dimensionScores };
+  return { totalScore: raw, maxTotalScore, percent, levelKey: level, level: level === 'low' ? '低' : level === 'high' ? '高' : '适中', dimensionScores };
 }
 
-/* ========== MBTI ========== */
+/* ========== MBTI ========== - 移植自 src/utils/mbti_scoring.ts */
+const MBTI_DIMENSION_LABELS = {
+  EI: '外向-内向 (E/I)',
+  SN: '实感-直觉 (S/N)',
+  TF: '思考-情感 (T/F)',
+  JP: '判断-知觉 (J/P)'
+};
+
+const MBTI_POLE_LABELS = {
+  E: '外向', I: '内向', S: '实感', N: '直觉',
+  T: '思考', F: '情感', J: '判断', P: '知觉'
+};
+
 function getMBTIScoreContribution(value) {
   if (value === 0) return { forA: 2, forB: 0 };
   if (value === 1) return { forA: 1, forB: 0 };
@@ -116,12 +140,25 @@ function calculateMBTIResult(answers) {
     const scoreB = scores[poleB];
     const total = scoreA + scoreB;
     const dominant = scoreA >= scoreB ? poleA : poleB;
+    const percentage = total > 0 ? Math.round((Math.max(scoreA, scoreB) / total) * 100) : 50;
     type += dominant;
-    dimensionScores.push({ dimension: dim, poleA, poleB, scoreA, scoreB, dominant });
+    dimensionScores.push({
+      dimension: dim,
+      poleA,
+      poleB,
+      scoreA,
+      scoreB,
+      dominant,
+      dominantLabel: MBTI_POLE_LABELS[dominant],
+      poleALabel: MBTI_POLE_LABELS[poleA],
+      poleBLabel: MBTI_POLE_LABELS[poleB],
+      percentage,
+      label: MBTI_DIMENSION_LABELS[dim]
+    });
     const value = total > 0 ? 5 + (scoreA - scoreB) / total * 5 : 5;
-    radarData.push({ subject: dim, A: Math.max(0, Math.min(10, value)), fullMark: 10 });
+    radarData.push({ subject: MBTI_DIMENSION_LABELS[dim], A: Math.max(0, Math.min(10, value)), fullMark: 10 });
   });
-  const typeInfo = mbtiTypeInfos[type] || { type, name: type, description: '基于你的作答，你呈现出的性格特质组合。' };
+  const typeInfo = mbtiTypeInfos[type] || { type, name: type, nameEn: type, slogan: '独特的你', description: '基于你的作答，你呈现出的性格特质组合。', strengths: [], weaknesses: [], career: [], relationships: '', workStyle: '', stressCoping: '' };
   return { type, typeInfo, dimensionScores, radarData };
 }
 
@@ -245,6 +282,18 @@ function calculateResult(testId, answers) {
     case 'mbti': return calculateMBTIResult(answers);
     case 'rpi': return null; /* RPI 由 result 页单独调用 calculateRpiScores(answersSelf, answersPartner) */
     case 'sri': return calculateSriScores(sriTest.questions, sriTest.dimensions, answers, sriReverseScoreIds);
+    case 'aat': return calculateAATResult(answers);
+    case 'psych-age': return calculatePsychAgeResult(answers);
+    case 'apt': return calculateAPTResult(answers);
+    case 'hit': return calculateHITResult(answers);
+    case 'dth': return calculateDTHResult(answers);
+    case 'tla': return calculateTLAResult(answers);
+    case 'fft': return calculateFFTResult(answers);
+    case 'ybt': return calculateYBTResult(answers);
+    case 'rvt': return calculateRVTResult(answers);
+    case 'mpt': return calculateMPTResult(answers);
+    case 'vbt': return calculateVBTResult(answers);
+    case 'city': return calculateCityResult(answers);
     default: return null;
   }
 }
@@ -253,6 +302,7 @@ module.exports = {
   calculateScl90Scores,
   calculateLBTResult,
   calculateMBTIResult,
+  MBTI_POLE_LABELS,
   calculateRpiScores,
   calculateSriScores,
   calculateResult

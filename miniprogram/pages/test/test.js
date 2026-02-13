@@ -49,7 +49,10 @@ Page({
     });
   },
   onSelect(e) {
-    const value = e.currentTarget.dataset.value;
+    let value = e.currentTarget.dataset.value;
+    if (this.data.config?.format === 'choice' && value !== undefined) {
+      value = typeof value === 'number' ? value : parseInt(String(value), 10);
+    }
     const { currentQ, answers, questions, total, testId } = this.data;
     const next = { ...answers, [currentQ.id]: value };
     saveAnswers(testId, next);

@@ -44,7 +44,7 @@ function fillSampleAnswers(testId) {
 
   if (testId === 'mbti') {
     const answers = {};
-    for (let i = 1; i <= 24; i++) answers['mbti-' + i] = randomBetween(0, 4);
+    for (let i = 1; i <= 90; i++) answers['mbti-' + i] = randomBetween(0, 4);
     saveAnswers('mbti', answers);
     return;
   }

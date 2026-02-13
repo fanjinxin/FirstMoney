@@ -1,12 +1,7 @@
 {
   "usingComponents": {
     "nav-header": "/components/nav-header/nav-header",
-    "theme-switcher": "/components/theme-switcher/theme-switcher",
-    "scl90-radar-chart": "/components/scl90-radar-chart/scl90-radar-chart",
-    "scl90-pie-chart": "/components/scl90-pie-chart/scl90-pie-chart",
-    "scl90-bar-chart": "/components/scl90-bar-chart/scl90-bar-chart",
-    "sri-bar-chart": "/components/sri-bar-chart/sri-bar-chart",
-    "rpi-bar-chart": "/components/rpi-bar-chart/rpi-bar-chart"
+    "theme-switcher": "/components/theme-switcher/theme-switcher"
   },
   "navigationBarTitleText": "测评结果"
 }
