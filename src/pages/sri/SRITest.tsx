@@ -5,7 +5,7 @@ import QuestionOverview from '../../components/QuestionOverview'
 import QuestionView from '../../components/QuestionView'
 import SectionHeader from '../../components/SectionHeader'
 import { sriTest } from '../../data/sri'
-import { loadAnswers, saveAnswers } from '../../utils/storage'
+import { loadAnswers, saveAnswers, clearAnswers } from '../../utils/storage'
 import { clearSampleFlag } from '../../utils/testSample'
 
 export default function SRITest() {
@@ -59,12 +59,25 @@ export default function SRITest() {
   const goNext = () => setCurrent((prev) => Math.min(total - 1, prev + 1))
   const goPrev = () => setCurrent((prev) => Math.max(0, prev - 1))
 
+  const handleRestart = () => {
+    if (window.confirm('确定要重新开始吗？当前的作答进度将被清空。')) {
+      clearAnswers(sriTest.id)
+      setAnswers({})
+      setCurrent(0)
+    }
+  }
+
   const canSubmit = answeredCount === total
 
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="space-y-4">
-        <SectionHeader title={sriTest.title} description={sriTest.subtitle} />
+        <div className="flex items-start justify-between">
+          <SectionHeader title={sriTest.title} description={sriTest.subtitle} />
+          <button onClick={handleRestart} className="text-xs text-xia-deep/50 hover:text-xia-teal underline px-2 py-1">
+            重新开始
+          </button>
+        </div>
         <p className="text-sm text-xia-deep/80">{sriTest.description}</p>
       </div>
 

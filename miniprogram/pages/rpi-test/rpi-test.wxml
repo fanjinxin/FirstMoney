@@ -2,9 +2,12 @@
 <view class="page-wrap rpi-page" style="{{themeStyle}}">
   <view class="rpi-main" wx:if="{{test}}">
     <view class="rpi-header-block">
-      <view class="section-header">
-        <view class="section-header-title">{{test.title}}</view>
-        <view class="section-header-desc" wx:if="{{test.subtitle}}">{{test.subtitle}}</view>
+      <view class="rpi-header-row">
+        <view class="section-header">
+          <view class="section-header-title">{{test.title}}</view>
+          <view class="section-header-desc" wx:if="{{test.subtitle}}">{{test.subtitle}}</view>
+        </view>
+        <view class="restart-btn" bindtap="onRestart">重新开始</view>
       </view>
       <view class="rpi-desc">{{test.description}}</view>
     </view>

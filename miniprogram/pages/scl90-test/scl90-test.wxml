@@ -12,6 +12,7 @@
           <view class="section-header-title">{{test.title}}</view>
           <view class="section-header-desc" wx:if="{{test.subtitle}}">{{test.subtitle}}</view>
         </view>
+        <view class="restart-btn" bindtap="onRestart">重新开始</view>
       </view>
       <view class="scl90-desc">{{test.description}}</view>
     </view>

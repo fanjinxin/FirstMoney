@@ -3,7 +3,7 @@
  */
 const { scl90Test } = require('../../data/scl90');
 const { TESTS } = require('../../data/tests');
-const { loadAnswers, saveAnswers } = require('../../utils/storage');
+const { loadAnswers, saveAnswers, clearAnswers } = require('../../utils/storage');
 const { clearSampleFlag } = require('../../utils/testSample');
 const { THEMES, getThemeStyle } = require('../../data/themes');
 
@@ -93,6 +93,18 @@ Page({
     });
   },
 
+  onRestart() {
+    wx.showModal({
+      title: '确认',
+      content: '确定要重新开始吗？当前的作答进度将被清空。',
+      success: (res) => {
+        if (res.confirm) {
+          clearAnswers(scl90Test.id);
+          this.onLoad();
+        }
+      },
+    });
+  },
   goPrev() {
     const { current, questions } = this.data;
     if (current <= 0) return;

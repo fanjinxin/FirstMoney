@@ -22,7 +22,15 @@
 .scl90-header-row {
   display: flex;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 24rpx;
+}
+.scl90-header-row .section-header { flex: 1; min-width: 0; }
+.scl90-header-row .restart-btn {
+  font-size: 26rpx;
+  color: var(--xia-teal);
+  text-decoration: underline;
+  flex-shrink: 0;
 }
 
 .scl90-header-icon-wrap {
