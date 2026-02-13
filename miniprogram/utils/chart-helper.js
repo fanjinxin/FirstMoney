@@ -10,24 +10,30 @@ const DEFAULT_COLORS = {
 
 function getCanvasSize(canvasId) {
   const sys = wx.getSystemInfoSync();
-  const w = Math.min(sys.windowWidth - 48, 350);
+  // 预留左右边距，确保图表不超出屏幕
+  const w = Math.min(sys.windowWidth - 56, 320);
   const sizes = {
-    'result-radar': [w, 280],
-    'result-bar': [w, 400],
-    'result-pie': [w, 260],
-    'result-rpi-bar': [w, 200],
-    'result-sri-bar': [w, 200],
+    'result-radar': [w, 260],
+    'result-bar': [w, 360],
+    'mpt-bar': [w, 220],
+    'lbt-bar': [w, 200],
+    'ybt-bar': [w, 208],
+    'result-pie': [w, 240],
+    'result-rpi-bar': [w, 180],
+    'result-sri-bar': [w, 180],
+    'vbt-bar': [w, 220],
+    'city-bar': [w, 280],
   };
-  return sizes[canvasId] || [w, 280];
+  return sizes[canvasId] || [w, 260];
 }
 
 function drawRadar(page, canvasId, data, colors, maxValue) {
   if (!data || data.length === 0) return;
   setTimeout(() => {
     const [w, h] = getCanvasSize(canvasId);
-    const ctx = wx.createCanvasContext(canvasId);
+    const ctx = wx.createCanvasContext(canvasId, page);
     const cx = w / 2, cy = h / 2, n = data.length;
-    const maxR = Math.min(w, h) / 2 - 40;
+    const maxR = Math.min(w, h) / 2 - 48;
     const getPoint = (i, r) => {
       const angle = (Math.PI * 2 / n) * i - Math.PI / 2;
       return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
@@ -73,8 +79,8 @@ function drawRadar(page, canvasId, data, colors, maxValue) {
     ctx.setFontSize(10);
     ctx.setTextAlign('center');
     for (let i = 0; i < n; i++) {
-      const name = (data[i] || {}).name || '';
-      const p = getPoint(i, maxR + 18);
+      const name = ((data[i] || {}).name || '').slice(0, 4);
+      const p = getPoint(i, maxR + 14);
       ctx.fillText(name, p.x, p.y);
     }
     ctx.draw();
@@ -86,7 +92,7 @@ function drawBar(page, canvasId, data, colors, maxScore) {
   if (sorted.length === 0) return;
   setTimeout(() => {
     const [w, h] = getCanvasSize(canvasId);
-    const ctx = wx.createCanvasContext(canvasId);
+    const ctx = wx.createCanvasContext(canvasId, page);
     const padLeft = 90, padRight = 30, padTop = 20, padBottom = 30;
     const chartW = w - padLeft - padRight;
     const chartH = h - padTop - padBottom;
@@ -126,7 +132,7 @@ function drawPie(page, canvasId, data, colors) {
   if (total === 0) return;
   setTimeout(() => {
     const [w, h] = getCanvasSize(canvasId);
-    const ctx = wx.createCanvasContext(canvasId);
+    const ctx = wx.createCanvasContext(canvasId, page);
     const cx = w / 2, cy = h / 2 - 10;
     const outerR = Math.min(w, h) / 2 - 30;
     const innerR = outerR * 0.4;
@@ -156,7 +162,7 @@ function drawRpiBar(page, canvasId, data, colors) {
   if (!data || data.length === 0) return;
   setTimeout(() => {
     const [w, h] = getCanvasSize(canvasId);
-    const ctx = wx.createCanvasContext(canvasId);
+    const ctx = wx.createCanvasContext(canvasId, page);
     const padLeft = 100, padRight = 24, padTop = 16, padBottom = 24;
     const chartW = w - padLeft - padRight;
     const chartH = h - padTop - padBottom;
@@ -203,7 +209,7 @@ function drawSriBar(page, canvasId, data) {
   if (sorted.length === 0) return;
   setTimeout(() => {
     const [w, h] = getCanvasSize(canvasId);
-    const ctx = wx.createCanvasContext(canvasId);
+    const ctx = wx.createCanvasContext(canvasId, page);
     const padLeft = 90, padRight = 30, padTop = 20, padBottom = 30;
     const chartW = w - padLeft - padRight;
     const chartH = h - padTop - padBottom;
@@ -224,6 +230,150 @@ function drawSriBar(page, canvasId, data) {
   }, 500);
 }
 
+/** YBT 病娇柱状图：玫瑰色 rgb(190,18,60)，maxValue=100 */
+function drawYBTBar(page, canvasId, data, maxValue) {
+  const sorted = (data || []).slice().sort((a, b) => (b.score || 0) - (a.score || 0));
+  if (sorted.length === 0) return;
+  const max = maxValue || 100;
+  const ROSE = 'rgb(190, 18, 60)';
+  setTimeout(() => {
+    const [w, h] = getCanvasSize(canvasId);
+    const ctx = wx.createCanvasContext(canvasId, page);
+    const padLeft = 90;
+    const padRight = 32;
+    const padTop = 24;
+    const padBottom = 24;
+    const chartW = w - padLeft - padRight;
+    const chartH = h - padTop - padBottom;
+    const rowH = chartH / sorted.length;
+    const barH = Math.min(18, rowH * 0.6);
+    const gap = (rowH - barH) / 2;
+    ctx.setFillStyle('#0F4C5C');
+    ctx.setFontSize(10);
+    ctx.setTextAlign('left');
+    sorted.forEach((d, i) => {
+      const y = padTop + i * rowH + gap;
+      const score = Math.min(max, Math.max(0, d.score || 0));
+      const barW = (score / max) * chartW;
+      ctx.setFillStyle(ROSE);
+      ctx.setGlobalAlpha(0.85);
+      ctx.fillRect(padLeft, y, barW, barH);
+      ctx.setGlobalAlpha(1);
+      ctx.setFillStyle('#0F4C5C');
+      ctx.fillText((d.name || '').slice(0, 8), 4, y + barH / 2 + 3);
+    });
+    ctx.draw();
+  }, canvasId === 'ybt-bar' ? 700 : 500);
+}
+
+/** RVT 恋爱观柱状图：玫瑰色 rgb(190,18,60)，maxValue=100 */
+function drawRVTBar(page, canvasId, data, maxValue) {
+  const sorted = (data || []).slice().sort((a, b) => (b.score || 0) - (a.score || 0));
+  if (sorted.length === 0) return;
+  const max = maxValue || 100;
+  const ROSE = 'rgb(190, 18, 60)';
+  setTimeout(() => {
+    const [w, h] = getCanvasSize(canvasId);
+    const ctx = wx.createCanvasContext(canvasId, page);
+    const padLeft = 90;
+    const padRight = 32;
+    const padTop = 24;
+    const padBottom = 24;
+    const chartW = w - padLeft - padRight;
+    const chartH = h - padTop - padBottom;
+    const rowH = chartH / sorted.length;
+    const barH = Math.min(18, rowH * 0.6);
+    const gap = (rowH - barH) / 2;
+    ctx.setFillStyle('#0F4C5C');
+    ctx.setFontSize(10);
+    ctx.setTextAlign('left');
+    sorted.forEach((d, i) => {
+      const y = padTop + i * rowH + gap;
+      const score = Math.min(max, Math.max(0, d.score || 0));
+      const barW = (score / max) * chartW;
+      ctx.setFillStyle(ROSE);
+      ctx.setGlobalAlpha(0.85);
+      ctx.fillRect(padLeft, y, barW, barH);
+      ctx.setGlobalAlpha(1);
+      ctx.setFillStyle('#0F4C5C');
+      ctx.fillText((d.name || '').slice(0, 8), 4, y + barH / 2 + 3);
+    });
+    ctx.draw();
+  }, 500);
+}
+
+/** LBT 恋爱脑柱状图：粉色 rgb(219,39,119)，maxValue=100 */
+function drawLBTBar(page, canvasId, data, maxValue) {
+  const sorted = (data || []).slice().sort((a, b) => (b.score || 0) - (a.score || 0));
+  if (sorted.length === 0) return;
+  const max = maxValue || 100;
+  const PINK = 'rgb(219, 39, 119)';
+  setTimeout(() => {
+    const [w, h] = getCanvasSize(canvasId);
+    const ctx = wx.createCanvasContext(canvasId, page);
+    const padLeft = 90;
+    const padRight = 32;
+    const padTop = 24;
+    const padBottom = 24;
+    const chartW = w - padLeft - padRight;
+    const chartH = h - padTop - padBottom;
+    const rowH = chartH / sorted.length;
+    const barH = Math.min(20, rowH * 0.6);
+    const gap = (rowH - barH) / 2;
+    ctx.setFillStyle('#0F4C5C');
+    ctx.setFontSize(10);
+    ctx.setTextAlign('left');
+    sorted.forEach((d, i) => {
+      const y = padTop + i * rowH + gap;
+      const score = Math.min(max, Math.max(0, d.score || 0));
+      const barW = (score / max) * chartW;
+      ctx.setFillStyle(PINK);
+      ctx.setGlobalAlpha(0.85);
+      ctx.fillRect(padLeft, y, barW, barH);
+      ctx.setGlobalAlpha(1);
+      ctx.setFillStyle('#0F4C5C');
+      ctx.fillText((d.name || '').slice(0, 10), 4, y + barH / 2 + 3);
+    });
+    ctx.draw();
+  }, canvasId === 'lbt-bar' ? 600 : 500);
+}
+
+/** MPT 亲密关系柱状图：teal 色 #2C6F7A，maxValue=100 */
+function drawMPTBar(page, canvasId, data, maxValue) {
+  const sorted = (data || []).slice().sort((a, b) => (b.score || 0) - (a.score || 0));
+  if (sorted.length === 0) return;
+  const max = maxValue || 100;
+  const TEAL = 'rgb(44, 111, 122)';
+  setTimeout(() => {
+    const [w, h] = getCanvasSize(canvasId);
+    const ctx = wx.createCanvasContext(canvasId, page);
+    const padLeft = 90;
+    const padRight = 32;
+    const padTop = 24;
+    const padBottom = 24;
+    const chartW = w - padLeft - padRight;
+    const chartH = h - padTop - padBottom;
+    const rowH = chartH / sorted.length;
+    const barH = Math.min(22, rowH * 0.6);
+    const gap = (rowH - barH) / 2;
+    ctx.setFillStyle('#0F4C5C');
+    ctx.setFontSize(10);
+    ctx.setTextAlign('left');
+    sorted.forEach((d, i) => {
+      const y = padTop + i * rowH + gap;
+      const score = Math.min(max, Math.max(0, d.score || 0));
+      const barW = (score / max) * chartW;
+      ctx.setFillStyle(TEAL);
+      ctx.setGlobalAlpha(0.85);
+      ctx.fillRect(padLeft, y, barW, barH);
+      ctx.setGlobalAlpha(1);
+      ctx.setFillStyle('#0F4C5C');
+      ctx.fillText((d.name || '').slice(0, 8), 4, y + barH / 2 + 3);
+    });
+    ctx.draw();
+  }, 500);
+}
+
 /** FFT 九型柱状图：每条 bar 使用水果颜色，maxValue=100 */
 function drawFFTBar(page, canvasId, data, maxValue) {
   const sorted = (data || []).slice().sort((a, b) => (b.score || 0) - (a.score || 0));
@@ -231,7 +381,7 @@ function drawFFTBar(page, canvasId, data, maxValue) {
   const max = maxValue || 100;
   setTimeout(() => {
     const [w, h] = getCanvasSize(canvasId);
-    const ctx = wx.createCanvasContext(canvasId);
+    const ctx = wx.createCanvasContext(canvasId, page);
     const padLeft = 100;
     const padRight = 40;
     const padTop = 24;
@@ -258,11 +408,83 @@ function drawFFTBar(page, canvasId, data, maxValue) {
   }, 500);
 }
 
+/** City 宜居城市柱状图：teal 色 #2C6F7A，5 维，maxValue=100 */
+function drawCityBar(page, canvasId, data, maxValue) {
+  const sorted = (data || []).slice().sort((a, b) => (b.score || 0) - (a.score || 0));
+  if (sorted.length === 0) return;
+  const max = maxValue || 100;
+  const TEAL = 'rgb(44, 111, 122)';
+  setTimeout(() => {
+    const [w, h] = getCanvasSize(canvasId);
+    const ctx = wx.createCanvasContext(canvasId, page);
+    const padLeft = 90;
+    const padRight = 32;
+    const padTop = 24;
+    const padBottom = 24;
+    const chartW = w - padLeft - padRight;
+    const chartH = h - padTop - padBottom;
+    const rowH = chartH / sorted.length;
+    const barH = Math.min(22, rowH * 0.6);
+    const gap = (rowH - barH) / 2;
+    ctx.setFillStyle('#0F4C5C');
+    ctx.setFontSize(10);
+    ctx.setTextAlign('left');
+    sorted.forEach((d, i) => {
+      const y = padTop + i * rowH + gap;
+      const score = Math.min(max, Math.max(0, d.score || 0));
+      const barW = (score / max) * chartW;
+      ctx.setFillStyle(TEAL);
+      ctx.setGlobalAlpha(0.85);
+      ctx.fillRect(padLeft, y, barW, barH);
+      ctx.setGlobalAlpha(1);
+      ctx.setFillStyle('#0F4C5C');
+      ctx.fillText((d.name || '').slice(0, 8), 4, y + barH / 2 + 3);
+    });
+    ctx.draw();
+  }, 500);
+}
+
+/** VBT 易被欺负保护力柱状图：teal 色 #2C6F7A，仅 3 个保护力维度，maxValue=100 */
+function drawVBTBar(page, canvasId, data, maxValue) {
+  const sorted = (data || []).slice().sort((a, b) => (b.score || 0) - (a.score || 0));
+  if (sorted.length === 0) return;
+  const max = maxValue || 100;
+  const TEAL = 'rgb(44, 111, 122)';
+  setTimeout(() => {
+    const [w, h] = getCanvasSize(canvasId);
+    const ctx = wx.createCanvasContext(canvasId, page);
+    const padLeft = 90;
+    const padRight = 32;
+    const padTop = 24;
+    const padBottom = 24;
+    const chartW = w - padLeft - padRight;
+    const chartH = h - padTop - padBottom;
+    const rowH = chartH / sorted.length;
+    const barH = Math.min(22, rowH * 0.6);
+    const gap = (rowH - barH) / 2;
+    ctx.setFillStyle('#0F4C5C');
+    ctx.setFontSize(10);
+    ctx.setTextAlign('left');
+    sorted.forEach((d, i) => {
+      const y = padTop + i * rowH + gap;
+      const score = Math.min(max, Math.max(0, d.score || 0));
+      const barW = (score / max) * chartW;
+      ctx.setFillStyle(TEAL);
+      ctx.setGlobalAlpha(0.85);
+      ctx.fillRect(padLeft, y, barW, barH);
+      ctx.setGlobalAlpha(1);
+      ctx.setFillStyle('#0F4C5C');
+      ctx.fillText((d.name || '').slice(0, 8), 4, y + barH / 2 + 3);
+    });
+    ctx.draw();
+  }, 500);
+}
+
 function drawHollandHexagon(page, canvasId, topThreeIds) {
   const ids = topThreeIds || [];
   setTimeout(() => {
     const sz = 280;
-    const ctx = wx.createCanvasContext(canvasId);
+    const ctx = wx.createCanvasContext(canvasId, page);
     const cx = sz / 2, cy = sz / 2, r = sz * 0.4;
     const order = ['R', 'I', 'A', 'S', 'E', 'C'];
     const points = order.map((_, i) => {
@@ -294,4 +516,4 @@ function drawHollandHexagon(page, canvasId, topThreeIds) {
   }, 100);
 }
 
-module.exports = { drawRadar, drawBar, drawPie, drawRpiBar, drawSriBar, drawFFTBar, drawHollandHexagon };
+module.exports = { drawRadar, drawBar, drawPie, drawRpiBar, drawSriBar, drawYBTBar, drawRVTBar, drawLBTBar, drawMPTBar, drawVBTBar, drawCityBar, drawFFTBar, drawHollandHexagon };
