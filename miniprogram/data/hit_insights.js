@@ -1,6 +1,10 @@
 /**
  * HIT 霍兰德职业兴趣解读 - 移植自 src/data/hit_insights.ts
  */
+const HOLLAND_CODE_INTRO = {
+  what: '六型 RIASEC 按得分取前三组成代码，用于匹配职业。',
+};
+
 const HOLLAND_ADJACENT = { R: ['I', 'C'], I: ['R', 'A'], A: ['I', 'S'], S: ['A', 'E'], E: ['S', 'C'], C: ['E', 'R'] };
 
 function getCodeConsistency(topThree) {
@@ -54,4 +58,4 @@ const HOLLAND_CODE_EXAMPLES = {
   CIE: '信息系统管理', CIS: '人力资源专员', CIA: '市场研究分析师',
 };
 
-module.exports = { getCodeConsistency, HIT_DIMENSION_SHORT, HIT_DIMENSION_INSIGHTS, HOLLAND_CODE_EXAMPLES };
+module.exports = { getCodeConsistency, HIT_DIMENSION_SHORT, HIT_DIMENSION_INSIGHTS, HOLLAND_CODE_EXAMPLES, HOLLAND_CODE_INTRO };

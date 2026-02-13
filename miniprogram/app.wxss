@@ -3,6 +3,7 @@ page {
   --xia-sky: #7FBFE1;
   --xia-aqua: #68D4DB;
   --xia-mint: #98E6E2;
+  --xia-mint-rgb: 152, 230, 226;
   --xia-cream: #F8F4E1;
   --xia-haze: #CFEFF0;
   --xia-deep: #0F4C5C;

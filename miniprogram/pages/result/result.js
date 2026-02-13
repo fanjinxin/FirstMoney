@@ -2,7 +2,7 @@ const { loadAnswers, clearAnswers } = require('../../utils/storage');
 const { calculateResult, calculateRpiScores, MBTI_POLE_LABELS } = require('../../utils/scoring');
 const { sriTest } = require('../../data/sri');
 const { THEMES, getThemeStyle } = require('../../data/themes');
-const { drawRadar, drawBar, drawPie, drawRpiBar, drawSriBar } = require('../../utils/chart-helper');
+const { drawRadar, drawBar, drawPie, drawRpiBar, drawSriBar, drawFFTBar, drawHollandHexagon } = require('../../utils/chart-helper');
 
 function hexToRgb(hex) {
   const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -368,13 +368,16 @@ Page({
 
     let psychAgeReport = null;
     if (testId === 'psych-age' && result && result.dimensionScores) {
-      const { PSYCH_AGE_RANGE_INSIGHTS, PSYCH_AGE_DIMENSION_INSIGHTS } = require('../../data/psych_age_insights');
+      const { PSYCH_AGE_RANGE_INSIGHTS, PSYCH_AGE_DIMENSION_INSIGHTS, PSYCH_AGE_PROFESSIONAL_GUIDANCE } = require('../../data/psych_age_insights');
       const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
       const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
         id: d.id, name: d.name, score: d.percent, level: d.trend === 'young' ? 'normal' : d.trend === 'balanced' ? 'mild' : 'moderate'
       }));
       const youngestDim = [...(result.dimensionScores || [])].sort((a, b) => a.percent - b.percent)[0];
       const oldestDim = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent)[0];
+      const r = result.psychAgeRange || '';
+      const ageImagePath = /70|岁以上/.test(r) ? '/assets/age-test/audit60-100.jpg' : /60|69/.test(r) ? '/assets/age-test/audit60-100.jpg' : /50|59/.test(r) ? '/assets/age-test/audit40-50.jpg' : /40|49/.test(r) ? '/assets/age-test/audit40-50.jpg' : /30|39/.test(r) ? '/assets/age-test/audit30-40.jpg' : '/assets/age-test/audit20-30.jpg';
+      const ringProgress = result.maxTotalScore > 0 ? Math.min(1, result.totalScore / result.maxTotalScore) : 0;
       psychAgeReport = {
         formatDate: formatDate(),
         rangeInsight: PSYCH_AGE_RANGE_INSIGHTS[result.psychAgeRange] || '暂无解读',
@@ -383,12 +386,15 @@ Page({
         barChartData,
         youngestDim,
         oldestDim,
+        ageImagePath,
+        ringProgress: Math.round(ringProgress * 360),
+        professionalGuidance: PSYCH_AGE_PROFESSIONAL_GUIDANCE,
       };
     }
 
     let aptReport = null;
     if (testId === 'apt' && result && result.dimensionScores) {
-      const { APT_LEVEL_LABELS, APT_LEVEL_DESC, APT_CAREER_SUGGESTIONS, APT_IMPROVE_TIPS, APT_DIMENSION_INSIGHTS, getCareerSuggestionKey } = require('../../data/apt_insights');
+      const { APT_LEVEL_LABELS, APT_LEVEL_DESC, APT_CAREER_SUGGESTIONS, APT_IMPROVE_TIPS, APT_DIMENSION_INSIGHTS, APT_SUMMARY, getCareerSuggestionKey } = require('../../data/apt_insights');
       const levelKey = result.totalLevel;
       const levelLabel = APT_LEVEL_LABELS[levelKey] || '中等';
       const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
@@ -403,6 +409,9 @@ Page({
         isWeak: weakIds.indexOf(d.id) >= 0,
         improveTip: APT_IMPROVE_TIPS[d.id],
       }));
+      const topDim = result.topDimensions && result.topDimensions[0];
+      const weakDim = result.weakDimensions && result.weakDimensions[0];
+      const aptRingProgress = Math.round((result.totalPercent / 100) * 360);
       aptReport = {
         formatDate: formatDate(),
         levelKey,
@@ -414,12 +423,16 @@ Page({
         dimInsights: APT_DIMENSION_INSIGHTS,
         improveTips: APT_IMPROVE_TIPS,
         dimensionList,
+        summary: APT_SUMMARY,
+        ringProgress: aptRingProgress,
+        topDim: topDim ? { name: topDim.name, level: topDim.level } : null,
+        weakDim: weakDim ? { name: weakDim.name, level: weakDim.level } : null,
       };
     }
 
     let hitReport = null;
     if (testId === 'hit' && result && result.dimensionScores) {
-      const { getCodeConsistency, HIT_DIMENSION_INSIGHTS, HOLLAND_CODE_EXAMPLES } = require('../../data/hit_insights');
+      const { getCodeConsistency, HIT_DIMENSION_INSIGHTS, HIT_DIMENSION_SHORT, HOLLAND_CODE_EXAMPLES, HOLLAND_CODE_INTRO } = require('../../data/hit_insights');
       const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
       const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.rawScore - a.rawScore).map(d => ({
         id: d.id, name: `${d.name}(${d.id})`, score: d.rawScore, level: result.topThree.some(t => t.id === d.id) ? 'normal' : 'mild'
@@ -427,10 +440,16 @@ Page({
       const codeExamples = HOLLAND_CODE_EXAMPLES[result.hollandCode] || '可根据前三型自行探索适合职业';
       const consistency = getCodeConsistency(result.topThree);
       const topThreeIds = (result.topThree || []).map(t => t.id);
-      const dimensionList = (result.dimensionScores || []).map(d => ({
-        ...d,
-        isTop: topThreeIds.indexOf(d.id) >= 0,
-      }));
+      const dimensionList = (result.dimensionScores || []).map(d => {
+        const topIdx = (result.topThree || []).findIndex(t => t.id === d.id);
+        return {
+          ...d,
+          isTop: topIdx >= 0,
+          topIdx,
+          roleLabel: topIdx === 0 ? '主导' : topIdx >= 1 ? '辅助' : '',
+          dimShort: HIT_DIMENSION_SHORT[d.id] || '',
+        };
+      });
       hitReport = {
         formatDate: formatDate(),
         radarData,
@@ -439,81 +458,112 @@ Page({
         consistency,
         dimInsights: HIT_DIMENSION_INSIGHTS,
         dimensionList,
+        codeIntro: HOLLAND_CODE_INTRO,
+        topThreeDisplay: (result.topThree || []).map(t => `${t.name}(${t.id})`).join(' > '),
+        topThreeIds,
       };
     }
 
     let dthReport = null;
     if (testId === 'dth' && result && result.dimensionScores) {
-      const { DTH_OVERALL_CONCLUSIONS, DTH_PROFILE_HINTS, DTH_DIMENSION_INSIGHTS, DTH_DIMENSION_BY_LEVEL, getDTHOverallLevel, getDTHDominantDimension } = require('../../data/dth_insights');
+      const { DTH_LEVEL_LABELS, DTH_OVERALL_CONCLUSIONS, DTH_PROFILE_HINTS, DTH_DIMENSION_INSIGHTS, DTH_DIMENSION_BY_LEVEL, DTH_DISCLAIMER, getDTHOverallLevel, getDTHDominantDimension } = require('../../data/dth_insights');
       const avgPercent = result.dimensionScores.length ? Math.round(result.dimensionScores.reduce((s, d) => s + d.percent, 0) / result.dimensionScores.length) : 0;
       const overallLevel = getDTHOverallLevel(avgPercent);
       const dominantId = getDTHDominantDimension(result.dimensionScores);
+      const conclusion = DTH_OVERALL_CONCLUSIONS[overallLevel];
+      const profileHint = DTH_PROFILE_HINTS[dominantId];
       const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
-      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
-        id: d.id, name: d.name, score: d.percent, level: d.level === 'high' ? 'moderate' : d.level === 'low' ? 'normal' : 'mild'
+      const barChartData = (result.dimensionScores || []).map(d => ({
+        id: d.id, name: d.name, score: d.percent, level: d.level === 'high' ? 'moderate' : d.level === 'low' ? 'normal' : 'mild',
       }));
       const dimensionList = (result.dimensionScores || []).map(d => ({
         ...d,
-        levelHint: DTH_DIMENSION_BY_LEVEL[d.id]?.[d.level] || '',
+        levelLabel: DTH_LEVEL_LABELS[d.level],
+        levelConclusion: DTH_DIMENSION_BY_LEVEL[d.id]?.[d.level] || '',
       }));
       dthReport = {
         formatDate: formatDate(),
         overallLevel,
-        overallConclusion: DTH_OVERALL_CONCLUSIONS[overallLevel],
-        profileHint: DTH_PROFILE_HINTS[dominantId],
+        avgPercent,
+        conclusion,
+        profileHint,
         radarData,
         barChartData,
         dimInsights: DTH_DIMENSION_INSIGHTS,
         dimensionList,
+        disclaimer: DTH_DISCLAIMER,
       };
     }
 
     let tlaReport = null;
     if (testId === 'tla' && result && result.dimensionScores) {
-      const { TLA_DIMENSION_CUTE, TLA_PROFILE_SHORT, getTLAProfileKey, TLA_DIMENSION_INSIGHTS } = require('../../data/tla_insights');
+      const { TLA_DIMENSION_CUTE, TLA_PROFILE_SHORT, getTLAProfileKey, TLA_DIMENSION_INSIGHTS, TLA_TIP } = require('../../data/tla_insights');
       const topTwo = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).slice(0, 2);
       const profileKey = getTLAProfileKey(topTwo);
-      const profileShort = TLA_PROFILE_SHORT[profileKey] || TLA_PROFILE_SHORT.default;
+      const profileDesc = TLA_PROFILE_SHORT[profileKey] || TLA_PROFILE_SHORT.default;
       const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
       const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
-        id: d.id, name: d.name, score: d.percent, level: topTwo.some(t => t.id === d.id) ? 'normal' : 'mild'
+        id: d.id, name: (TLA_DIMENSION_CUTE[d.id] || {}).label || d.name, score: d.percent, level: topTwo.some(t => t.id === d.id) ? 'normal' : 'mild'
       }));
       const dimensionList = (result.dimensionScores || []).map(d => {
-        const cute = TLA_DIMENSION_CUTE[d.id] || { label: d.name, emoji: '' };
-        return { ...d, cuteLabel: cute.label, emoji: cute.emoji, isTop: topTwo.some(t => t.id === d.id) };
+        const cute = TLA_DIMENSION_CUTE[d.id] || { label: d.name, emoji: '❤️', icon: '/assets/icons/heart-filled.svg' };
+        return { ...d, cuteLabel: cute.label, emoji: cute.emoji, icon: cute.icon, isTop: topTwo.some(t => t.id === d.id) };
       });
       tlaReport = {
         formatDate: formatDate(),
-        profileShort,
-        topTwo,
+        profileDesc,
+        topTwo: topTwo.map(d => ({ ...d, cute: TLA_DIMENSION_CUTE[d.id] || { label: d.name, emoji: '❤️', icon: '/assets/icons/heart-filled.svg' } })),
         radarData,
         barChartData,
         dimInsights: TLA_DIMENSION_INSIGHTS,
         dimensionList,
+        tip: TLA_TIP,
       };
     }
 
     let fftReport = null;
     if (testId === 'fft' && result && result.primaryFruit) {
-      const { FFT_FRUIT_EMOJI, FFT_FRUIT_INSIGHTS } = require('../../data/fft_insights');
-      const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
-      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.rawScore - a.rawScore).map(d => ({
-        id: d.id, name: d.name, score: d.rawScore, level: d.id === result.primaryFruit.id ? 'normal' : 'mild'
+      const { FFT_FRUIT_EMOJI, FFT_FRUIT_INSIGHTS, FFT_FRUIT_COLORS } = require('../../data/fft_insights');
+      const primary = result.primaryFruit;
+      const sorted = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent);
+      const secondary = sorted[1] ? { ...sorted[1], emoji: FFT_FRUIT_EMOJI[sorted[1].id] || '' } : null;
+      const tertiary = sorted[2] ? { ...sorted[2], emoji: FFT_FRUIT_EMOJI[sorted[2].id] || '' } : null;
+      const radarData = (result.dimensionScores || []).map(d => ({
+        name: d.name.replace('型', ''),
+        score: d.percent,
+        id: d.id,
+      }));
+      const barChartData = sorted.map(d => ({
+        id: d.id,
+        name: `${FFT_FRUIT_EMOJI[d.id] || ''} ${d.name}`,
+        score: d.percent,
+        color: FFT_FRUIT_COLORS[d.id] || '#2C6F7A',
       }));
       const dimensionList = (result.dimensionScores || []).map(d => ({
         ...d,
         emoji: FFT_FRUIT_EMOJI[d.id] || '',
-        isPrimary: d.id === result.primaryFruit.id,
+        color: FFT_FRUIT_COLORS[d.id] || '#2C6F7A',
+        isPrimary: d.id === primary.id,
+        isSecondary: secondary && d.id === secondary.id,
       }));
-      const primaryEmoji = FFT_FRUIT_EMOJI[result.primaryFruit.id] || '';
+      const scoreGrid = (result.dimensionScores || []).map(d => ({
+        ...d,
+        emoji: FFT_FRUIT_EMOJI[d.id] || '',
+        nameShort: d.name.replace('型', ''),
+        isPrimary: d.id === primary.id,
+        isSecondary: secondary && d.id === secondary.id,
+      }));
       fftReport = {
         formatDate: formatDate(),
-        primaryFruit: result.primaryFruit,
-        primaryEmoji,
+        primary,
+        secondary,
+        tertiary,
+        scoreGrid,
         radarData,
         barChartData,
         dimInsights: FFT_FRUIT_INSIGHTS,
         dimensionList,
+        primaryEmoji: FFT_FRUIT_EMOJI[primary.id] || '',
       };
     }
 
@@ -731,6 +781,7 @@ Page({
       drawBar(page, 'result-bar', r.barChartData, chartColors, 100);
     } else if (testId === 'hit' && this.data.hitReport) {
       const r = this.data.hitReport;
+      drawHollandHexagon(page, 'hit-hexagon', r.topThreeIds);
       drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
       drawBar(page, 'result-bar', r.barChartData, chartColors, 15);
     } else if (testId === 'dth' && this.data.dthReport) {
@@ -744,7 +795,7 @@ Page({
     } else if (testId === 'fft' && this.data.fftReport) {
       const r = this.data.fftReport;
       drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
-      drawBar(page, 'result-bar', r.barChartData, chartColors, 6);
+      drawFFTBar(page, 'result-bar', r.barChartData, 100);
     } else if (testId === 'ybt' && this.data.ybtReport) {
       const r = this.data.ybtReport;
       drawRadar(page, 'result-radar', r.radarData, chartColors, 100);

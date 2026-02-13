@@ -224,4 +224,74 @@ function drawSriBar(page, canvasId, data) {
   }, 500);
 }
 
-module.exports = { drawRadar, drawBar, drawPie, drawRpiBar, drawSriBar };
+/** FFT 九型柱状图：每条 bar 使用水果颜色，maxValue=100 */
+function drawFFTBar(page, canvasId, data, maxValue) {
+  const sorted = (data || []).slice().sort((a, b) => (b.score || 0) - (a.score || 0));
+  if (sorted.length === 0) return;
+  const max = maxValue || 100;
+  setTimeout(() => {
+    const [w, h] = getCanvasSize(canvasId);
+    const ctx = wx.createCanvasContext(canvasId);
+    const padLeft = 100;
+    const padRight = 40;
+    const padTop = 24;
+    const padBottom = 24;
+    const chartW = w - padLeft - padRight;
+    const chartH = h - padTop - padBottom;
+    const rowH = chartH / sorted.length;
+    const barH = Math.min(14, rowH * 0.6);
+    const gap = (rowH - barH) / 2;
+    ctx.setFillStyle('#0F4C5C');
+    ctx.setFontSize(10);
+    ctx.setTextAlign('left');
+    sorted.forEach((d, i) => {
+      const y = padTop + i * rowH + gap;
+      const score = Math.min(max, Math.max(0, d.score || 0));
+      const barW = (score / max) * chartW;
+      const color = d.color || '#2C6F7A';
+      ctx.setFillStyle(color);
+      ctx.fillRect(padLeft, y, barW, barH);
+      ctx.setFillStyle('#0F4C5C');
+      ctx.fillText((d.name || '').slice(0, 14), 4, y + barH / 2 + 3);
+    });
+    ctx.draw();
+  }, 500);
+}
+
+function drawHollandHexagon(page, canvasId, topThreeIds) {
+  const ids = topThreeIds || [];
+  setTimeout(() => {
+    const sz = 280;
+    const ctx = wx.createCanvasContext(canvasId);
+    const cx = sz / 2, cy = sz / 2, r = sz * 0.4;
+    const order = ['R', 'I', 'A', 'S', 'E', 'C'];
+    const points = order.map((_, i) => {
+      const a = -Math.PI / 2 + i * (Math.PI / 3);
+      return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a), id: order[i] };
+    });
+    ctx.setStrokeStyle('rgba(207,239,240,0.8)');
+    ctx.setLineWidth(2);
+    ctx.beginPath();
+    points.forEach((p, i) => { i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y); });
+    ctx.closePath();
+    ctx.stroke();
+    points.forEach((p) => {
+      const isTop = ids.indexOf(p.id) >= 0;
+      ctx.setFillStyle(isTop ? 'rgba(44,111,122,0.5)' : 'rgba(207,239,240,0.3)');
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.setStrokeStyle('#2C6F7A');
+      ctx.setLineWidth(isTop ? 2 : 1);
+      ctx.stroke();
+      ctx.setFillStyle('#0F4C5C');
+      ctx.setFontSize(14);
+      ctx.setTextAlign('center');
+      ctx.setTextBaseline('middle');
+      ctx.fillText(p.id, p.x, p.y + 2);
+    });
+    ctx.draw();
+  }, 100);
+}
+
+module.exports = { drawRadar, drawBar, drawPie, drawRpiBar, drawSriBar, drawFFTBar, drawHollandHexagon };

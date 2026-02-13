@@ -2,10 +2,10 @@
  * TLA 年上年下恋爱测试解读 - 移植自 src/data/tla_insights.ts
  */
 const TLA_DIMENSION_CUTE = {
-  older: { label: '年上控', emoji: '✨' },
-  younger: { label: '年下控', emoji: '🌸' },
-  care: { label: '照顾型', emoji: '🫶' },
-  cared: { label: '被宠型', emoji: '💕' },
+  older: { label: '年上控', emoji: '✨', icon: '/assets/icons/sparkles.svg' },
+  younger: { label: '年下控', emoji: '🌸', icon: '/assets/icons/flower.svg' },
+  care: { label: '照顾型', emoji: '🫶', icon: '/assets/icons/heart.svg' },
+  cared: { label: '被宠型', emoji: '💕', icon: '/assets/icons/heart-filled.svg' },
 };
 
 const TLA_PROFILE_SHORT = {
@@ -31,4 +31,7 @@ const TLA_DIMENSION_INSIGHTS = {
   cared: '被照顾欲反映你乐于在关系中被呵护、被支持的倾向。高分者享受被关心与包容，适合与愿意付出的伴侣相处。',
 };
 
-module.exports = { TLA_DIMENSION_CUTE, TLA_PROFILE_SHORT, getTLAProfileKey, TLA_DIMENSION_INSIGHTS };
+/** 温馨提示（与 web 版一致，已移入 icon，此处不再含 emoji） */
+const TLA_TIP = '恋爱偏好因人而异，没有对错～这份报告帮你更好地了解自己，在关系中做真实的自己就好啦！';
+
+module.exports = { TLA_DIMENSION_CUTE, TLA_PROFILE_SHORT, getTLAProfileKey, TLA_DIMENSION_INSIGHTS, TLA_TIP };

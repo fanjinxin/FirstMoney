@@ -299,21 +299,33 @@
     </view>
   </view>
 
-  <!-- 心理年龄测验结果 -->
+  <!-- 心理年龄测验结果（严格参照 web 版布局） -->
   <view wx:if="{{testId === 'psych-age' && result && psychAgeReport}}" class="psych-age-report-wrap">
     <view class="psych-age-report-paper">
       <view class="psych-age-header">
-        <view class="psych-age-header-inner">
-          <view class="psych-age-circle-wrap"><view class="psych-age-circle-inner">{{result.psychAgeRange}}</view></view>
-          <view class="psych-age-header-text">
-            <view class="psych-age-header-sub">心理年龄测验</view>
-            <view class="psych-age-header-title">心理年龄：{{result.psychAgeRange}}</view>
-            <view class="psych-age-meta">总分 {{result.totalScore}}/{{result.maxTotalScore}} · 已完成 {{result.answeredCount}}/{{result.totalQuestions}} 题</view>
+        <view class="psych-age-header-row">
+          <view class="psych-age-left">
+            <view class="psych-age-ring-wrap">
+              <view class="psych-age-ring-outer"></view>
+              <view class="psych-age-ring-fill" style="background: conic-gradient(from -90deg, var(--xia-teal) 0deg, var(--xia-teal) {{psychAgeReport.ringProgress}}deg, rgba(var(--xia-sky-rgb), 0.35) {{psychAgeReport.ringProgress}}deg, rgba(var(--xia-sky-rgb), 0.35) 360deg);"></view>
+              <view class="psych-age-ring-inner">
+                <image wx:if="{{psychAgeReport.ageImagePath}}" class="psych-age-icon-img" src="{{psychAgeReport.ageImagePath}}" mode="aspectFill" />
+              </view>
+            </view>
+            <view class="psych-age-left-text">
+              <view class="psych-age-label">心理年龄</view>
+              <view class="psych-age-score">总分 {{result.totalScore}}/{{result.maxTotalScore}}</view>
+            </view>
           </view>
-        </view>
-        <view wx:if="{{psychAgeReport.youngestDim && psychAgeReport.oldestDim}}" class="psych-age-tags">
-          <view class="psych-age-tag psych-age-trend-{{psychAgeReport.youngestDim.trend}}">最年轻：{{psychAgeReport.youngestDim.name}}</view>
-          <view class="psych-age-tag psych-age-trend-{{psychAgeReport.oldestDim.trend}}">最成熟：{{psychAgeReport.oldestDim.name}}</view>
+          <view class="psych-age-right">
+            <view class="psych-age-right-sub">心理年龄测验</view>
+            <view class="psych-age-right-title">{{result.psychAgeRange}}</view>
+            <view class="psych-age-right-desc">根据七维度综合评估，你的心理特征倾向于此年龄区间的特质。</view>
+            <view wx:if="{{psychAgeReport.youngestDim && psychAgeReport.oldestDim}}" class="psych-age-tags">
+              <view class="psych-age-tag psych-age-trend-{{psychAgeReport.youngestDim.trend}}"><text class="psych-age-tag-lbl">最年轻</text><text class="psych-age-tag-val">{{psychAgeReport.youngestDim.name}}</text></view>
+              <view class="psych-age-tag psych-age-trend-{{psychAgeReport.oldestDim.trend}}"><text class="psych-age-tag-lbl">最成熟</text><text class="psych-age-tag-val">{{psychAgeReport.oldestDim.name}}</text></view>
+            </view>
+          </view>
         </view>
       </view>
       <view class="psych-age-body">
@@ -337,6 +349,25 @@
             <view class="psych-age-dim-desc">{{psychAgeReport.dimInsights[item.id] || '暂无解读'}}</view>
           </view>
         </view>
+        <view class="psych-age-divider"></view>
+        <view class="psych-age-section psych-age-guidance">
+          <view class="psych-age-section-title">专业指导</view>
+          <view class="psych-age-guidance-inner">
+            <view class="psych-age-guidance-block">
+              <view class="psych-age-guidance-label">以下情况建议寻求专业帮助</view>
+              <view class="psych-age-guidance-list">
+                <view wx:for="{{psychAgeReport.professionalGuidance.whenToSeekHelp}}" wx:key="*this" class="psych-age-guidance-item">{{item}}</view>
+              </view>
+            </view>
+            <view class="psych-age-guidance-block">
+              <view class="psych-age-guidance-label">自我调节建议</view>
+              <view class="psych-age-guidance-list">
+                <view wx:for="{{psychAgeReport.professionalGuidance.selfCareTips}}" wx:key="*this" class="psych-age-guidance-item">{{item}}</view>
+              </view>
+            </view>
+            <view class="psych-age-guidance-note">{{psychAgeReport.professionalGuidance.note}}</view>
+          </view>
+        </view>
       </view>
       <view class="psych-age-footer">
         <view class="psych-age-footer-text">报告生成时间：{{psychAgeReport.formatDate}} · 心理年龄测验</view>
@@ -345,23 +376,34 @@
     </view>
   </view>
 
-  <!-- APT 天赋潜能结果 -->
+  <!-- APT 天赋潜能结果（严格参照 web 版布局） -->
   <view wx:if="{{testId === 'apt' && result && aptReport}}" class="apt-report-wrap">
     <view class="apt-report-paper">
       <view class="apt-header">
-        <view class="apt-header-inner">
-          <view class="apt-circle-wrap"><view class="apt-circle-inner">{{result.totalPercent}}%</view></view>
-          <view class="apt-header-text">
-            <view class="apt-header-sub">APT 天赋潜能</view>
-            <view class="apt-header-title">综合潜能指数</view>
-            <view class="apt-level-badge apt-level-{{aptReport.levelKey}}">{{aptReport.levelLabel}}</view>
-            <view class="apt-header-desc">{{aptReport.levelDesc}}</view>
-            <view class="apt-meta">总分 {{result.totalScore}}/{{result.maxTotalScore}}</view>
+        <view class="apt-header-row">
+          <view class="apt-left">
+            <view class="apt-ring-wrap">
+              <view class="apt-ring-outer"></view>
+              <view class="apt-ring-fill" style="background: conic-gradient(from -90deg, var(--xia-teal) 0deg, var(--xia-teal) {{aptReport.ringProgress}}deg, rgba(var(--xia-sky-rgb), 0.35) {{aptReport.ringProgress}}deg, rgba(var(--xia-sky-rgb), 0.35) 360deg);"></view>
+              <view class="apt-ring-inner">
+                <image class="apt-icon-img" src="/assets/icons/sparkles.svg" mode="aspectFit" />
+              </view>
+            </view>
+            <view class="apt-left-text">
+              <view class="apt-label">APT 天赋潜能</view>
+              <view class="apt-score">总分 {{result.totalScore}}/{{result.maxTotalScore}}</view>
+            </view>
           </view>
-        </view>
-        <view class="apt-stats-row">
-          <view class="apt-stat-card apt-stat-wide"><view class="apt-stat-lbl">最强</view><view class="apt-stat-val">{{result.topDimensions[0].name}}</view></view>
-          <view class="apt-stat-card"><view class="apt-stat-lbl">待提升</view><view class="apt-stat-val apt-stat-weak">{{result.weakDimensions[0].name}}</view></view>
+          <view class="apt-right">
+            <view class="apt-right-sub">天赋潜能评估</view>
+            <view class="apt-right-title">综合潜能指数</view>
+            <view class="apt-level-badge apt-level-{{aptReport.levelKey}}">{{aptReport.levelLabel}}</view>
+            <view class="apt-right-desc">{{aptReport.levelDesc}}</view>
+            <view wx:if="{{aptReport.topDim || aptReport.weakDim}}" class="apt-tags">
+              <view wx:if="{{aptReport.topDim}}" class="apt-tag apt-level-{{aptReport.topDim.level}}"><text class="apt-tag-lbl">最强</text><text class="apt-tag-val">{{aptReport.topDim.name}}</text></view>
+              <view wx:if="{{aptReport.weakDim}}" class="apt-tag apt-level-{{aptReport.weakDim.level}}"><text class="apt-tag-lbl">待提升</text><text class="apt-tag-val">{{aptReport.weakDim.name}}</text></view>
+            </view>
+          </view>
         </view>
       </view>
       <view class="apt-body">
@@ -387,6 +429,13 @@
             <view wx:if="{{item.isWeak && item.improveTip}}" class="apt-improve">💡 {{item.improveTip}}</view>
           </view>
         </view>
+        <view class="apt-divider"></view>
+        <view class="apt-section apt-summary-section">
+          <view class="apt-section-title">综合建议</view>
+          <view class="apt-summary-card">
+            <view wx:for="{{aptReport.summary}}" wx:key="*this" class="apt-summary-item">· {{item}}</view>
+          </view>
+        </view>
       </view>
       <view class="apt-footer">
         <view class="apt-footer-text">报告生成时间：{{aptReport.formatDate}} · APT 天赋潜能评估</view>
@@ -395,39 +444,75 @@
     </view>
   </view>
 
-  <!-- HIT 霍兰德职业兴趣结果 -->
+  <!-- HIT 霍兰德职业兴趣结果（严格参照 web 版） -->
   <view wx:if="{{testId === 'hit' && result && hitReport}}" class="hit-report-wrap">
     <view class="hit-report-paper">
       <view class="hit-header">
-        <view class="hit-header-inner">
-          <view class="hit-code-wrap"><view class="hit-code-inner">{{result.hollandCode}}</view></view>
-          <view class="hit-header-text">
-            <view class="hit-header-sub">HIT 霍兰德职业兴趣</view>
-            <view class="hit-header-title">你的霍兰德代码</view>
-            <view class="hit-consistency">{{hitReport.consistency.level}}一致性 · {{hitReport.consistency.short}}</view>
-            <view class="hit-meta">六型 RIASEC 按得分取前三组成代码</view>
+        <view class="hit-header-row">
+          <view class="hit-left">
+            <view class="hit-icon-wrap">
+              <image class="hit-icon-img" src="/assets/huolande-icon.png" mode="aspectFit" />
+            </view>
+          </view>
+          <view class="hit-right">
+            <view class="hit-right-sub">HIT 霍兰德职业兴趣</view>
+            <view class="hit-right-title">你的霍兰德代码：{{result.hollandCode}}</view>
+            <view class="hit-right-top3">前三型：{{hitReport.topThreeDisplay}}</view>
+            <view class="hit-career-box">
+              <view class="hit-career-label">推荐职业：</view>
+              <view class="hit-career-val">{{hitReport.codeExamples}}</view>
+            </view>
+            <view class="hit-consistency-box">
+              <view class="hit-consistency-lbl">一致性 {{hitReport.consistency.level}}</view>
+              <view class="hit-consistency-short">· {{hitReport.consistency.short}}</view>
+            </view>
           </view>
         </view>
       </view>
       <view class="hit-body">
         <view class="hit-section">
-          <view class="hit-section-title">可视化分析</view>
-          <view class="hit-charts-row">
-            <view class="hit-radar-wrap"><view class="hit-chart-title">六型雷达图</view><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
-            <view class="hit-bar-wrap"><view class="hit-chart-title">六型得分排序</view><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
+          <view class="hit-section-title"><view class="hit-section-icon"></view>霍兰德六边形</view>
+          <view class="hit-hexagon-card">
+            <view class="hit-hexagon-canvas-wrap">
+              <canvas canvas-id="hit-hexagon" class="hit-hexagon-canvas" style="width:280px;height:280px;"></canvas>
+            </view>
+            <view class="hit-hexagon-text">
+              <view class="hit-code-intro-item"><view class="hit-intro-num">1</view><view class="hit-intro-txt">{{hitReport.codeIntro.what}}</view></view>
+              <view class="hit-code-intro-item"><view class="hit-intro-num">2</view><view class="hit-intro-txt">你的代码 <text class="hit-code-bold">{{result.hollandCode}}</text>：首位 <text class="hit-code-bold">{{result.topThree && result.topThree[0] ? result.topThree[0].name : '-'}}</text> 为主导型</view></view>
+            </view>
           </view>
         </view>
         <view class="hit-divider"></view>
         <view class="hit-section">
-          <view class="hit-section-title">职业方向建议</view>
-          <view class="hit-career-card">{{hitReport.codeExamples}}</view>
+          <view class="hit-section-title">六型雷达</view>
+          <view class="hit-chart-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:320px;"></canvas></view>
+        </view>
+        <view class="hit-divider"></view>
+        <view class="hit-section">
+          <view class="hit-section-title">六型得分</view>
+          <view class="hit-chart-wrap"><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:360px;"></canvas></view>
         </view>
         <view class="hit-divider"></view>
         <view class="hit-section">
           <view class="hit-section-title">六型解读</view>
-          <view wx:for="{{hitReport.dimensionList}}" wx:key="id" class="hit-dim-item {{item.isTop ? 'hit-top' : ''}}">
-            <view class="hit-dim-head"><view class="hit-dim-name">{{item.name}}({{item.id}})</view><view class="hit-dim-meta">{{item.rawScore}}/15 · {{item.percent}}%</view></view>
-            <view class="hit-dim-desc">{{hitReport.dimInsights[item.id] || '暂无解读'}}</view>
+          <view class="hit-dim-grid">
+            <view wx:for="{{hitReport.dimensionList}}" wx:key="id" class="hit-dim-card {{item.isTop ? 'hit-top' : ''}}">
+              <view class="hit-dim-card-icon {{item.isTop ? 'hit-icon-top' : 'hit-icon-normal'}}">{{item.id}}</view>
+              <view class="hit-dim-card-body">
+                <view class="hit-dim-card-head"><view class="hit-dim-card-name">{{item.name}}（{{item.id}}）</view><view class="hit-dim-card-score">{{item.rawScore}}/15</view></view>
+                <view wx:if="{{item.roleLabel}}" class="hit-dim-role">{{item.roleLabel}}</view>
+                <view class="hit-dim-bar"><view class="hit-dim-fill" style="width: {{item.percent}}%"></view></view>
+                <view class="hit-dim-short">{{item.dimShort}}</view>
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="hit-divider"></view>
+        <view class="hit-section">
+          <view class="hit-usage-row">
+            <view class="hit-usage-item"><view class="hit-usage-dot"></view>前三型组成代码 · 首位主导</view>
+            <view class="hit-usage-item"><view class="hit-usage-dot"></view>可查 O*NET / 职业索引</view>
+            <view class="hit-usage-item"><view class="hit-usage-dot"></view>兴趣≠能力 · 仅供参考</view>
           </view>
         </view>
       </view>
@@ -438,106 +523,229 @@
     </view>
   </view>
 
-  <!-- DTH 黑暗三角结果 -->
+  <!-- DTH 黑暗三角结果（严格参照 web 版） -->
   <view wx:if="{{testId === 'dth' && result && dthReport}}" class="dth-report-wrap">
     <view class="dth-report-paper">
       <view class="dth-header">
-        <view class="dth-header-inner">
-          <view class="dth-level-wrap"><view class="dth-level-inner dth-level-{{dthReport.overallLevel}}">{{dthReport.overallConclusion.title}}</view></view>
-          <view class="dth-header-text">
-            <view class="dth-header-sub">DTH 黑暗三角</view>
-            <view class="dth-header-title">{{dthReport.overallConclusion.title}}</view>
-            <view class="dth-profile-hint">{{dthReport.profileHint}}</view>
-            <view class="dth-summary">{{dthReport.overallConclusion.summary}}</view>
+        <view class="dth-header-row">
+          <view class="dth-left">
+            <view class="dth-icon-wrap">
+              <image class="dth-icon-img" src="/assets/icons/shield.svg" mode="aspectFit" />
+            </view>
+          </view>
+          <view class="dth-right">
+            <view class="dth-right-sub">DTH 黑暗三角人格</view>
+            <view class="dth-right-title">{{dthReport.conclusion.title}}</view>
+            <view class="dth-right-meta">三维均分 {{dthReport.avgPercent}}% · 总分 {{result.totalScore}}/{{result.maxTotalScore}}</view>
           </view>
         </view>
       </view>
       <view class="dth-body">
         <view class="dth-section">
-          <view class="dth-section-title">可视化分析</view>
-          <view class="dth-charts-row">
-            <view class="dth-radar-wrap"><view class="dth-chart-title">三维雷达图</view><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
-            <view class="dth-bar-wrap"><view class="dth-chart-title">维度得分排序</view><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
+          <view class="dth-conclusion-card">
+            <view class="dth-conclusion-icon-wrap dth-icon-{{dthReport.overallLevel}}">
+              <view class="dth-conclusion-icon-inner">{{dthReport.overallLevel === 'low' ? '✓' : dthReport.overallLevel === 'moderate' ? 'i' : '!'}}</view>
+            </view>
+            <view class="dth-conclusion-content">
+              <view class="dth-conclusion-title">{{dthReport.conclusion.title}}</view>
+              <view class="dth-conclusion-summary">{{dthReport.conclusion.summary}}</view>
+              <view class="dth-conclusion-profile">{{dthReport.profileHint}}</view>
+              <view class="dth-conclusion-hint">{{dthReport.conclusion.hint}}</view>
+            </view>
           </view>
         </view>
         <view class="dth-divider"></view>
         <view class="dth-section">
-          <view class="dth-section-title">三维度解读</view>
-          <view wx:for="{{dthReport.dimensionList}}" wx:key="id" class="dth-dim-item dth-level-{{item.level}}">
-            <view class="dth-dim-head"><view class="dth-dim-name">{{item.name}}</view><view class="dth-dim-meta">{{item.percent}}% · {{item.level === 'low' ? '偏低' : item.level === 'high' ? '偏高' : '适中'}}</view></view>
+          <view class="dth-section-title">三角雷达</view>
+          <view class="dth-chart-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:288px;"></canvas></view>
+        </view>
+        <view class="dth-divider"></view>
+        <view class="dth-section">
+          <view class="dth-section-title">三维度得分</view>
+          <view class="dth-chart-wrap"><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:240px;"></canvas></view>
+        </view>
+        <view class="dth-divider"></view>
+        <view class="dth-section">
+          <view class="dth-section-title">维度解读</view>
+          <view wx:for="{{dthReport.dimensionList}}" wx:key="id" class="dth-dim-card">
+            <view class="dth-dim-head"><view class="dth-dim-name">{{item.name}}</view><view class="dth-dim-meta">{{item.percent}}% · {{item.levelLabel}}</view></view>
+            <view class="dth-dim-bar"><view class="dth-dim-fill" style="width: {{item.percent}}%"></view></view>
+            <view wx:if="{{item.levelConclusion}}" class="dth-dim-level-box">✓ {{item.levelConclusion}}</view>
             <view class="dth-dim-desc">{{dthReport.dimInsights[item.id] || '暂无解读'}}</view>
-            <view wx:if="{{item.levelHint}}" class="dth-dim-hint">{{item.levelHint}}</view>
           </view>
         </view>
-        <view class="dth-hint-box">{{dthReport.overallConclusion.hint}}</view>
+        <view class="dth-divider"></view>
+        <view class="dth-section">
+          <view class="dth-disclaimer-card">
+            <view class="dth-disclaimer-title">说明：</view>
+            <view class="dth-disclaimer-text">{{dthReport.disclaimer}}</view>
+          </view>
+        </view>
       </view>
       <view class="dth-footer">
-        <view class="dth-footer-text">报告生成时间：{{dthReport.formatDate}} · DTH 黑暗三角人格测试 · 仅供教育参考</view>
+        <view class="dth-footer-text">报告生成时间：{{dthReport.formatDate}} · DTH 黑暗三角人格测试</view>
         <view class="dth-footer-links"><navigator url="/pages/test/test?testId=dth" class="dth-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="dth-footer-link">返回首页</navigator></view>
       </view>
     </view>
   </view>
 
-  <!-- TLA 年上年下结果 -->
+  <!-- TLA 年上年下结果（严格参照 web 版） -->
   <view wx:if="{{testId === 'tla' && result && tlaReport}}" class="tla-report-wrap">
     <view class="tla-report-paper">
       <view class="tla-header">
-        <view class="tla-header-inner">
-          <view class="tla-profile-desc">{{tlaReport.profileShort}}</view>
-          <view class="tla-meta">四维雷达 · 年上/年下 · 照顾/被照顾</view>
+        <view class="tla-header-row">
+          <view class="tla-left">
+            <view class="tla-icon-wrap">
+              <image class="tla-icon-img" src="/assets/icons/heart-filled.svg" mode="aspectFit" />
+            </view>
+          </view>
+          <view class="tla-right">
+            <view class="tla-right-sub"><image class="tla-sparkles-img" src="/assets/icons/sparkles.svg" mode="aspectFit" />TLA 年上年下恋爱测试</view>
+            <view class="tla-right-title">你的恋爱偏好报告</view>
+            <view class="tla-tags">
+              <view wx:for="{{tlaReport.topTwo}}" wx:key="id" class="tla-tag"><image wx:if="{{item.cute.icon}}" class="tla-tag-icon" src="{{item.cute.icon}}" mode="aspectFit" /><text wx:else class="tla-tag-emoji">{{item.cute.emoji}}</text><text class="tla-tag-label">{{item.cute.label}}</text></view>
+            </view>
+          </view>
         </view>
       </view>
       <view class="tla-body">
         <view class="tla-section">
-          <view class="tla-section-title">可视化分析</view>
-          <view class="tla-charts-row">
-            <view class="tla-radar-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
-            <view class="tla-bar-wrap"><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
+          <view class="tla-portrait-card">
+            <image class="tla-portrait-icon" src="/assets/icons/heart-filled.svg" mode="aspectFit" />
+            <view class="tla-portrait-content">
+              <view class="tla-portrait-title">你的恋爱画像</view>
+              <view class="tla-portrait-desc">{{tlaReport.profileDesc}}</view>
+            </view>
           </view>
         </view>
         <view class="tla-divider"></view>
         <view class="tla-section">
-          <view class="tla-section-title">四维度解读</view>
-          <view wx:for="{{tlaReport.dimensionList}}" wx:key="id" class="tla-dim-item {{item.isTop ? 'tla-top' : ''}}">
-            <view class="tla-dim-head"><view class="tla-dim-emoji">{{item.emoji}}</view><view class="tla-dim-name">{{item.name}} · {{item.cuteLabel}}</view><view class="tla-dim-meta">{{item.percent}}%</view></view>
-            <view class="tla-dim-desc">{{tlaReport.dimInsights[item.id] || '暂无解读'}}</view>
+          <view class="tla-section-title"><image class="tla-section-icon" src="/assets/icons/radar.svg" mode="aspectFit" />恋爱偏好雷达</view>
+          <view class="tla-chart-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:288px;"></canvas></view>
+        </view>
+        <view class="tla-divider"></view>
+        <view class="tla-section">
+          <view class="tla-section-title"><image class="tla-section-icon" src="/assets/icons/chart-bar.svg" mode="aspectFit" />四维得分</view>
+          <view class="tla-chart-wrap"><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:224px;"></canvas></view>
+        </view>
+        <view class="tla-divider"></view>
+        <view class="tla-section">
+          <view class="tla-section-title"><image class="tla-section-icon" src="/assets/icons/mail.svg" mode="aspectFit" />维度解读</view>
+          <view class="tla-dim-grid">
+            <view wx:for="{{tlaReport.dimensionList}}" wx:key="id" class="tla-dim-card {{item.isTop ? 'tla-top' : ''}}">
+              <view class="tla-dim-head">
+                <view class="tla-dim-name-row"><image wx:if="{{item.icon}}" class="tla-dim-icon" src="{{item.icon}}" mode="aspectFit" /><text wx:else class="tla-dim-emoji">{{item.emoji}}</text><view class="tla-dim-name">{{item.name}}</view><view wx:if="{{item.isTop}}" class="tla-dim-badge">偏好较高</view></view>
+                <view class="tla-dim-percent">{{item.percent}}%</view>
+              </view>
+              <view class="tla-dim-bar"><view class="tla-dim-fill" style="width: {{item.percent}}%"></view></view>
+              <view class="tla-dim-desc">{{tlaReport.dimInsights[item.id] || '暂无解读'}}</view>
+            </view>
           </view>
+        </view>
+        <view class="tla-divider"></view>
+        <view class="tla-section">
+          <view class="tla-section-title"><image class="tla-section-icon" src="/assets/icons/info.svg" mode="aspectFit" />温馨提示</view>
+          <view class="tla-tip-card">{{tlaReport.tip}}</view>
         </view>
       </view>
       <view class="tla-footer">
-        <view class="tla-footer-text">报告生成时间：{{tlaReport.formatDate}} · TLA 年上年下恋爱测试</view>
-        <view class="tla-footer-links"><navigator url="/pages/test/test?testId=tla" class="tla-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="tla-footer-link">返回首页</navigator></view>
+        <view class="tla-footer-text">报告生成时间：{{tlaReport.formatDate}} · 年上年下恋爱测试</view>
+        <view class="tla-footer-links">
+          <navigator url="/pages/test/test?testId=tla" class="tla-footer-btn">返回测验</navigator>
+          <navigator url="/pages/index/index" class="tla-footer-link">返回首页</navigator>
+        </view>
       </view>
     </view>
   </view>
 
-  <!-- FFT 水果塑结果 -->
+  <!-- FFT 水果塑结果（严格按 web 布局） -->
   <view wx:if="{{testId === 'fft' && result && fftReport}}" class="fft-report-wrap">
     <view class="fft-report-paper">
+      <!-- 头部：与 web 一致 -->
       <view class="fft-header">
-        <view class="fft-primary-wrap"><view class="fft-primary-emoji">{{fftReport.primaryEmoji}}</view><view class="fft-primary-name">{{fftReport.primaryFruit.name}}</view></view>
-        <view class="fft-meta">九型水果人格 · 你的主导类型</view>
+        <view class="fft-header-inner">
+          <view class="fft-header-row">
+            <view class="fft-emoji-circle">
+              <text class="fft-emoji">{{fftReport.primaryEmoji}}</text>
+            </view>
+            <view class="fft-header-text">
+              <view class="fft-meta">FFT 水果塑形 · 九型人格</view>
+              <view class="fft-title">你是{{fftReport.primary.name}}人格</view>
+              <view class="fft-sub">主型 {{fftReport.primary.percent}}% · {{fftReport.primary.rawScore}}/{{fftReport.primary.maxScore}}</view>
+              <view class="fft-tags">
+                <view wx:if="{{fftReport.secondary}}" class="fft-tag fft-tag-secondary">{{fftReport.secondary.emoji}} 次型 {{fftReport.secondary.name}} {{fftReport.secondary.percent}}%</view>
+                <view wx:if="{{fftReport.tertiary}}" class="fft-tag fft-tag-tertiary">{{fftReport.tertiary.emoji}} {{fftReport.tertiary.name}}</view>
+              </view>
+            </view>
+          </view>
+          <!-- 九型得分：3 列网格 -->
+          <view class="fft-score-grid-wrap">
+            <view class="fft-score-grid-title">九型得分</view>
+            <view class="fft-score-grid">
+              <view wx:for="{{fftReport.scoreGrid}}" wx:key="id" class="fft-score-cell {{item.isPrimary ? 'fft-score-primary' : ''}} {{item.isSecondary ? 'fft-score-secondary' : ''}}">
+                <text class="fft-score-emoji">{{item.emoji}}</text>
+                <text class="fft-score-name">{{item.nameShort}}</text>
+                <text class="fft-score-pct">{{item.percent}}%</text>
+              </view>
+            </view>
+          </view>
+        </view>
       </view>
+
       <view class="fft-body">
+        <!-- 主型解读 -->
         <view class="fft-section">
-          <view class="fft-section-title">可视化分析</view>
-          <view class="fft-charts-row">
-            <view class="fft-radar-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
-            <view class="fft-bar-wrap"><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
+          <view class="fft-section-title"><text class="fft-section-emoji">{{fftReport.primaryEmoji}}</text>{{fftReport.primary.name}}解读</view>
+          <view class="fft-primary-card">
+            <view class="fft-primary-desc">{{fftReport.dimInsights[fftReport.primary.id] || '暂无解读'}}</view>
+            <view class="fft-primary-disclaimer">本测验基于情境选择法，54 题三选一。主型为得分最高维度，次型为第二高。结果仅供自我觉察，不构成专业心理评估。</view>
           </view>
         </view>
-        <view class="fft-divider"></view>
+
+        <!-- 九维雷达 -->
         <view class="fft-section">
-          <view class="fft-section-title">九型解读</view>
-          <view wx:for="{{fftReport.dimensionList}}" wx:key="id" class="fft-dim-item {{item.isPrimary ? 'fft-primary' : ''}}">
-            <view class="fft-dim-head"><view class="fft-dim-emoji">{{item.emoji}}</view><view class="fft-dim-name">{{item.name}}</view><view class="fft-dim-meta">{{item.rawScore}}/6 · {{item.percent}}%</view></view>
-            <view class="fft-dim-desc">{{fftReport.dimInsights[item.id] || '暂无解读'}}</view>
+          <view class="fft-section-title">九维雷达</view>
+          <view class="fft-radar-wrap">
+            <canvas canvas-id="result-radar" class="fft-chart-canvas" style="width:100%;height:256px;"></canvas>
+          </view>
+        </view>
+
+        <!-- 九型柱状图 -->
+        <view class="fft-section">
+          <view class="fft-section-title">九型得分</view>
+          <view class="fft-bar-wrap">
+            <canvas canvas-id="result-bar" class="fft-chart-canvas" style="width:100%;height:240px;"></canvas>
+          </view>
+        </view>
+
+        <!-- 九型概览：3 列网格 -->
+        <view class="fft-section">
+          <view class="fft-section-title">九型概览</view>
+          <view class="fft-overview-grid">
+            <view wx:for="{{fftReport.dimensionList}}" wx:key="id" class="fft-overview-card {{item.isPrimary ? 'fft-overview-primary' : ''}} {{item.isSecondary ? 'fft-overview-secondary' : ''}}">
+              <view class="fft-overview-head">
+                <text class="fft-overview-emoji">{{item.emoji}}</text>
+                <view class="fft-overview-badges">
+                  <text wx:if="{{item.isPrimary}}" class="fft-badge fft-badge-primary">主型</text>
+                  <text wx:if="{{item.isSecondary}}" class="fft-badge fft-badge-secondary">次型</text>
+                  <text class="fft-overview-pct">{{item.percent}}%</text>
+                </view>
+              </view>
+              <view class="fft-overview-name">{{item.name}}</view>
+              <view class="fft-overview-bar"><view class="fft-overview-fill" style="width:{{item.percent}}%;background-color:{{item.color}};"></view></view>
+              <view class="fft-overview-desc">{{fftReport.dimInsights[item.id] || '暂无解读'}}</view>
+            </view>
           </view>
         </view>
       </view>
+
       <view class="fft-footer">
-        <view class="fft-footer-text">报告生成时间：{{fftReport.formatDate}} · FFT 水果塑形测试</view>
-        <view class="fft-footer-links"><navigator url="/pages/test/test?testId=fft" class="fft-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="fft-footer-link">返回首页</navigator></view>
+        <view class="fft-footer-text">报告生成时间：{{fftReport.formatDate}}</view>
+        <view class="fft-footer-links">
+          <navigator url="/pages/test/test?testId=fft" class="fft-footer-link">返回测验</navigator>
+          <text class="fft-footer-dot">·</text>
+          <navigator url="/pages/index/index" class="fft-footer-link">返回首页</navigator>
+        </view>
       </view>
     </view>
   </view>

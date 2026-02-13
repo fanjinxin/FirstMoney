@@ -1,6 +1,20 @@
 /**
  * FFT 水果塑形测试解读 - 移植自 src/data/fft_insights.ts
  */
+
+/** 九种水果颜色（与 web 版一致） */
+const FFT_FRUIT_COLORS = {
+  apple: '#e74c3c',
+  grape: '#9b59b6',
+  strawberry: '#e91e63',
+  orange: '#f39c12',
+  lemon: '#f1c40f',
+  banana: '#f4d03f',
+  pear: '#2ecc71',
+  cherry: '#c0392b',
+  pomelo: '#27ae60',
+};
+
 const FFT_FRUIT_EMOJI = {
   apple: '🍎', grape: '🍇', strawberry: '🍓', orange: '🍊', lemon: '🍋',
   banana: '🍌', pear: '🍐', cherry: '🍒', pomelo: '🍈',
@@ -18,4 +32,4 @@ const FFT_FRUIT_INSIGHTS = {
   pomelo: '柚子型人格身体健康、运动细胞好、自我意识强，有时容易急躁。你精力充沛、有主见，但可能给人自我或不够耐心的印象。在关系中你直接果断，需留意给伴侣足够的表达空间。优势在于行动力与自信；需留意情绪管理与倾听他人。适合与能包容你直接、同时帮你缓下来的类型相处。',
 };
 
-module.exports = { FFT_FRUIT_EMOJI, FFT_FRUIT_INSIGHTS };
+module.exports = { FFT_FRUIT_EMOJI, FFT_FRUIT_INSIGHTS, FFT_FRUIT_COLORS };
