@@ -1004,34 +1004,51 @@
 .aat-footer-links { display: flex; justify-content: center; gap: 32rpx; margin-top: 24rpx; }
 .aat-footer-link { font-size: 28rpx; color: var(--xia-teal); text-decoration: underline; }
 
-/* ========== 心理年龄测验报告 ========== */
+/* ========== 心理年龄测验报告（严格参照 web 版） ========== */
 .psych-age-report-wrap { padding: 24rpx; }
 .psych-age-report-paper {
-  border-radius: 24rpx; overflow: hidden;
-  border: 2rpx solid rgba(var(--xia-deep-rgb), 0.12);
+  border-radius: 48rpx; overflow: hidden;
+  border: 2rpx solid rgba(var(--xia-deep-rgb), 0.08);
   background: #fff; box-shadow: 0 8rpx 32rpx rgba(var(--xia-deep-rgb), 0.08);
 }
 .psych-age-header {
-  background: linear-gradient(135deg, rgba(var(--xia-sky-rgb), 0.15) 0%, rgba(var(--xia-cream-rgb), 0.4) 50%, #fff 100%);
-  padding: 48rpx 32rpx;
+  background: linear-gradient(135deg, rgba(var(--xia-mint-rgb), 0.25) 0%, rgba(var(--xia-cream-rgb), 0.4) 50%, #fff 100%);
+  padding: 64rpx 48rpx;
   border-bottom: 2rpx solid rgba(var(--xia-deep-rgb), 0.08);
 }
-.psych-age-header-inner { display: flex; align-items: center; gap: 40rpx; flex-wrap: wrap; }
-.psych-age-circle-wrap { flex-shrink: 0; }
-.psych-age-circle-inner {
-  width: 120rpx; height: 120rpx; line-height: 120rpx; text-align: center;
-  border-radius: 50%; border: 8rpx solid rgba(var(--xia-teal-rgb), 0.4);
-  font-size: 36rpx; font-weight: 700; color: var(--xia-deep); background: rgba(255,255,255,0.8);
+.psych-age-header-row { display: flex; flex-direction: column; align-items: center; gap: 48rpx; }
+@media (min-width: 600px) {
+  .psych-age-header-row { flex-direction: row; align-items: center; justify-content: space-between; gap: 64rpx; }
+  .psych-age-right { align-items: flex-start; text-align: left; }
+  .psych-age-tags { justify-content: flex-start; }
 }
-.psych-age-header-text { flex: 1; min-width: 0; }
-.psych-age-header-sub { font-size: 22rpx; font-weight: 600; letter-spacing: 0.15em; color: rgba(var(--xia-deep-rgb), 0.5); }
-.psych-age-header-title { font-size: 36rpx; font-weight: 700; color: var(--xia-deep); margin-top: 12rpx; }
-.psych-age-meta { font-size: 22rpx; color: rgba(var(--xia-deep-rgb), 0.5); margin-top: 12rpx; }
-.psych-age-tags { display: flex; flex-wrap: wrap; gap: 12rpx; margin-top: 24rpx; }
-.psych-age-tag { padding: 10rpx 24rpx; border-radius: 999rpx; font-size: 24rpx; font-weight: 500; border: 2rpx solid; }
+.psych-age-left { display: flex; flex-direction: column; align-items: center; gap: 24rpx; flex-shrink: 0; }
+.psych-age-ring-wrap { position: relative; width: 224rpx; height: 224rpx; flex-shrink: 0; }
+.psych-age-ring-outer {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 12rpx solid rgba(var(--xia-teal-rgb), 0.25);
+}
+.psych-age-ring-inner {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 160rpx; height: 160rpx; border-radius: 50%;
+  background: rgba(255,255,255,0.95); box-shadow: 0 8rpx 24rpx rgba(44,111,122,0.12);
+  overflow: hidden; border: 4rpx solid rgba(var(--xia-teal-rgb), 0.2);
+}
+.psych-age-icon-img { width: 100%; height: 100%; display: block; }
+.psych-age-left-text { text-align: center; }
+.psych-age-label { font-size: 20rpx; font-weight: 600; letter-spacing: 0.25em; color: rgba(var(--xia-deep-rgb), 0.4); }
+.psych-age-score { font-size: 22rpx; color: rgba(var(--xia-deep-rgb), 0.6); margin-top: 8rpx; }
+.psych-age-right { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 24rpx; text-align: center; }
+.psych-age-right-sub { font-size: 22rpx; font-weight: 500; letter-spacing: 0.2em; color: rgba(var(--xia-deep-rgb), 0.5); }
+.psych-age-right-title { font-size: 48rpx; font-weight: 700; color: var(--xia-deep); line-height: 1.2; letter-spacing: -0.02em; }
+.psych-age-right-desc { font-size: 26rpx; color: rgba(var(--xia-deep-rgb), 0.7); line-height: 1.6; }
+.psych-age-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 24rpx; }
+.psych-age-tag { display: flex; align-items: center; gap: 12rpx; padding: 20rpx 32rpx; border-radius: 32rpx; border: 2rpx solid; box-shadow: 0 2rpx 8rpx rgba(var(--xia-deep-rgb), 0.06); }
+.psych-age-tag-lbl { font-size: 26rpx; font-weight: 500; }
+.psych-age-tag-val { font-size: 26rpx; font-weight: 600; }
 .psych-age-trend-young { background: rgba(var(--xia-mint-rgb), 0.2); border-color: var(--xia-mint); color: var(--xia-deep); }
 .psych-age-trend-balanced { background: rgba(var(--xia-sky-rgb), 0.2); border-color: var(--xia-sky); color: var(--xia-deep); }
-.psych-age-trend-aged { background: rgba(var(--xia-deep-rgb), 0.12); border-color: var(--xia-deep); color: var(--xia-deep); }
+.psych-age-trend-aged { background: rgba(var(--xia-aqua-rgb), 0.2); border-color: var(--xia-aqua); color: var(--xia-deep); }
 
 .psych-age-body { padding: 48rpx 32rpx; }
 .psych-age-divider { height: 2rpx; background: rgba(var(--xia-deep-rgb), 0.12); margin: 48rpx 0; }
@@ -1051,6 +1068,14 @@
 .psych-age-dim-name { font-size: 30rpx; font-weight: 600; color: var(--xia-deep); }
 .psych-age-dim-meta { font-size: 24rpx; font-weight: 500; color: rgba(var(--xia-deep-rgb), 0.6); }
 .psych-age-dim-desc { font-size: 26rpx; color: var(--xia-deep); line-height: 1.6; opacity: 0.9; }
+
+.psych-age-guidance { margin-bottom: 0; }
+.psych-age-guidance-block { margin-bottom: 28rpx; }
+.psych-age-guidance-block:last-of-type { margin-bottom: 0; }
+.psych-age-guidance-label { font-size: 28rpx; font-weight: 600; color: var(--xia-deep); margin-bottom: 16rpx; line-height: 1.5; }
+.psych-age-guidance-item { font-size: 26rpx; color: var(--xia-deep); line-height: 1.7; opacity: 0.9; margin-bottom: 12rpx; padding-left: 24rpx; position: relative; }
+.psych-age-guidance-item::before { content: '·'; position: absolute; left: 0; color: var(--xia-teal); }
+.psych-age-guidance-note { font-size: 24rpx; color: rgba(var(--xia-deep-rgb), 0.6); line-height: 1.6; margin-top: 24rpx; padding: 20rpx; background: rgba(var(--xia-sky-rgb), 0.12); border-radius: 12rpx; }
 
 .psych-age-footer { border-top: 2rpx solid rgba(var(--xia-deep-rgb), 0.12); background: rgba(var(--xia-cream-rgb), 0.2); padding: 48rpx 32rpx; text-align: center; }
 .psych-age-footer-text { font-size: 24rpx; color: rgba(var(--xia-deep-rgb), 0.5); }

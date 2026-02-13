@@ -368,13 +368,15 @@ Page({
 
     let psychAgeReport = null;
     if (testId === 'psych-age' && result && result.dimensionScores) {
-      const { PSYCH_AGE_RANGE_INSIGHTS, PSYCH_AGE_DIMENSION_INSIGHTS } = require('../../data/psych_age_insights');
+      const { PSYCH_AGE_RANGE_INSIGHTS, PSYCH_AGE_DIMENSION_INSIGHTS, PSYCH_AGE_PROFESSIONAL_GUIDANCE } = require('../../data/psych_age_insights');
       const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
       const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
         id: d.id, name: d.name, score: d.percent, level: d.trend === 'young' ? 'normal' : d.trend === 'balanced' ? 'mild' : 'moderate'
       }));
       const youngestDim = [...(result.dimensionScores || [])].sort((a, b) => a.percent - b.percent)[0];
       const oldestDim = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent)[0];
+      const r = result.psychAgeRange || '';
+      const ageImagePath = /70|岁以上/.test(r) ? '/assets/age-test/audit60-100.jpg' : /60|69/.test(r) ? '/assets/age-test/audit60-100.jpg' : /50|59/.test(r) ? '/assets/age-test/audit40-50.jpg' : /40|49/.test(r) ? '/assets/age-test/audit40-50.jpg' : /30|39/.test(r) ? '/assets/age-test/audit30-40.jpg' : '/assets/age-test/audit20-30.jpg';
       psychAgeReport = {
         formatDate: formatDate(),
         rangeInsight: PSYCH_AGE_RANGE_INSIGHTS[result.psychAgeRange] || '暂无解读',
@@ -383,6 +385,8 @@ Page({
         barChartData,
         youngestDim,
         oldestDim,
+        ageImagePath,
+        professionalGuidance: PSYCH_AGE_PROFESSIONAL_GUIDANCE,
       };
     }
 

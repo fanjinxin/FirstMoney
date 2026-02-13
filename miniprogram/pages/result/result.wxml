@@ -299,21 +299,32 @@
     </view>
   </view>
 
-  <!-- 心理年龄测验结果 -->
+  <!-- 心理年龄测验结果（严格参照 web 版布局） -->
   <view wx:if="{{testId === 'psych-age' && result && psychAgeReport}}" class="psych-age-report-wrap">
     <view class="psych-age-report-paper">
       <view class="psych-age-header">
-        <view class="psych-age-header-inner">
-          <view class="psych-age-circle-wrap"><view class="psych-age-circle-inner">{{result.psychAgeRange}}</view></view>
-          <view class="psych-age-header-text">
-            <view class="psych-age-header-sub">心理年龄测验</view>
-            <view class="psych-age-header-title">心理年龄：{{result.psychAgeRange}}</view>
-            <view class="psych-age-meta">总分 {{result.totalScore}}/{{result.maxTotalScore}} · 已完成 {{result.answeredCount}}/{{result.totalQuestions}} 题</view>
+        <view class="psych-age-header-row">
+          <view class="psych-age-left">
+            <view class="psych-age-ring-wrap">
+              <view class="psych-age-ring-outer"></view>
+              <view class="psych-age-ring-inner">
+                <image wx:if="{{psychAgeReport.ageImagePath}}" class="psych-age-icon-img" src="{{psychAgeReport.ageImagePath}}" mode="aspectFill" />
+              </view>
+            </view>
+            <view class="psych-age-left-text">
+              <view class="psych-age-label">心理年龄</view>
+              <view class="psych-age-score">总分 {{result.totalScore}}/{{result.maxTotalScore}}</view>
+            </view>
           </view>
-        </view>
-        <view wx:if="{{psychAgeReport.youngestDim && psychAgeReport.oldestDim}}" class="psych-age-tags">
-          <view class="psych-age-tag psych-age-trend-{{psychAgeReport.youngestDim.trend}}">最年轻：{{psychAgeReport.youngestDim.name}}</view>
-          <view class="psych-age-tag psych-age-trend-{{psychAgeReport.oldestDim.trend}}">最成熟：{{psychAgeReport.oldestDim.name}}</view>
+          <view class="psych-age-right">
+            <view class="psych-age-right-sub">心理年龄测验</view>
+            <view class="psych-age-right-title">{{result.psychAgeRange}}</view>
+            <view class="psych-age-right-desc">根据七维度综合评估，你的心理特征倾向于此年龄区间的特质。</view>
+            <view wx:if="{{psychAgeReport.youngestDim && psychAgeReport.oldestDim}}" class="psych-age-tags">
+              <view class="psych-age-tag psych-age-trend-{{psychAgeReport.youngestDim.trend}}"><text class="psych-age-tag-lbl">最年轻</text><text class="psych-age-tag-val">{{psychAgeReport.youngestDim.name}}</text></view>
+              <view class="psych-age-tag psych-age-trend-{{psychAgeReport.oldestDim.trend}}"><text class="psych-age-tag-lbl">最成熟</text><text class="psych-age-tag-val">{{psychAgeReport.oldestDim.name}}</text></view>
+            </view>
+          </view>
         </view>
       </view>
       <view class="psych-age-body">
@@ -336,6 +347,19 @@
             <view class="psych-age-dim-head"><view class="psych-age-dim-name">{{item.name}}</view><view class="psych-age-dim-meta">{{item.percent}}% · {{item.trendLabel}}</view></view>
             <view class="psych-age-dim-desc">{{psychAgeReport.dimInsights[item.id] || '暂无解读'}}</view>
           </view>
+        </view>
+        <view class="psych-age-divider"></view>
+        <view class="psych-age-section psych-age-guidance">
+          <view class="psych-age-section-title">专业指导</view>
+          <view class="psych-age-guidance-block">
+            <view class="psych-age-guidance-label">以下情况建议寻求专业帮助：</view>
+            <view wx:for="{{psychAgeReport.professionalGuidance.whenToSeekHelp}}" wx:key="*this" class="psych-age-guidance-item">{{item}}</view>
+          </view>
+          <view class="psych-age-guidance-block">
+            <view class="psych-age-guidance-label">自我调节建议：</view>
+            <view wx:for="{{psychAgeReport.professionalGuidance.selfCareTips}}" wx:key="*this" class="psych-age-guidance-item">{{item}}</view>
+          </view>
+          <view class="psych-age-guidance-note">{{psychAgeReport.professionalGuidance.note}}</view>
         </view>
       </view>
       <view class="psych-age-footer">

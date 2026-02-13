@@ -20,4 +20,21 @@ const PSYCH_AGE_DIMENSION_INSIGHTS = {
   resilience: '心理韧性维度反映抗挫能力、自信与专注。得分低表示抗挫力较强、自信稳定、专注力好；得分高可能提示对挫折敏感、自信不足、工作效率下降。',
 };
 
-module.exports = { PSYCH_AGE_RANGE_INSIGHTS, PSYCH_AGE_DIMENSION_INSIGHTS };
+/** 专业指导模块：何时需寻求专业帮助及自我调节建议 */
+const PSYCH_AGE_PROFESSIONAL_GUIDANCE = {
+  whenToSeekHelp: [
+    '心理年龄与实际年龄差距较大，长期困扰自我认同或人际交往',
+    '心理年龄偏大伴随持续低落、兴趣丧失、精力明显下降',
+    '心理年龄偏年轻伴随冲动决策、人际关系频繁冲突',
+    '对测验结果过度焦虑，反复纠结或影响日常功能',
+  ],
+  selfCareTips: [
+    '保持规律作息与充足睡眠，有助于心理节律稳定',
+    '适度运动（每周 3 次以上）可提升精力与心理活力',
+    '拓展社交与兴趣，接触新事物延缓心理固化',
+    '正念、冥想或放松训练有助于情绪与认知调节',
+  ],
+  note: '本测验为趣味自评，不构成专业诊断。若持续情绪困扰或影响生活，建议寻求心理咨询师或精神科医师的专业评估。',
+};
+
+module.exports = { PSYCH_AGE_RANGE_INSIGHTS, PSYCH_AGE_DIMENSION_INSIGHTS, PSYCH_AGE_PROFESSIONAL_GUIDANCE };
