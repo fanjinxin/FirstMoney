@@ -1,0 +1,7 @@
+<view class="sri-bar-wrap">
+  <view class="sri-bar-header">
+    <text class="sri-bar-title">四维度均分（1–5，越高越压抑）</text>
+    <view class="sri-bar-tag">柱状图</view>
+  </view>
+  <canvas type="2d" id="{{canvasId}}" class="sri-bar-canvas" style="width:100%;height:200px;"></canvas>
+</view>

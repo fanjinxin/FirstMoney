@@ -1,0 +1,1242 @@
+<view class="page-wrap" style="{{themeStyle}}" wx:if="{{result}}">
+  <nav-header currentPath="/{{testId}}"></nav-header>
+  <view class="container">
+  <view class="actions">
+    <navigator url="/pages/index/index" class="link">← 返回首页</navigator>
+    <view class="retake" bindtap="onRetake">重新测试</view>
+  </view>
+
+  <!-- SCL90 完整报告 - 移植自 SCL90Result.tsx -->
+  <view wx:if="{{testId === 'scl90' && scl90Report}}" class="scl90-report-wrap">
+    <view class="scl90-report-paper">
+      <!-- Report Header -->
+      <view class="scl90-header">
+        <view class="scl90-header-inner">
+          <view class="scl90-header-sub">Psychological Assessment Report</view>
+          <view class="scl90-header-title">90项症状自评量表（SCL-90）</view>
+          <view class="scl90-header-desc">心理健康筛查评估报告</view>
+        </view>
+      </view>
+      <!-- Report Meta -->
+      <view class="scl90-meta">
+        <view class="scl90-meta-grid">
+          <view class="scl90-meta-item"><view class="scl90-meta-label">报告日期</view><view class="scl90-meta-val">{{scl90Report.formatDate}}</view></view>
+          <view class="scl90-meta-item"><view class="scl90-meta-label">评估时段</view><view class="scl90-meta-val">最近一周</view></view>
+          <view class="scl90-meta-item"><view class="scl90-meta-label">量表题数</view><view class="scl90-meta-val">90 题</view></view>
+          <view class="scl90-meta-item"><view class="scl90-meta-label">计分范围</view><view class="scl90-meta-val">1（无）~ 5（严重）</view></view>
+        </view>
+      </view>
+      <!-- Report Body -->
+      <view class="scl90-body">
+        <!-- 心理健康画像 - 三张独立卡片，严格还原原图 -->
+        <!-- 卡片1：画像 + 核心结论 -->
+        <view class="scl90-card">
+          <view class="scl90-card-header">
+            <view class="scl90-dot"></view>
+            <text class="scl90-card-title">心理健康画像</text>
+          </view>
+          <view class="scl90-main-result">{{result.basic.totalLevel}}</view>
+          <view class="scl90-desc">{{scl90Report.portraitDesc}}</view>
+          <view class="scl90-core-chip">
+            <text class="scl90-core-lbl">核心结论</text>
+            <text class="scl90-core-val">{{result.basic.totalLevel}}</text>
+          </view>
+        </view>
+
+        <!-- 卡片2：突出维度（名称+分数横向排列） -->
+        <view class="scl90-card scl90-dim-card" wx:if="{{result.top3Factors.length}}">
+          <view class="scl90-dim-row">
+            <text class="scl90-dim-label">突出维度</text>
+            <view class="scl90-dim-items">
+              <view wx:for="{{result.top3Factors}}" wx:key="id" class="scl90-dim-item">
+                <text class="scl90-dim-name">{{item.name}}</text>
+                <text class="scl90-dim-score">{{item.scoreStr}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 卡片3：测试总分 -->
+        <view class="scl90-card scl90-score-card">
+          <view class="scl90-score-top">
+            <view class="scl90-score-left">
+              <text class="scl90-score-label">测试总分</text>
+              <view class="scl90-score-main">
+                <text class="scl90-score-num">{{result.basic.totalScore}}</text>
+                <text class="scl90-score-max">/ 450</text>
+              </view>
+            </view>
+            <view class="scl90-bar-icon"><view class="scl90-bar-1"></view><view class="scl90-bar-2"></view><view class="scl90-bar-3"></view></view>
+          </view>
+          <view class="scl90-score-grid">
+            <view class="scl90-score-cell"><text class="scl90-cell-lbl">总均分</text><text class="scl90-cell-val">{{result.basic.avgTotalStr}}</text></view>
+            <view class="scl90-score-cell"><text class="scl90-cell-lbl">阳性项目</text><text class="scl90-cell-val">{{result.basic.positiveCount}} 项</text></view>
+          </view>
+          <view class="scl90-top-dim" wx:if="{{result.top3Factors[0]}}">
+            <view class="scl90-top-dim-row">
+              <text class="scl90-top-dim-label">最高维度: {{result.top3Factors[0].name}}</text>
+              <view class="scl90-top-dim-bar-wrap">
+                <view class="scl90-top-dim-bar"><view class="scl90-top-dim-fill" style="width: {{(result.top3Factors[0].score/5)*100}}%"></view></view>
+                <text class="scl90-top-dim-val">{{result.top3Factors[0].scoreStr2}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view class="scl90-divider"></view>
+
+        <!-- 1 可视化分析：雷达图 + 饼图 + 柱状图 -->
+        <view class="scl90-section">
+          <view class="scl90-section-title"><view class="scl90-section-num">1</view>可视化分析</view>
+          <view class="scl90-section-desc">通过图表快速了解十因子整体轮廓、症状分布与因子强弱排序。</view>
+          <view class="scl90-charts-row">
+            <view class="scl90-chart-left"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="scl90-chart-right"><canvas canvas-id="result-pie" class="result-chart-canvas" style="width:100%;height:260px;"></canvas><view class="scl90-pie-legend"><view wx:for="{{scl90Report.symptomDist}}" wx:key="name" class="scl90-legend-item"><view class="scl90-legend-dot" style="background:{{['#7FBFE1','#68D4DB','#98E6E2','#2C6F7A','#0F4C5C'][index % 5]}}"></view><text>{{item.name}}</text></view></view></view>
+          </view>
+          <view class="scl90-bar-wrap"><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
+        </view>
+
+        <view class="scl90-divider"></view>
+
+        <!-- 2 十因子分析 -->
+        <view class="scl90-section">
+          <view class="scl90-section-title"><view class="scl90-section-num">2</view>十因子分析</view>
+          <view class="scl90-section-desc">SCL-90 量表从十个维度评估近期心理症状。因子均分 &lt; 2 为正常，2–3 为轻度，3–4 为中度，≥ 4 为重度。</view>
+          <view class="scl90-factor-table">
+            <view class="scl90-table-row scl90-table-head"><text>序号</text><text>因子维度</text><text>题数</text><text>因子均分</text><text>严重程度</text></view>
+            <view wx:for="{{result.factors}}" wx:key="id" class="scl90-table-row {{index % 2 === 1 ? 'scl90-table-alt' : ''}}">
+              <text>{{index + 1}}</text><text>{{item.name}}</text><text>{{item.count}}</text><text class="scl90-score-{{item.level}}">{{item.scoreStr}}</text><view class="scl90-level-badge scl90-level-{{item.level}}">{{item.levelLabel}}</view>
+            </view>
+          </view>
+        </view>
+
+        <view class="scl90-divider"></view>
+
+        <!-- 3 总体评价 -->
+        <view class="scl90-section">
+          <view class="scl90-section-title"><view class="scl90-section-num">3</view>总体评价</view>
+          <view class="scl90-section-text">本次评估总分为 <text class="scl90-bold">{{result.basic.totalScore}} 分</text>，总均分 <text class="scl90-bold">{{result.basic.avgTotalStr}}</text>。在 90 个项目中，有 <text class="scl90-bold">{{result.basic.positiveCount}} 项（{{scl90Report.positiveRatio}}%）</text> 达到阳性标准（评分 ≥ 2），阳性症状均分 <text class="scl90-bold">{{result.basic.positiveAvgStr}}</text>。</view>
+          <view class="scl90-total-conclusion scl90-conclusion-{{scl90Report.conclusionClass}}">
+            <view class="scl90-conclusion-row"><text class="scl90-conclusion-label">综合评估结论：</text><text class="scl90-conclusion-val">{{result.basic.totalLevel}}</text></view>
+            <view class="scl90-conclusion-desc">{{scl90Report.conclusionDesc}}</view>
+          </view>
+          <view class="scl90-indicator-table">
+            <view class="scl90-table-row scl90-table-head"><text>指标</text><text>数值</text><text>说明</text></view>
+            <view class="scl90-table-row"><text>总分</text><text>{{result.basic.totalScore}}</text><text>90项评分之和（范围 90–450）</text></view>
+            <view class="scl90-table-row"><text>总均分</text><text>{{result.basic.avgTotalStr}}</text><text>总分 ÷ 90</text></view>
+            <view class="scl90-table-row"><text>阳性项目数</text><text>{{result.basic.positiveCount}}</text><text>评分 ≥ 2 的项目数（占比 {{scl90Report.positiveRatio}}%）</text></view>
+            <view class="scl90-table-row"><text>阴性项目数</text><text>{{result.basic.negativeCount}}</text><text>评分 = 1 的项目数</text></view>
+            <view class="scl90-table-row"><text>阳性症状均分</text><text>{{result.basic.positiveAvgStr}}</text><text>(总分 − 阴性项目数) ÷ 阳性项目数</text></view>
+          </view>
+          <view class="scl90-judge-note">* 判断标准：总分 &lt; 160 正常；160–250 轻度困扰；250–350 中度困扰；≥ 350 重度困扰</view>
+        </view>
+
+        <view class="scl90-divider"></view>
+
+        <!-- 4 主要困扰维度 -->
+        <view class="scl90-section">
+          <view class="scl90-section-title"><view class="scl90-section-num">4</view>主要困扰维度</view>
+          <view class="scl90-section-desc">以下三个维度得分最高，是近期最突出的心理困扰来源，建议优先关注与干预。</view>
+          <view class="scl90-top3-card">
+            <view wx:for="{{result.top3Factors}}" wx:key="id" class="scl90-top3-item">
+              <view class="scl90-top3-divider" wx:if="{{index > 0}}"></view>
+              <view class="scl90-top3-row">
+                <view class="scl90-top3-num">{{index + 1}}</view>
+                <view class="scl90-top3-content">
+                  <view class="scl90-top3-head"><text class="scl90-top3-name">{{item.name}}</text><view class="scl90-level-badge scl90-level-{{item.level}}">{{item.scoreStr2}} 分 · {{item.levelLabel}}</view></view>
+                  <view class="scl90-top3-desc">主要表现：{{item.description}}</view>
+                  <view class="scl90-top3-detail">{{item.detail}}</view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view class="scl90-divider"></view>
+
+        <!-- 5 各维度详细解读 -->
+        <view class="scl90-section">
+          <view class="scl90-section-title"><view class="scl90-section-num">5</view>各维度详细解读</view>
+          <view wx:for="{{result.factors}}" wx:key="id" class="scl90-factor-detail">
+            <view class="scl90-factor-detail-row"><view class="scl90-factor-detail-head"><text>{{index + 1}}. {{item.name}}</text><view class="scl90-level-badge scl90-level-{{item.level}}">{{item.levelLabel}}</view></view><text class="scl90-factor-detail-score scl90-score-{{item.level}}">{{item.scoreStr}}</text></view>
+            <view class="scl90-factor-detail-text">{{item.detail}}</view>
+            <view class="scl90-factor-detail-bar"><view class="scl90-factor-bar-fill scl90-bar-{{item.level}}" style="width: {{(item.score/5)*100}}%"></view></view>
+          </view>
+        </view>
+
+        <view class="scl90-divider"></view>
+
+        <!-- 6 综合建议 -->
+        <view class="scl90-section">
+          <view class="scl90-section-title"><view class="scl90-section-num">6</view>综合建议</view>
+          <view class="scl90-suggest-row">
+            <text class="scl90-suggest-label">建议干预等级：</text>
+            <view class="scl90-suggest-badges">
+              <view class="scl90-sugg-badge {{scl90Report.suggestionLevel === 'normal' ? 'active' : ''}}">自我调节</view>
+              <view class="scl90-sugg-badge {{scl90Report.suggestionLevel === 'mild' ? 'active' : ''}}">心理疏导</view>
+              <view class="scl90-sugg-badge {{scl90Report.suggestionLevel === 'moderate' ? 'active' : ''}}">心理咨询</view>
+              <view class="scl90-sugg-badge {{scl90Report.suggestionLevel === 'severe' ? 'active' : ''}}">专业评估</view>
+            </view>
+          </view>
+          <view class="scl90-suggest-list">
+            <view class="scl90-sugg-item"><view class="scl90-sugg-num">1</view><view><text class="scl90-sugg-title">生活方式调整：</text>保持规律作息，保证充足睡眠；适度运动（每周 3–5 次，每次 30 分钟以上）；减少熬夜与过度信息摄入。</view></view>
+            <view class="scl90-sugg-item"><view class="scl90-sugg-num">2</view><view><text class="scl90-sugg-title">情绪管理：</text>学习放松技巧（如渐进式肌肉放松、腹式呼吸）；尝试正念冥想；适当倾诉与表达。</view></view>
+            <view class="scl90-sugg-item"><view class="scl90-sugg-num">3</view><view><text class="scl90-sugg-title">社会支持：</text>增加积极的人际互动，减少社交孤立；向信任的朋友或家人寻求支持。</view></view>
+            <view class="scl90-sugg-item"><view class="scl90-sugg-num">4</view><view><text class="scl90-sugg-title">专业帮助：</text>{{scl90Report.professionalHelp}}</view></view>
+          </view>
+        </view>
+      </view>
+
+      <!-- Report Footer -->
+      <view class="scl90-footer">
+        <view class="scl90-footer-title">重要声明</view>
+        <view class="scl90-footer-text">1. 本报告依据被试自评结果生成，仅作为心理健康筛查参考，不构成任何精神或心理疾病的临床诊断。</view>
+        <view class="scl90-footer-text">2. 测评结果受被试当时主观状态、理解能力及配合程度影响，可能与客观情况存在偏差。</view>
+        <view class="scl90-footer-text">3. 本报告不能替代精神科医师、心理治疗师或心理咨询师的专业面诊评估。</view>
+        <view class="scl90-footer-text">4. 若出现自伤、自杀想法或严重情绪失控等紧急状况，请立即拨打心理援助热线或前往最近的医疗机构急诊。</view>
+        <view class="scl90-footer-meta">报告生成时间：{{scl90Report.formatDate}} · SCL-90 心理健康筛查评估</view>
+        <view class="scl90-footer-links"><navigator url="/pages/scl90-test/scl90-test" class="scl90-footer-link">返回测试</navigator><navigator url="/pages/index/index" class="scl90-footer-link">返回首页</navigator></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- AAT 学习适应性测验完整报告 - 移植自 AATResult.tsx -->
+  <view wx:if="{{testId === 'aat' && result && aatReport}}" class="aat-report-wrap">
+    <view class="aat-report-paper">
+      <view class="aat-header">
+        <view class="aat-header-inner">
+          <view class="aat-header-circle-wrap">
+            <view class="aat-circle-outer">
+              <view class="aat-circle-inner">{{result.totalPercent}}<text class="aat-circle-unit">%</text></view>
+            </view>
+          </view>
+          <view class="aat-header-text">
+            <view class="aat-header-sub">AAT 学习适应性测验</view>
+            <view class="aat-header-title">综合适应指数</view>
+            <view class="aat-level-badge aat-level-{{aatReport.totalLevelClass}}">{{aatReport.totalLevel.label}}</view>
+            <view class="aat-header-desc">{{aatReport.totalLevel.desc}}</view>
+            <view class="aat-meta">已完成 {{result.answeredCount}}/{{result.totalQuestions}} 题</view>
+          </view>
+        </view>
+        <view class="aat-stats-row">
+          <view class="aat-stat-card"><view class="aat-stat-lbl">优势因子</view><view class="aat-stat-val">{{aatReport.goodCount}}</view><view class="aat-stat-hint">表现较好</view></view>
+          <view class="aat-stat-card"><view class="aat-stat-lbl">待改进</view><view class="aat-stat-val">{{aatReport.poorCount}}</view><view class="aat-stat-hint">需关注</view></view>
+          <view class="aat-stat-card aat-stat-wide"><view class="aat-stat-lbl">优先改进</view><view class="aat-stat-val">{{aatReport.bottom3[0] ? aatReport.bottom3[0].name : '-'}} {{aatReport.bottom3[0] ? aatReport.bottom3[0].percent : 0}}%</view><view class="aat-stat-hint">建议从该因子着手</view></view>
+        </view>
+        <view class="aat-groups-row">
+          <view wx:for="{{aatReport.groupScores}}" wx:key="id" class="aat-group-cell">
+            <view class="aat-group-name">{{item.name}}</view>
+            <view class="aat-group-avg">{{item.avg}}%</view>
+            <view class="aat-group-bar"><view class="aat-group-fill" style="width: {{item.avg}}%"></view></view>
+          </view>
+        </view>
+      </view>
+      <view class="aat-body">
+        <view class="aat-section">
+          <view class="aat-section-title">可视化分析</view>
+          <view class="aat-charts-row">
+            <view class="aat-radar-wrap"><view class="aat-chart-title">十二因子雷达图</view><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="aat-bar-wrap"><view class="aat-chart-title">因子得分排序（由高到低）</view><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
+          </view>
+        </view>
+        <view class="aat-divider"></view>
+        <view class="aat-section">
+          <view class="aat-section-title">四维分组概览</view>
+          <view class="aat-group-cards">
+            <view wx:for="{{aatReport.groupScores}}" wx:key="id" class="aat-group-card">
+              <view class="aat-group-card-head"><view><view class="aat-group-card-name">{{item.name}}</view><view class="aat-group-card-hint">{{item.hint}}</view></view><view class="aat-group-card-avg">{{item.avg}}%</view></view>
+              <view class="aat-group-card-bar"><view class="aat-group-card-fill" style="width: {{item.avg}}%"></view></view>
+              <view class="aat-group-tags"><view wx:for="{{item.items}}" wx:key="id" wx:for-item="f" class="aat-factor-tag aat-level-{{f.level}}">{{f.name}} {{f.percent}}%</view></view>
+            </view>
+          </view>
+        </view>
+        <view class="aat-divider"></view>
+        <view class="aat-section">
+          <view class="aat-section-title">优势与待改进因子</view>
+          <view class="aat-compare-row">
+            <view class="aat-top3-block">
+              <view class="aat-block-title">表现较好 · 可继续保持</view>
+              <view class="aat-top3-cards">
+                <view wx:for="{{aatReport.top3}}" wx:key="id" class="aat-top3-item {{index === 0 ? 'aat-top3-first' : ''}}">
+                  <view class="aat-top3-rank">{{index + 1}}</view>
+                  <view class="aat-top3-name">{{item.name}}</view>
+                  <view class="aat-top3-pct">{{item.percent}}%</view>
+                </view>
+              </view>
+            </view>
+            <view class="aat-bottom3-block">
+              <view class="aat-block-title">建议优先改进</view>
+              <view wx:if="{{aatReport.bottom3[0]}}" class="aat-priority-card">
+                <view class="aat-priority-head"><view class="aat-priority-name">{{aatReport.bottom3[0].name}}</view><view class="aat-priority-pct">{{aatReport.bottom3[0].percent}}%</view></view>
+                <view wx:if="{{aatReport.factorImprove[aatReport.bottom3[0].id]}}" class="aat-priority-tip">💡 {{aatReport.factorImprove[aatReport.bottom3[0].id]}}</view>
+              </view>
+              <view class="aat-bottom3-list">
+                <view wx:for="{{aatReport.bottom3}}" wx:key="id" wx:for-item="b" wx:if="{{index > 0}}" class="aat-bottom3-item">
+                  <view class="aat-bottom3-rank">{{index + 1}}</view>
+                  <view class="aat-bottom3-name">{{b.name}}</view>
+                  <view class="aat-bottom3-pct">{{b.percent}}%</view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="aat-divider"></view>
+        <view class="aat-section">
+          <view class="aat-section-title">十二因子得分与解读</view>
+          <view wx:for="{{result.factorScores}}" wx:key="id" class="aat-factor-detail aat-level-{{item.level}}">
+            <view class="aat-factor-detail-head"><view class="aat-factor-detail-name">{{item.name}}</view><view class="aat-factor-detail-meta">{{item.percent}}% · {{item.levelLabel}}</view></view>
+            <view class="aat-factor-detail-bar"><view class="aat-factor-bar-fill" style="width: {{item.percent}}%"></view></view>
+            <view class="aat-factor-detail-desc">{{aatReport.factorInsights[item.id] || '暂无解读'}}</view>
+            <view wx:if="{{(item.level === 'poor' || item.level === 'veryPoor') && aatReport.factorImprove[item.id]}}" class="aat-factor-improve">改进建议：{{aatReport.factorImprove[item.id]}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="aat-footer">
+        <view class="aat-footer-text">报告生成时间：{{aatReport.formatDate}} · AAT 学习适应性测验</view>
+        <view class="aat-footer-note">本测验仅供自我觉察与学习参考，不构成专业评估。结果仅供参考，不用于区分优劣。如有学习困扰，建议寻求专业辅导。</view>
+        <view class="aat-footer-links"><navigator url="/pages/test/test?testId=aat" class="aat-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="aat-footer-link">返回首页</navigator></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 心理年龄测验结果 -->
+  <view wx:if="{{testId === 'psych-age' && result && psychAgeReport}}" class="psych-age-report-wrap">
+    <view class="psych-age-report-paper">
+      <view class="psych-age-header">
+        <view class="psych-age-header-inner">
+          <view class="psych-age-circle-wrap"><view class="psych-age-circle-inner">{{result.psychAgeRange}}</view></view>
+          <view class="psych-age-header-text">
+            <view class="psych-age-header-sub">心理年龄测验</view>
+            <view class="psych-age-header-title">心理年龄：{{result.psychAgeRange}}</view>
+            <view class="psych-age-meta">总分 {{result.totalScore}}/{{result.maxTotalScore}} · 已完成 {{result.answeredCount}}/{{result.totalQuestions}} 题</view>
+          </view>
+        </view>
+        <view wx:if="{{psychAgeReport.youngestDim && psychAgeReport.oldestDim}}" class="psych-age-tags">
+          <view class="psych-age-tag psych-age-trend-{{psychAgeReport.youngestDim.trend}}">最年轻：{{psychAgeReport.youngestDim.name}}</view>
+          <view class="psych-age-tag psych-age-trend-{{psychAgeReport.oldestDim.trend}}">最成熟：{{psychAgeReport.oldestDim.name}}</view>
+        </view>
+      </view>
+      <view class="psych-age-body">
+        <view class="psych-age-section">
+          <view class="psych-age-section-title">心理年龄区间解读</view>
+          <view class="psych-age-range-desc">{{psychAgeReport.rangeInsight}}</view>
+        </view>
+        <view class="psych-age-divider"></view>
+        <view class="psych-age-section">
+          <view class="psych-age-section-title">可视化分析</view>
+          <view class="psych-age-chart-row">
+            <view class="psych-age-radar-wrap"><view class="psych-age-chart-title">七维雷达图</view><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="psych-age-bar-wrap"><view class="psych-age-chart-title">维度得分排序</view><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
+          </view>
+        </view>
+        <view class="psych-age-divider"></view>
+        <view class="psych-age-section">
+          <view class="psych-age-section-title">七维度解读</view>
+          <view wx:for="{{result.dimensionScores}}" wx:key="id" class="psych-age-dim-item psych-age-trend-{{item.trend}}">
+            <view class="psych-age-dim-head"><view class="psych-age-dim-name">{{item.name}}</view><view class="psych-age-dim-meta">{{item.percent}}% · {{item.trendLabel}}</view></view>
+            <view class="psych-age-dim-desc">{{psychAgeReport.dimInsights[item.id] || '暂无解读'}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="psych-age-footer">
+        <view class="psych-age-footer-text">报告生成时间：{{psychAgeReport.formatDate}} · 心理年龄测验</view>
+        <view class="psych-age-footer-links"><navigator url="/pages/test/test?testId=psych-age" class="psych-age-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="psych-age-footer-link">返回首页</navigator></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- APT 天赋潜能结果 -->
+  <view wx:if="{{testId === 'apt' && result && aptReport}}" class="apt-report-wrap">
+    <view class="apt-report-paper">
+      <view class="apt-header">
+        <view class="apt-header-inner">
+          <view class="apt-circle-wrap"><view class="apt-circle-inner">{{result.totalPercent}}%</view></view>
+          <view class="apt-header-text">
+            <view class="apt-header-sub">APT 天赋潜能</view>
+            <view class="apt-header-title">综合潜能指数</view>
+            <view class="apt-level-badge apt-level-{{aptReport.levelKey}}">{{aptReport.levelLabel}}</view>
+            <view class="apt-header-desc">{{aptReport.levelDesc}}</view>
+            <view class="apt-meta">总分 {{result.totalScore}}/{{result.maxTotalScore}}</view>
+          </view>
+        </view>
+        <view class="apt-stats-row">
+          <view class="apt-stat-card apt-stat-wide"><view class="apt-stat-lbl">最强</view><view class="apt-stat-val">{{result.topDimensions[0].name}}</view></view>
+          <view class="apt-stat-card"><view class="apt-stat-lbl">待提升</view><view class="apt-stat-val apt-stat-weak">{{result.weakDimensions[0].name}}</view></view>
+        </view>
+      </view>
+      <view class="apt-body">
+        <view class="apt-section">
+          <view class="apt-section-title">可视化分析</view>
+          <view class="apt-charts-row">
+            <view class="apt-radar-wrap"><view class="apt-chart-title">六维天赋雷达</view><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="apt-bar-wrap"><view class="apt-chart-title">维度得分排序</view><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
+          </view>
+        </view>
+        <view class="apt-divider"></view>
+        <view class="apt-section">
+          <view class="apt-section-title">职业与发展方向建议</view>
+          <view class="apt-career-card">{{aptReport.careerSuggestion}}</view>
+        </view>
+        <view class="apt-divider"></view>
+        <view class="apt-section">
+          <view class="apt-section-title">六维度解读与发展建议</view>
+          <view wx:for="{{aptReport.dimensionList}}" wx:key="id" class="apt-dim-item apt-level-{{item.level}}">
+            <view class="apt-dim-head"><view class="apt-dim-name">{{item.name}}</view><view class="apt-dim-meta">{{item.percent}}% · {{item.levelLabel}}</view></view>
+            <view class="apt-dim-bar"><view class="apt-dim-fill" style="width: {{item.percent}}%"></view></view>
+            <view class="apt-dim-desc">{{aptReport.dimInsights[item.id] || '暂无解读'}}</view>
+            <view wx:if="{{item.isWeak && item.improveTip}}" class="apt-improve">💡 {{item.improveTip}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="apt-footer">
+        <view class="apt-footer-text">报告生成时间：{{aptReport.formatDate}} · APT 天赋潜能评估</view>
+        <view class="apt-footer-links"><navigator url="/pages/test/test?testId=apt" class="apt-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="apt-footer-link">返回首页</navigator></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- HIT 霍兰德职业兴趣结果 -->
+  <view wx:if="{{testId === 'hit' && result && hitReport}}" class="hit-report-wrap">
+    <view class="hit-report-paper">
+      <view class="hit-header">
+        <view class="hit-header-inner">
+          <view class="hit-code-wrap"><view class="hit-code-inner">{{result.hollandCode}}</view></view>
+          <view class="hit-header-text">
+            <view class="hit-header-sub">HIT 霍兰德职业兴趣</view>
+            <view class="hit-header-title">你的霍兰德代码</view>
+            <view class="hit-consistency">{{hitReport.consistency.level}}一致性 · {{hitReport.consistency.short}}</view>
+            <view class="hit-meta">六型 RIASEC 按得分取前三组成代码</view>
+          </view>
+        </view>
+      </view>
+      <view class="hit-body">
+        <view class="hit-section">
+          <view class="hit-section-title">可视化分析</view>
+          <view class="hit-charts-row">
+            <view class="hit-radar-wrap"><view class="hit-chart-title">六型雷达图</view><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="hit-bar-wrap"><view class="hit-chart-title">六型得分排序</view><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
+          </view>
+        </view>
+        <view class="hit-divider"></view>
+        <view class="hit-section">
+          <view class="hit-section-title">职业方向建议</view>
+          <view class="hit-career-card">{{hitReport.codeExamples}}</view>
+        </view>
+        <view class="hit-divider"></view>
+        <view class="hit-section">
+          <view class="hit-section-title">六型解读</view>
+          <view wx:for="{{hitReport.dimensionList}}" wx:key="id" class="hit-dim-item {{item.isTop ? 'hit-top' : ''}}">
+            <view class="hit-dim-head"><view class="hit-dim-name">{{item.name}}({{item.id}})</view><view class="hit-dim-meta">{{item.rawScore}}/15 · {{item.percent}}%</view></view>
+            <view class="hit-dim-desc">{{hitReport.dimInsights[item.id] || '暂无解读'}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="hit-footer">
+        <view class="hit-footer-text">报告生成时间：{{hitReport.formatDate}} · HIT 霍兰德职业兴趣测试</view>
+        <view class="hit-footer-links"><navigator url="/pages/test/test?testId=hit" class="hit-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="hit-footer-link">返回首页</navigator></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- DTH 黑暗三角结果 -->
+  <view wx:if="{{testId === 'dth' && result && dthReport}}" class="dth-report-wrap">
+    <view class="dth-report-paper">
+      <view class="dth-header">
+        <view class="dth-header-inner">
+          <view class="dth-level-wrap"><view class="dth-level-inner dth-level-{{dthReport.overallLevel}}">{{dthReport.overallConclusion.title}}</view></view>
+          <view class="dth-header-text">
+            <view class="dth-header-sub">DTH 黑暗三角</view>
+            <view class="dth-header-title">{{dthReport.overallConclusion.title}}</view>
+            <view class="dth-profile-hint">{{dthReport.profileHint}}</view>
+            <view class="dth-summary">{{dthReport.overallConclusion.summary}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="dth-body">
+        <view class="dth-section">
+          <view class="dth-section-title">可视化分析</view>
+          <view class="dth-charts-row">
+            <view class="dth-radar-wrap"><view class="dth-chart-title">三维雷达图</view><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="dth-bar-wrap"><view class="dth-chart-title">维度得分排序</view><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
+          </view>
+        </view>
+        <view class="dth-divider"></view>
+        <view class="dth-section">
+          <view class="dth-section-title">三维度解读</view>
+          <view wx:for="{{dthReport.dimensionList}}" wx:key="id" class="dth-dim-item dth-level-{{item.level}}">
+            <view class="dth-dim-head"><view class="dth-dim-name">{{item.name}}</view><view class="dth-dim-meta">{{item.percent}}% · {{item.level === 'low' ? '偏低' : item.level === 'high' ? '偏高' : '适中'}}</view></view>
+            <view class="dth-dim-desc">{{dthReport.dimInsights[item.id] || '暂无解读'}}</view>
+            <view wx:if="{{item.levelHint}}" class="dth-dim-hint">{{item.levelHint}}</view>
+          </view>
+        </view>
+        <view class="dth-hint-box">{{dthReport.overallConclusion.hint}}</view>
+      </view>
+      <view class="dth-footer">
+        <view class="dth-footer-text">报告生成时间：{{dthReport.formatDate}} · DTH 黑暗三角人格测试 · 仅供教育参考</view>
+        <view class="dth-footer-links"><navigator url="/pages/test/test?testId=dth" class="dth-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="dth-footer-link">返回首页</navigator></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- TLA 年上年下结果 -->
+  <view wx:if="{{testId === 'tla' && result && tlaReport}}" class="tla-report-wrap">
+    <view class="tla-report-paper">
+      <view class="tla-header">
+        <view class="tla-header-inner">
+          <view class="tla-profile-desc">{{tlaReport.profileShort}}</view>
+          <view class="tla-meta">四维雷达 · 年上/年下 · 照顾/被照顾</view>
+        </view>
+      </view>
+      <view class="tla-body">
+        <view class="tla-section">
+          <view class="tla-section-title">可视化分析</view>
+          <view class="tla-charts-row">
+            <view class="tla-radar-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="tla-bar-wrap"><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
+          </view>
+        </view>
+        <view class="tla-divider"></view>
+        <view class="tla-section">
+          <view class="tla-section-title">四维度解读</view>
+          <view wx:for="{{tlaReport.dimensionList}}" wx:key="id" class="tla-dim-item {{item.isTop ? 'tla-top' : ''}}">
+            <view class="tla-dim-head"><view class="tla-dim-emoji">{{item.emoji}}</view><view class="tla-dim-name">{{item.name}} · {{item.cuteLabel}}</view><view class="tla-dim-meta">{{item.percent}}%</view></view>
+            <view class="tla-dim-desc">{{tlaReport.dimInsights[item.id] || '暂无解读'}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="tla-footer">
+        <view class="tla-footer-text">报告生成时间：{{tlaReport.formatDate}} · TLA 年上年下恋爱测试</view>
+        <view class="tla-footer-links"><navigator url="/pages/test/test?testId=tla" class="tla-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="tla-footer-link">返回首页</navigator></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- FFT 水果塑结果 -->
+  <view wx:if="{{testId === 'fft' && result && fftReport}}" class="fft-report-wrap">
+    <view class="fft-report-paper">
+      <view class="fft-header">
+        <view class="fft-primary-wrap"><view class="fft-primary-emoji">{{fftReport.primaryEmoji}}</view><view class="fft-primary-name">{{fftReport.primaryFruit.name}}</view></view>
+        <view class="fft-meta">九型水果人格 · 你的主导类型</view>
+      </view>
+      <view class="fft-body">
+        <view class="fft-section">
+          <view class="fft-section-title">可视化分析</view>
+          <view class="fft-charts-row">
+            <view class="fft-radar-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="fft-bar-wrap"><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
+          </view>
+        </view>
+        <view class="fft-divider"></view>
+        <view class="fft-section">
+          <view class="fft-section-title">九型解读</view>
+          <view wx:for="{{fftReport.dimensionList}}" wx:key="id" class="fft-dim-item {{item.isPrimary ? 'fft-primary' : ''}}">
+            <view class="fft-dim-head"><view class="fft-dim-emoji">{{item.emoji}}</view><view class="fft-dim-name">{{item.name}}</view><view class="fft-dim-meta">{{item.rawScore}}/6 · {{item.percent}}%</view></view>
+            <view class="fft-dim-desc">{{fftReport.dimInsights[item.id] || '暂无解读'}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="fft-footer">
+        <view class="fft-footer-text">报告生成时间：{{fftReport.formatDate}} · FFT 水果塑形测试</view>
+        <view class="fft-footer-links"><navigator url="/pages/test/test?testId=fft" class="fft-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="fft-footer-link">返回首页</navigator></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- YBT 病娇结果 -->
+  <view wx:if="{{testId === 'ybt' && result && ybtReport}}" class="ybt-report-wrap">
+    <view class="ybt-report-paper">
+      <view class="ybt-header">
+        <view class="ybt-profile-title">{{ybtReport.profile.title}}</view>
+        <view class="ybt-profile-summary">{{ybtReport.profile.summary}}</view>
+        <view class="ybt-advice">💡 {{ybtReport.profile.advice}}</view>
+      </view>
+      <view class="ybt-body">
+        <view class="ybt-section">
+          <view class="ybt-section-title">可视化分析</view>
+          <view class="ybt-charts-row">
+            <view class="ybt-radar-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="ybt-bar-wrap"><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
+          </view>
+        </view>
+        <view class="ybt-divider"></view>
+        <view class="ybt-section">
+          <view class="ybt-section-title">四维度解读</view>
+          <view wx:for="{{ybtReport.dimensionList}}" wx:key="id" class="ybt-dim-item">
+            <view class="ybt-dim-head"><view class="ybt-dim-name">{{item.name}}</view><view class="ybt-dim-meta">{{item.percent}}% · {{item.levelLabel}}</view></view>
+            <view class="ybt-dim-desc">{{ybtReport.dimInsights[item.id] || '暂无解读'}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="ybt-footer">
+        <view class="ybt-footer-text">报告生成时间：{{ybtReport.formatDate}} · YBT 病娇测试 · 仅供娱乐参考</view>
+        <view class="ybt-footer-links"><navigator url="/pages/test/test?testId=ybt" class="ybt-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="ybt-footer-link">返回首页</navigator></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- RVT 恋爱观结果 -->
+  <view wx:if="{{testId === 'rvt' && result && rvtReport}}" class="rvt-report-wrap">
+    <view class="rvt-report-paper">
+      <view class="rvt-header">
+        <view class="rvt-primary-title">{{rvtReport.primaryProfile.title}}</view>
+        <view class="rvt-primary-summary">{{rvtReport.primaryProfile.summary}}</view>
+        <view class="rvt-advice">💡 {{rvtReport.primaryProfile.advice}}</view>
+      </view>
+      <view class="rvt-body">
+        <view class="rvt-section">
+          <view class="rvt-charts-row">
+            <view class="rvt-radar-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="rvt-bar-wrap"><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
+          </view>
+        </view>
+        <view class="rvt-divider"></view>
+        <view class="rvt-section">
+          <view class="rvt-section-title">六种爱情风格解读</view>
+          <view wx:for="{{rvtReport.dimensionList}}" wx:key="id" class="rvt-dim-item {{item.isPrimary ? 'rvt-primary' : ''}}">
+            <view class="rvt-dim-head"><view class="rvt-dim-name">{{item.name}}</view><view class="rvt-dim-meta">{{item.percent}}%</view></view>
+            <view class="rvt-dim-desc">{{rvtReport.dimInsights[item.id] || ''}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="rvt-footer">
+        <view class="rvt-footer-text">报告生成时间：{{rvtReport.formatDate}} · RVT 恋爱观测试</view>
+        <view class="rvt-footer-links"><navigator url="/pages/test/test?testId=rvt" class="rvt-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="rvt-footer-link">返回首页</navigator></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- MPT 麋鹿性偏好结果 -->
+  <view wx:if="{{testId === 'mpt' && result && mptReport}}" class="mpt-report-wrap">
+    <view class="mpt-report-paper">
+      <view class="mpt-header">
+        <view class="mpt-primary-title">{{mptReport.primaryProfile.title}}</view>
+        <view class="mpt-primary-summary">{{mptReport.primaryProfile.summary}}</view>
+        <view class="mpt-advice">💡 {{mptReport.primaryProfile.advice}}</view>
+      </view>
+      <view class="mpt-body">
+        <view class="mpt-section">
+          <view class="mpt-charts-row">
+            <view class="mpt-radar-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="mpt-bar-wrap"><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
+          </view>
+        </view>
+        <view class="mpt-divider"></view>
+        <view class="mpt-section">
+          <view class="mpt-section-title">得分分布：{{mptReport.patternInfo.title}}</view>
+          <view class="mpt-pattern-text">{{mptReport.patternInfo.analysis}}</view>
+          <view class="mpt-pattern-implication">{{mptReport.patternInfo.implication}}</view>
+        </view>
+        <view class="mpt-divider"></view>
+        <view class="mpt-section">
+          <view class="mpt-section-title">四维解读</view>
+          <view wx:for="{{mptReport.dimensionList}}" wx:key="id" class="mpt-dim-item {{item.isPrimary ? 'mpt-primary' : ''}}">
+            <view class="mpt-dim-head"><view class="mpt-dim-name">{{item.name}}</view><view class="mpt-dim-meta">{{item.percent}}% · {{item.levelLabel}}</view></view>
+            <view class="mpt-dim-level">{{item.levelHint}}</view>
+            <view class="mpt-dim-desc">{{item.dimInsight}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="mpt-footer">
+        <view class="mpt-footer-text">报告生成时间：{{mptReport.formatDate}} · MPT 麋鹿性偏好测试</view>
+        <view class="mpt-footer-links"><navigator url="/pages/test/test?testId=mpt" class="mpt-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="mpt-footer-link">返回首页</navigator></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- VBT 易被欺负结果 -->
+  <view wx:if="{{testId === 'vbt' && result && vbtReport}}" class="vbt-report-wrap">
+    <view class="vbt-report-paper">
+      <view class="vbt-header">
+        <view class="vbt-primary-title">{{vbtReport.profile.title}}</view>
+        <view class="vbt-primary-summary">{{vbtReport.profile.summary}}</view>
+        <view class="vbt-zone-badge">{{vbtReport.zoneInfo.title}} · 易被欺负指数 {{vbtReport.vulnerabilityIndex}}</view>
+        <view class="vbt-advice">💡 {{vbtReport.profile.focus}}</view>
+      </view>
+      <view class="vbt-body">
+        <view class="vbt-section">
+          <view class="vbt-charts-row">
+            <view class="vbt-radar-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="vbt-bar-wrap"><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
+          </view>
+        </view>
+        <view class="vbt-divider"></view>
+        <view class="vbt-section">
+          <view class="vbt-section-title">四维解读</view>
+          <view wx:for="{{vbtReport.dimensionList}}" wx:key="id" class="vbt-dim-item {{item.isWeakest ? 'vbt-weakest' : ''}}">
+            <view class="vbt-dim-head"><view class="vbt-dim-name">{{item.name}}</view><view class="vbt-dim-meta">{{item.percent}}% · {{item.levelLabel}}</view></view>
+            <view class="vbt-dim-level">{{item.levelHint}}</view>
+            <view class="vbt-dim-desc">{{item.dimInsight}}</view>
+          </view>
+        </view>
+        <view class="vbt-divider"></view>
+        <view class="vbt-section">
+          <view class="vbt-section-title">自我保护建议</view>
+          <view wx:for="{{vbtReport.tips}}" wx:key="*this" class="vbt-tip-item">• {{item}}</view>
+        </view>
+      </view>
+      <view class="vbt-footer">
+        <view class="vbt-footer-text">报告生成时间：{{vbtReport.formatDate}} · VBT 易被欺负测试</view>
+        <view class="vbt-footer-links"><navigator url="/pages/test/test?testId=vbt" class="vbt-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="vbt-footer-link">返回首页</navigator></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- City 宜居城市结果 -->
+  <view wx:if="{{testId === 'city' && result && cityReport}}" class="city-report-wrap">
+    <view class="city-report-paper">
+      <view class="city-header">
+        <view class="city-primary-title">为你推荐的两座城市</view>
+        <view class="city-top-cities">
+          <view wx:for="{{cityReport.topCities}}" wx:key="city.id" class="city-card {{index === 0 ? 'city-first' : 'city-second'}}">
+            <view class="city-name">{{item.city.name}}</view>
+            <view class="city-province">{{item.city.province}}</view>
+            <view class="city-match">匹配 {{item.matchPercent}}%</view>
+            <view class="city-brief">{{item.city.brief}}</view>
+          </view>
+        </view>
+        <view class="city-profile">{{cityReport.profile.title}} · {{cityReport.profile.focus}}</view>
+      </view>
+      <view class="city-body">
+        <view class="city-section">
+          <view class="city-charts-row">
+            <view class="city-radar-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="city-bar-wrap"><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
+          </view>
+        </view>
+        <view class="city-divider"></view>
+        <view class="city-section">
+          <view class="city-section-title">五维解读</view>
+          <view wx:for="{{cityReport.dimensionList}}" wx:key="id" class="city-dim-item">
+            <view class="city-dim-head"><view class="city-dim-name">{{item.name}}</view><view class="city-dim-meta">{{item.percent}}% · {{item.levelLabel}}</view></view>
+            <view class="city-dim-level">{{item.levelHint}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="city-footer">
+        <view class="city-footer-text">报告生成时间：{{cityReport.formatDate}} · 宜居城市测试</view>
+        <view class="city-footer-links"><navigator url="/pages/test/test?testId=city" class="city-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="city-footer-link">返回首页</navigator></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- LBT 恋爱脑结果 -->
+  <view wx:if="{{testId === 'lbt' && result && lbtReport}}" class="lbt-report-wrap">
+    <view class="lbt-report-paper">
+      <view class="lbt-header">
+        <view class="lbt-primary-title">{{lbtReport.profile.title}}</view>
+        <view class="lbt-level-badge">恋爱脑程度 {{lbtReport.levelLabel}}</view>
+        <view class="lbt-primary-summary">{{lbtReport.profile.summary}}</view>
+        <view class="lbt-advice">💡 {{lbtReport.profile.advice}}</view>
+      </view>
+      <view class="lbt-body">
+        <view class="lbt-section">
+          <view class="lbt-charts-row">
+            <view class="lbt-radar-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="lbt-bar-wrap"><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
+          </view>
+        </view>
+        <view class="lbt-divider"></view>
+        <view class="lbt-section">
+          <view class="lbt-section-title">三维解读</view>
+          <view wx:for="{{lbtReport.dimensionList}}" wx:key="id" class="lbt-dim-item">
+            <view class="lbt-dim-head"><view class="lbt-dim-name">{{item.name}}</view><view class="lbt-dim-meta">{{item.percent}}% · {{item.levelLabel}}</view></view>
+            <view class="lbt-dim-level">{{item.levelHint}}</view>
+            <view class="lbt-dim-desc">{{item.dimInsight}}</view>
+          </view>
+        </view>
+        <view class="lbt-divider"></view>
+        <view class="lbt-section">
+          <view class="lbt-section-title">关系建议</view>
+          <view wx:for="{{lbtReport.tips}}" wx:key="*this" class="lbt-tip-item">• {{item}}</view>
+        </view>
+      </view>
+      <view class="lbt-footer">
+        <view class="lbt-footer-text">报告生成时间：{{lbtReport.formatDate}} · LBT 恋爱脑测试</view>
+        <view class="lbt-footer-links"><navigator url="/pages/test/test?testId=lbt" class="lbt-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="lbt-footer-link">返回首页</navigator></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- MBTI 完整报告 - 移植自 MBTIResult.tsx -->
+  <view wx:if="{{testId === 'mbti' && result && mbtiReport}}" class="mbti-report-wrap">
+    <view class="mbti-report-paper">
+      <view class="mbti-header">
+        <view class="mbti-header-sub">你的人格类型</view>
+        <view class="mbti-header-title">{{result.type}} · {{result.typeInfo.name}}</view>
+        <view class="mbti-header-en" wx:if="{{result.typeInfo.nameEn}}">{{result.typeInfo.nameEn}}</view>
+        <view class="mbti-slogan" wx:if="{{result.typeInfo.slogan}}">「{{result.typeInfo.slogan}}」</view>
+        <view class="mbti-desc">{{result.typeInfo.description}}</view>
+        <view class="mbti-strengths" wx:if="{{result.typeInfo.strengths && result.typeInfo.strengths.length}}">
+          <view wx:for="{{result.typeInfo.strengths}}" wx:key="*this" class="mbti-strength-tag">#{{item}}</view>
+        </view>
+      </view>
+      <view class="mbti-body">
+        <view class="mbti-section">
+          <view class="mbti-section-title">四维度详细得分</view>
+          <view class="mbti-dim-bars">
+            <view wx:for="{{result.dimensionScores}}" wx:key="dimension" class="mbti-dim-bar">
+              <view class="mbti-dim-bar-head"><text class="mbti-dim-label">{{item.label}}</text><text class="mbti-dim-scores">{{item.poleALabel}} {{item.scoreA}} · {{item.poleBLabel}} {{item.scoreB}}</text></view>
+              <view class="mbti-dim-bar-track">
+                <view class="mbti-dim-bar-a" style="width: {{item.scoreA + item.scoreB > 0 ? (item.scoreA / (item.scoreA + item.scoreB)) * 100 : 50}}%"></view>
+                <view class="mbti-dim-bar-b"></view>
+              </view>
+              <view class="mbti-dim-bar-hint">你更偏向 <text class="mbti-bold">{{item.dominantLabel}}</text>，倾向度约 {{item.percentage}}%</view>
+            </view>
+          </view>
+        </view>
+        <view class="mbti-divider"></view>
+        <view class="mbti-section">
+          <view class="mbti-section-title">维度雷达图</view>
+          <view class="mbti-chart-row">
+            <view class="mbti-radar-wrap"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
+            <view class="mbti-radar-legend" wx:if="{{mbtiReport.radarLegendItems && mbtiReport.radarLegendItems.length}}">
+              <view class="mbti-legend-title">各维度解读</view>
+              <view wx:for="{{mbtiReport.radarLegendItems}}" wx:key="subject" class="mbti-legend-item">
+                <view class="mbti-legend-row"><text class="mbti-legend-dim">{{item.subject}}</text><text class="mbti-legend-val">{{item.dominantLabel}} · {{item.value}}/10</text></view>
+                <view class="mbti-legend-bar"><view class="mbti-legend-fill" style="width: {{item.pct}}%"></view></view>
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="mbti-divider"></view>
+        <view class="mbti-section" wx:if="{{mbtiInsight && mbtiInsight.depthAnalysis}}">
+          <view class="mbti-section-title">人格深度分析</view>
+          <view class="mbti-depth-block">
+            <view class="mbti-depth-title">核心特质与内在驱动力</view>
+            <view class="mbti-depth-text">{{mbtiInsight.depthAnalysis}}</view>
+          </view>
+          <view class="mbti-analysis-grid">
+            <view class="mbti-analysis-card">
+              <view class="mbti-card-title">优势特质详解</view>
+              <view wx:if="{{mbtiInsight.strengthDetails && mbtiInsight.strengthDetails.length}}" class="mbti-detail-list">
+                <view wx:for="{{mbtiInsight.strengthDetails}}" wx:key="trait" class="mbti-detail-item">
+                  <view class="mbti-detail-head"><view class="mbti-dot"></view><text>{{item.trait}}</text></view>
+                  <view class="mbti-detail-body">{{item.detail}}</view>
+                </view>
+              </view>
+              <view wx:else class="mbti-simple-list">
+                <view wx:for="{{result.typeInfo.strengths}}" wx:key="*this" wx:for-item="s" class="mbti-simple-item"><view class="mbti-dot-sm"></view>{{s}}</view>
+              </view>
+            </view>
+            <view class="mbti-analysis-card mbti-card-weak">
+              <view class="mbti-card-title">待发展领域与改进建议</view>
+              <view wx:if="{{mbtiInsight.weaknessDetails && mbtiInsight.weaknessDetails.length}}" class="mbti-detail-list">
+                <view wx:for="{{mbtiInsight.weaknessDetails}}" wx:key="trait" class="mbti-detail-item">
+                  <view class="mbti-detail-head"><view class="mbti-dot mbti-dot-weak"></view><text>{{item.trait}}</text></view>
+                  <view class="mbti-detail-body">{{item.suggestion}}</view>
+                </view>
+              </view>
+              <view wx:else class="mbti-simple-list">
+                <view wx:for="{{result.typeInfo.weaknesses}}" wx:key="*this" wx:for-item="w" class="mbti-simple-item"><view class="mbti-dot-sm mbti-dot-weak"></view>{{w}}</view>
+              </view>
+            </view>
+            <view class="mbti-analysis-card mbti-card-full" wx:if="{{result.typeInfo.career && result.typeInfo.career.length}}">
+              <view class="mbti-card-title">职业发展建议</view>
+              <view class="mbti-career-tags"><view wx:for="{{result.typeInfo.career}}" wx:key="*this" class="mbti-career-tag">{{item}}</view></view>
+              <view wx:if="{{mbtiInsight && mbtiInsight.growthTips && mbtiInsight.growthTips.length}}" class="mbti-growth-tips">
+                <view class="mbti-growth-title">可执行的成长建议</view>
+                <view wx:for="{{mbtiInsight.growthTips}}" wx:key="*this" class="mbti-growth-item">✓ {{item}}</view>
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="mbti-divider"></view>
+        <view class="mbti-section" wx:if="{{result.typeInfo.relationships || result.typeInfo.workStyle || result.typeInfo.stressCoping}}">
+          <view class="mbti-section-title">多维应用洞察</view>
+          <view class="mbti-insight-grid">
+            <view class="mbti-insight-card" wx:if="{{result.typeInfo.relationships}}">
+              <view class="mbti-insight-title">亲密关系</view>
+              <view class="mbti-insight-text">{{result.typeInfo.relationships}}</view>
+              <view wx:if="{{mbtiInsight && mbtiInsight.relationshipsInsight}}" class="mbti-insight-deep">
+                <view class="mbti-insight-deep-title">深度洞察</view>
+                <view class="mbti-insight-deep-text">{{mbtiInsight.relationshipsInsight}}</view>
+              </view>
+            </view>
+            <view class="mbti-insight-card" wx:if="{{result.typeInfo.workStyle}}">
+              <view class="mbti-insight-title">工作与职业</view>
+              <view class="mbti-insight-text">{{result.typeInfo.workStyle}}</view>
+              <view wx:if="{{mbtiInsight && mbtiInsight.workInsight}}" class="mbti-insight-deep">
+                <view class="mbti-insight-deep-title">环境与角色建议</view>
+                <view class="mbti-insight-deep-text">{{mbtiInsight.workInsight}}</view>
+              </view>
+            </view>
+            <view class="mbti-insight-card" wx:if="{{result.typeInfo.stressCoping}}">
+              <view class="mbti-insight-title">压力应对与成长</view>
+              <view class="mbti-insight-text">{{result.typeInfo.stressCoping}}</view>
+              <view wx:if="{{mbtiInsight && mbtiInsight.stressInsight}}" class="mbti-insight-deep">
+                <view class="mbti-insight-deep-title">压力来源与恢复建议</view>
+                <view class="mbti-insight-deep-text">{{mbtiInsight.stressInsight}}</view>
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="mbti-divider"></view>
+        <view class="mbti-section" wx:if="{{mbtiReport.dimensionCards && mbtiReport.dimensionCards.length}}">
+          <view class="mbti-section-title">四维度细致解析</view>
+          <view class="mbti-dim-cards">
+            <view wx:for="{{mbtiReport.dimensionCards}}" wx:key="title" class="mbti-dim-card">
+              <view class="mbti-dim-card-title">{{item.title}}</view>
+              <view class="mbti-dim-card-content">{{item.content}}</view>
+              <view class="mbti-dim-card-tend">你的倾向：{{item.dominantLabel}} · 倾向度约 {{item.percentage}}%</view>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="mbti-footer">
+        <view class="mbti-footer-text">报告生成时间：{{mbtiReport.formatDate}} · MBTI 16型人格测试</view>
+        <view class="mbti-footer-note">本测试基于荣格心理学理论，结果仅供自我了解与娱乐参考，不构成专业诊断。</view>
+        <view class="mbti-footer-links"><navigator url="/pages/test/test?testId=mbti" class="mbti-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="mbti-footer-link">返回首页</navigator></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- RPI 完整报告 - 移植自 RPIResult.tsx -->
+  <view wx:if="{{testId === 'rpi' && rpiReport}}" class="rpi-report-wrap">
+    <view class="rpi-report-paper">
+      <view class="rpi-header">
+        <view class="rpi-header-inner">
+          <view class="rpi-header-sub">Romantic Possessiveness Index</view>
+          <view class="rpi-header-title">RPI 恋爱占有欲指数测试</view>
+          <view class="rpi-header-desc">40 题双视角完整版 · 评估报告</view>
+        </view>
+      </view>
+      <view class="rpi-meta">
+        <view class="rpi-meta-grid">
+          <view class="rpi-meta-item"><view class="rpi-meta-label">报告日期</view><view class="rpi-meta-val">{{rpiReport.formatDate}}</view></view>
+          <view class="rpi-meta-item"><view class="rpi-meta-label">题数</view><view class="rpi-meta-val">40 题（双视角各 20 题）</view></view>
+          <view class="rpi-meta-item"><view class="rpi-meta-label">维度</view><view class="rpi-meta-val">控制 / 嫉妒 / 依赖 / 安全感</view></view>
+          <view class="rpi-meta-item"><view class="rpi-meta-label">计分</view><view class="rpi-meta-val">每维度 5–25 分，总分 20–100</view></view>
+        </view>
+      </view>
+      <view class="rpi-body">
+        <view class="rpi-card rpi-core-card">
+          <view class="rpi-core-inner">
+            <view class="rpi-core-left">
+              <view class="rpi-core-sub">核心结论卡</view>
+              <view class="rpi-core-title">关系占有欲画像</view>
+              <view class="rpi-core-desc">{{rpiReport.hasSelf && rpiReport.hasPartner ? '双视角已完成，可对比彼此在控制、嫉妒、依赖与安全感上的差异。' : rpiReport.hasSelf ? '已完成自我视角，继续完成伴侣视角可生成更完整对比。' : '已完成伴侣视角，继续完成自我视角可生成更完整对比。'}}</view>
+              <view class="rpi-core-tags">
+                <view class="rpi-tag">人格类型：{{rpiReport.personaLabel}}</view>
+                <view class="rpi-tag rpi-tag-2">核心结论：{{rpiReport.coreLabel}}</view>
+              </view>
+            </view>
+            <view class="rpi-core-icon-wrap">
+              <image class="rpi-core-icon" src="/assets/users-icon.svg" mode="aspectFit" />
+            </view>
+          </view>
+        </view>
+
+        <view class="rpi-divider"></view>
+        <view class="rpi-section">
+          <view class="rpi-section-title"><view class="rpi-section-num">1</view>可视化概览</view>
+          <view class="rpi-section-desc">图表展示四个维度的占有欲强度，便于一眼对比。</view>
+          <view class="rpi-chart-wrap">
+            <view class="rpi-bar-wrap"><canvas canvas-id="result-rpi-bar" class="result-chart-canvas" style="width:100%;height:200px;"></canvas></view>
+          </view>
+        </view>
+
+        <view class="rpi-divider"></view>
+        <view class="rpi-section">
+          <view class="rpi-section-title"><view class="rpi-section-num">2</view>总体结论</view>
+          <view class="rpi-section-desc">RPI 从四个维度评估恋爱占有欲：控制欲望、嫉妒强度、情感依赖、关系不安全感。每维度 5 题，维度分为 5 题之和（5–25 分），总分为四维度之和（20–100 分）。等级：1–25 低占有欲、26–50 适中、51–75 偏高、76–100 极高。</view>
+          <view class="rpi-incomplete-tip" wx:if="{{!rpiReport.hasSelf || !rpiReport.hasPartner}}">{{rpiReport.hasSelf ? '伴侣视角已作答 ' : '自我视角已作答 '}}{{rpiReport.hasSelf ? rpiReport.partnerAnswered : rpiReport.selfAnswered}}/20，完成后可生成对比报告。</view>
+          <view class="rpi-total-cards">
+            <view wx:if="{{rpiReport.hasSelf && result.self}}" class="rpi-total-card rpi-level-{{rpiReport.selfLevelClass}}">
+              <view class="rpi-total-label">自我视角</view>
+              <view class="rpi-total-val">{{result.self.total}} 分 · {{result.self.levelLabel}}</view>
+            </view>
+            <view wx:if="{{rpiReport.hasPartner && result.partner}}" class="rpi-total-card rpi-level-{{rpiReport.partnerLevelClass}}">
+              <view class="rpi-total-label">伴侣视角</view>
+              <view class="rpi-total-val">{{result.partner.total}} 分 · {{result.partner.levelLabel}}</view>
+            </view>
+          </view>
+          <view class="rpi-top3-grid">
+            <view class="rpi-top3-cell"><view class="rpi-top3-lbl">自我突出维度</view><view class="rpi-top3-name">{{rpiReport.selfTop ? rpiReport.selfTop.name : '暂无'}}</view><view class="rpi-top3-detail">{{rpiReport.selfTop ? '得分 ' + rpiReport.selfTop.scoreSum + ' · ' + rpiReport.selfTop.levelLabel : '完成度 ' + rpiReport.selfAnswered + '/20'}}</view></view>
+            <view class="rpi-top3-cell"><view class="rpi-top3-lbl">伴侣突出维度</view><view class="rpi-top3-name">{{rpiReport.partnerTop ? rpiReport.partnerTop.name : '暂无'}}</view><view class="rpi-top3-detail">{{rpiReport.partnerTop ? '得分 ' + rpiReport.partnerTop.scoreSum + ' · ' + rpiReport.partnerTop.levelLabel : '完成度 ' + rpiReport.partnerAnswered + '/20'}}</view></view>
+            <view class="rpi-top3-cell"><view class="rpi-top3-lbl">视角差异最大</view><view class="rpi-top3-name">{{rpiReport.maxDiff ? rpiReport.maxDiff.name : '需完成双视角'}}</view><view class="rpi-top3-detail">{{rpiReport.maxDiff ? '差异 ' + (rpiReport.maxDiff.diff > 0 ? '+' : '') + rpiReport.maxDiff.diff : '完成双视角后计算'}}</view></view>
+          </view>
+        </view>
+
+        <view class="rpi-divider"></view>
+        <view class="rpi-section">
+          <view class="rpi-section-title"><view class="rpi-section-num">3</view>维度得分</view>
+          <view class="rpi-view-switcher" wx:if="{{rpiReport.hasSelf && rpiReport.hasPartner}}">
+            <view class="rpi-view-btn {{rpiReport.view === 'both' ? 'rpi-view-active' : ''}}" data-view="both" bindtap="onRpiViewChange">双视角</view>
+            <view class="rpi-view-btn {{rpiReport.view === 'self' ? 'rpi-view-active' : ''}}" data-view="self" bindtap="onRpiViewChange">自我视角</view>
+            <view class="rpi-view-btn {{rpiReport.view === 'partner' ? 'rpi-view-active' : ''}}" data-view="partner" bindtap="onRpiViewChange">伴侣视角</view>
+          </view>
+          <view class="rpi-perspective-cards">
+            <view wx:if="{{rpiReport.view !== 'partner' && rpiReport.hasSelf && result.self}}" class="rpi-perspective-block">
+              <view class="rpi-perspective-header"><text class="rpi-perspective-title">自我视角</text><view class="rpi-perspective-badge">{{result.self.total}} 分 · {{result.self.levelLabel}}</view></view>
+              <view wx:for="{{result.self.dimensionScores}}" wx:key="id" class="rpi-dim-row">
+                <view class="rpi-dim-left"><text class="rpi-dim-name">{{item.name}}</text><view class="rpi-dim-badge rpi-badge-{{item.level}}">{{item.levelLabel}}</view></view>
+                <view class="rpi-dim-hint" wx:if="{{item.hint}}">{{item.hint}}</view>
+                <view class="rpi-dim-right"><text class="rpi-dim-mean">均分 {{item.scoreMeanStr}}</text><text class="rpi-dim-sum">{{item.scoreSum}}</text><view class="rpi-dim-bar-wrap"><view class="rpi-dim-bar"><view class="rpi-dim-fill rpi-fill-{{item.level}}" style="width: {{(item.scoreSum/25)*100}}%"></view></view></view></view>
+              </view>
+            </view>
+            <view wx:if="{{rpiReport.view !== 'self' && rpiReport.hasPartner && result.partner}}" class="rpi-perspective-block">
+              <view class="rpi-perspective-header"><text class="rpi-perspective-title">伴侣视角</text><view class="rpi-perspective-badge">{{result.partner.total}} 分 · {{result.partner.levelLabel}}</view></view>
+              <view wx:for="{{result.partner.dimensionScores}}" wx:key="id" class="rpi-dim-row">
+                <view class="rpi-dim-left"><text class="rpi-dim-name">{{item.name}}</text><view class="rpi-dim-badge rpi-badge-{{item.level}}">{{item.levelLabel}}</view></view>
+                <view class="rpi-dim-hint" wx:if="{{item.hint}}">{{item.hint}}</view>
+                <view class="rpi-dim-right"><text class="rpi-dim-mean">均分 {{item.scoreMeanStr}}</text><text class="rpi-dim-sum">{{item.scoreSum}}</text><view class="rpi-dim-bar-wrap"><view class="rpi-dim-bar"><view class="rpi-dim-fill rpi-fill-{{item.level}}" style="width: {{(item.scoreSum/25)*100}}%"></view></view></view></view>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view wx:if="{{result.comparison && rpiReport.hasSelf && rpiReport.hasPartner}}" class="rpi-divider"></view>
+        <view wx:if="{{result.comparison && rpiReport.hasSelf && rpiReport.hasPartner}}" class="rpi-section">
+          <view class="rpi-section-title"><view class="rpi-section-num">4</view>双视角对比</view>
+          <view class="rpi-section-desc">{{result.comparison.summary}}</view>
+          <view class="rpi-compare-table">
+            <view class="rpi-table-row rpi-table-head"><text>维度</text><text>自我</text><text>伴侣</text><text>差异</text></view>
+            <view wx:for="{{result.comparison.dimensionDiffs}}" wx:key="id" class="rpi-table-row"><text>{{item.name}}</text><text>{{item.selfSum}}</text><text>{{item.partnerSum}}</text><text>{{item.diff > 0 ? '+' : ''}}{{item.diff}}</text></view>
+          </view>
+        </view>
+
+        <view class="rpi-divider"></view>
+        <view class="rpi-section">
+          <view class="rpi-section-title"><view class="rpi-section-num">5</view>沟通与关系建议</view>
+          <view class="rpi-advice-list">
+            <view class="rpi-advice-item">· 使用「我感到…」而非「你总是…」的表达方式，减少指责感。</view>
+            <view class="rpi-advice-item">· 对安全感与边界需求给出可执行的具体约定（如回复频率、与异性相处的底线）。</view>
+            <view class="rpi-advice-item">· 若双方在控制、嫉妒或依赖维度上差异较大，可共同讨论各自舒适区与底线。</view>
+            <view class="rpi-advice-item">· 本结果仅作关系沟通与自我觉察参考，不替代伴侣咨询或个体心理咨询。</view>
+          </view>
+        </view>
+      </view>
+      <view class="rpi-footer">
+        <view class="rpi-footer-title">声明</view>
+        <view class="rpi-footer-text">本报告依据自评/为伴侣评结果生成，仅供关系沟通与自我觉察参考，不构成任何临床诊断。数据在本地处理，不上传服务器。</view>
+        <view class="rpi-footer-meta">{{rpiReport.formatDate}} · RPI 恋爱占有欲指数</view>
+        <view class="rpi-footer-links"><navigator url="/pages/rpi-test/rpi-test" class="rpi-footer-link">返回测试</navigator><navigator url="/pages/index/index" class="rpi-footer-link">返回首页</navigator></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- SRI 性压抑指数 - 未完成时提示 -->
+  <view wx:if="{{testId === 'sri' && result && !sriReport}}" class="sri-incomplete-wrap">
+    <view class="sri-incomplete-msg">请完成全部 48 题后查看结果</view>
+    <navigator url="/pages/test/test?testId=sri" class="sri-incomplete-link">返回继续测试</navigator>
+  </view>
+  <!-- SRI 性压抑指数完整报告 - 移植自 SRIResult.tsx -->
+  <view wx:elif="{{testId === 'sri' && sriReport}}" class="sri-report-wrap">
+    <view class="sri-report-paper">
+      <view class="sri-header">
+        <view class="sri-header-inner">
+          <view class="sri-header-sub">Sexual Repression Index</view>
+          <view class="sri-header-title">SRI 性压抑指数测试</view>
+          <view class="sri-header-desc">四维度评估报告 · 欲望表达 · 观念冲突 · 情绪紧张 · 行为抑制</view>
+        </view>
+      </view>
+      <view class="sri-meta">
+        <view class="sri-meta-grid">
+          <view class="sri-meta-item"><view class="sri-meta-label">报告日期</view><view class="sri-meta-val">{{sriReport.formatDate}}</view></view>
+          <view class="sri-meta-item"><view class="sri-meta-label">题数</view><view class="sri-meta-val">48 题</view></view>
+          <view class="sri-meta-item"><view class="sri-meta-label">维度</view><view class="sri-meta-val">欲望表达 / 观念冲突 / 情绪紧张 / 行为抑制</view></view>
+          <view class="sri-meta-item"><view class="sri-meta-label">指数范围</view><view class="sri-meta-val">0–100（越高越压抑）</view></view>
+        </view>
+      </view>
+      <view class="sri-body">
+        <view class="sri-card sri-core-card">
+          <view class="sri-core-inner">
+            <view class="sri-core-left">
+              <view class="sri-core-sub">核心结论卡</view>
+              <view class="sri-core-title">综合结论：{{result.levelLabel}}</view>
+              <view class="sri-core-desc">当前性压抑指数为 {{result.totalIndex}} 分，主要影响集中在{{sriReport.topDim ? sriReport.topDim.name : '核心维度'}}。</view>
+              <view class="sri-core-tags">
+                <view class="sri-tag">人格类型：{{result.levelLabel}}型</view>
+                <view class="sri-tag sri-tag-2">核心结论：{{sriReport.topDim ? sriReport.topDim.name : '待完成'}}</view>
+              </view>
+            </view>
+            <view class="sri-core-icon-wrap">
+              <image class="sri-core-icon" src="/assets/icons/person-intimate.svg" mode="aspectFit" />
+            </view>
+          </view>
+        </view>
+        <view class="sri-divider"></view>
+        <view class="sri-section">
+          <view class="sri-section-title"><view class="sri-section-num">1</view>可视化概览</view>
+          <view class="sri-section-desc">通过图表直观看到四维度得分分布与压抑程度。</view>
+          <view class="sri-radar-wrap" wx:if="{{sriReport.radarData && sriReport.radarData.length}}">
+            <view class="sri-chart-title">四维雷达图</view>
+            <canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas>
+          </view>
+          <view class="sri-chart-wrap">
+            <canvas canvas-id="result-sri-bar" class="result-chart-canvas" style="width:100%;height:200px;"></canvas>
+          </view>
+        </view>
+        <view class="sri-divider"></view>
+        <view class="sri-section">
+          <view class="sri-section-title"><view class="sri-section-num">2</view>总体结论</view>
+          <view class="sri-section-desc">SRI 从四个维度评估性压抑程度：欲望表达、观念冲突、情绪紧张、行为抑制。指数 0–100，越高表示压抑程度越高。等级：0–20 很低、20–40 偏低、40–60 中等、60–80 偏高、80–100 很高。</view>
+          <view class="sri-total-card sri-total-{{sriReport.totalLevelClass}}">
+            <view class="sri-total-row">
+              <view><view class="sri-total-label">性压抑指数</view><view class="sri-total-val">{{result.totalIndex}} 分 · {{result.levelLabel}}</view></view>
+              <view class="sri-total-bar-wrap"><view class="sri-total-bar"><view class="sri-total-fill" style="width: {{result.totalIndex}}%"></view></view></view>
+            </view>
+          </view>
+          <view class="sri-stats-grid">
+            <view class="sri-stat-cell"><view class="sri-stat-lbl">总体指数</view><view class="sri-stat-val">{{result.totalIndex}}</view><view class="sri-stat-hint">0–100</view></view>
+            <view class="sri-stat-cell"><view class="sri-stat-lbl">等级</view><view class="sri-stat-val">{{result.levelLabel}}</view><view class="sri-stat-hint">五等级</view></view>
+            <view class="sri-stat-cell"><view class="sri-stat-lbl">最高维度</view><view class="sri-stat-val">{{sriReport.topDim ? sriReport.topDim.name : '暂无'}}</view><view class="sri-stat-hint">{{sriReport.topDimHint}}</view></view>
+            <view class="sri-stat-cell"><view class="sri-stat-lbl">完成度</view><view class="sri-stat-val">{{sriReport.answeredCount}}/48</view><view class="sri-stat-hint">全部完成</view></view>
+          </view>
+        </view>
+        <view class="sri-divider"></view>
+        <view class="sri-section">
+          <view class="sri-section-title"><view class="sri-section-num">3</view>四维度得分</view>
+          <view class="sri-dim-table">
+            <view wx:for="{{sriReport.dimScoresForView}}" wx:key="id" class="sri-dim-row">
+              <view class="sri-dim-left"><text class="sri-dim-name">{{item.name}}</text><view class="sri-dim-badge sri-badge-{{item.level}}">{{item.levelLabel}}</view></view>
+              <view class="sri-dim-hint">{{item.hint}}</view>
+              <view class="sri-dim-right"><text class="sri-dim-mean">均分 {{item.scoreStr}}</text><text class="sri-dim-index">{{item.index}}</text><view class="sri-dim-bar-wrap"><view class="sri-dim-bar"><view class="sri-dim-fill sri-fill-{{item.level}}" style="width: {{item.pct}}%"></view></view></view></view>
+            </view>
+          </view>
+        </view>
+        <view class="sri-divider"></view>
+        <view class="sri-section">
+          <view class="sri-section-title"><view class="sri-section-num">4</view>多角度解读</view>
+          <view class="sri-section-desc">以下从维度组合与突出维度两个角度对结果进行解读。</view>
+          <view class="sri-interp-card">
+            <view class="sri-interp-title">突出维度（得分最高的 3 个）</view>
+            <view wx:for="{{result.top3Dimensions}}" wx:key="id" class="sri-interp-item">{{index + 1}}. {{item.name}}（{{item.levelLabel}}）{{item.hint}}</view>
+          </view>
+          <view class="sri-interp-card">
+            <view class="sri-interp-title">观念与表达</view>
+            <view class="sri-interp-text">{{sriReport.conflictExpressionText}}</view>
+          </view>
+          <view class="sri-interp-card">
+            <view class="sri-interp-title">情绪与行为</view>
+            <view class="sri-interp-text">{{sriReport.anxietyInhibitionText}}</view>
+          </view>
+          <view class="sri-interp-card">
+            <view class="sri-interp-title">综合视角</view>
+            <view class="sri-interp-text">{{sriReport.summaryText}}</view>
+          </view>
+        </view>
+        <view class="sri-divider"></view>
+        <view class="sri-section">
+          <view class="sri-section-title"><view class="sri-section-num">5</view>建议方向</view>
+          <view class="sri-advice-list">
+            <view class="sri-advice-item">· 用「我需要/我不需要」表达感受，减少自我批评与「应该」的绑架。</view>
+            <view class="sri-advice-item">· 与可信赖的伴侣或对象建立安全的对话节奏，逐步明确边界与舒适区。</view>
+            <view class="sri-advice-item">· 区分「紧张」与「不愿意」，在自愿前提下小步增加表达或身体接触。</view>
+            <view class="sri-advice-item">· 本结果仅作自我了解与沟通参考，不构成任何临床诊断；如有持续困扰可寻求伴侣/性心理咨询。</view>
+          </view>
+        </view>
+      </view>
+      <view class="sri-footer">
+        <view class="sri-footer-title">声明</view>
+        <view class="sri-footer-text">本报告依据自评结果生成，仅供自我探索与沟通参考，不构成任何临床诊断。数据在本地处理，不上传服务器。</view>
+        <view class="sri-footer-meta">{{sriReport.formatDate}} · SRI 性压抑指数</view>
+        <view class="sri-footer-links"><navigator url="/pages/test/test?testId=sri" class="sri-footer-link">返回测试</navigator><navigator url="/pages/index/index" class="sri-footer-link">返回首页</navigator></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 人格动物塑 - 未完成时提示 -->
+  <view wx:if="{{testId === 'animal' && result && !animalReport}}" class="animal-incomplete-wrap">
+    <view class="animal-incomplete-msg">请完成至少 30 题后查看结果（共 60 题）</view>
+    <navigator url="/pages/animal-test/animal-test" class="animal-incomplete-link">返回继续测试</navigator>
+  </view>
+  <!-- 人格动物塑完整报告 - 移植自 AnimalResult.tsx -->
+  <view wx:elif="{{testId === 'animal' && animalReport}}" class="animal-report-wrap">
+    <view class="animal-report-paper">
+      <view class="animal-header">
+        <view class="animal-icon-wrap">{{animalReport.mainAnimal.emoji}}</view>
+        <view class="animal-header-sub">您的精神动物是</view>
+        <view class="animal-header-title">{{animalReport.mainAnimal.name}}</view>
+        <view class="animal-header-desc">{{animalReport.mainAnimal.description}}</view>
+        <view class="animal-traits">
+          <view wx:for="{{animalReport.mainAnimal.traits}}" wx:key="*this" class="animal-trait-tag">#{{item}}</view>
+        </view>
+        <view wx:if="{{animalReport.mainAnimal.weaknesses && animalReport.mainAnimal.weaknesses.length}}" class="animal-weaknesses">
+          <view class="animal-weak-label">潜在弱点</view>
+          <view class="animal-weak-tags">
+            <view wx:for="{{animalReport.mainAnimal.weaknesses}}" wx:key="*this" class="animal-weak-tag">{{item}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="animal-body">
+        <view class="animal-section">
+          <view class="animal-section-title">雷达图 · 维度解析</view>
+          <view class="animal-charts-row">
+            <view class="animal-radar-wrap">
+              <canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas>
+            </view>
+            <view class="animal-dim-list">
+              <view wx:for="{{animalReport.radarData}}" wx:key="name" class="animal-dim-item">
+                <view class="animal-dim-head"><text>{{item.name}}</text><text class="animal-dim-score">{{item.score}} / 10</text></view>
+                <view class="animal-dim-bar"><view class="animal-dim-fill" style="width: {{(item.score/10)*100}}%"></view></view>
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="animal-divider"></view>
+        <view class="animal-section">
+          <view class="animal-section-title">综合特质分析</view>
+          <view class="animal-compound-grid">
+            <view wx:for="{{animalReport.compoundRows}}" wx:key="key" class="animal-compound-item">
+              <view class="animal-compound-head"><view class="animal-compound-label">{{item.label}}</view><view class="animal-compound-right"><view class="animal-compound-status">{{item.status}}</view><text class="animal-compound-val">{{item.value.toFixed(1)}}</text></view></view>
+              <view class="animal-compound-bar"><view class="animal-compound-fill" style="width: {{(item.value/10)*100}}%"></view></view>
+            </view>
+          </view>
+        </view>
+        <view class="animal-divider"></view>
+        <view class="animal-section">
+          <view class="animal-section-title">潜在特质：第二动物形态</view>
+          <view class="animal-secondary-card">
+            <view class="animal-secondary-icon">{{animalReport.secondaryAnimal.emoji}}</view>
+            <view class="animal-secondary-content">
+              <view class="animal-secondary-name">{{animalReport.secondaryAnimal.name}}</view>
+              <view class="animal-secondary-traits">
+                <text wx:for="{{animalReport.secondaryAnimal.traits}}" wx:key="*this" class="animal-sec-tag">#{{item}}</text>
+              </view>
+              <view class="animal-secondary-desc">除了{{animalReport.mainAnimal.name}}的主导特质外，你还表现出{{animalReport.secondaryAnimal.name}}的一面。{{animalReport.secondaryAnimal.description}}</view>
+            </view>
+          </view>
+        </view>
+        <view class="animal-divider"></view>
+        <view class="animal-section">
+          <view class="animal-section-title">深度性格分析</view>
+          <view class="animal-analysis-grid">
+            <view class="animal-analysis-card">
+              <view class="animal-analysis-title">能量来源 (E)</view>
+              <view class="animal-analysis-text">{{animalReport.analysisE}}</view>
+            </view>
+            <view class="animal-analysis-card">
+              <view class="animal-analysis-title">思维模式 (O)</view>
+              <view class="animal-analysis-text">{{animalReport.analysisO}}</view>
+            </view>
+            <view class="animal-analysis-card">
+              <view class="animal-analysis-title">决策风格 (A/C)</view>
+              <view class="animal-analysis-text">{{animalReport.analysisAC}}</view>
+            </view>
+            <view class="animal-analysis-card">
+              <view class="animal-analysis-title">抗压能力 (N)</view>
+              <view class="animal-analysis-text">{{animalReport.analysisN}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="animal-footer">
+        <view class="animal-footer-meta">{{animalReport.formatDate}} · 动物塑性格测试</view>
+        <view class="animal-footer-text">本测试基于FFM五因素模型与动物心理学趣味映射，结果仅供娱乐与参考。</view>
+        <view class="animal-footer-links"><navigator url="/pages/animal-test/animal-test" class="animal-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="animal-footer-link">返回首页</navigator></view>
+      </view>
+    </view>
+  </view>
+  </view>
+  <theme-switcher bindthemechange="onThemeChange"></theme-switcher>
+</view>
+
+<view class="page-wrap" style="{{themeStyle}}" wx:else>
+  <nav-header currentPath="/"></nav-header>
+  <view class="empty">
+    <text>请先完成测评</text>
+    <navigator url="/pages/index/index" class="link">返回首页</navigator>
+  </view>
+  <theme-switcher bindthemechange="onThemeChange"></theme-switcher>
+</view>

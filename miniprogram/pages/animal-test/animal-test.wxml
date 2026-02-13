@@ -1,0 +1,51 @@
+<view class="page-wrap animal-page" style="{{themeStyle}}">
+  <nav-header currentPath="/animal"></nav-header>
+
+  <view class="animal-main">
+    <view class="animal-header-block">
+      <view class="section-header">
+        <view class="section-header-title">{{testInfo.title}}</view>
+        <view class="section-header-desc">{{testInfo.subtitle}}</view>
+      </view>
+      <view class="restart-btn" bindtap="onRestart">重新开始</view>
+    </view>
+    <view class="animal-desc">{{testInfo.description}}</view>
+
+    <view class="animal-progress-wrap">
+      <view class="animal-progress-bar" style="width: {{progress}}%"></view>
+    </view>
+
+    <view class="animal-question-card" wx:if="{{currentQ}}">
+      <view class="animal-q-meta">题目 {{current + 1}}/{{total}}</view>
+      <view class="animal-q-text">{{currentQ.text}}</view>
+      <view class="animal-options">
+        <view
+          wx:for="{{currentQ.options}}"
+          wx:key="label"
+          class="animal-opt {{answers[currentQ.id] === index ? 'animal-opt-selected' : ''}}"
+          data-value="{{index}}"
+          bindtap="onSelect"
+        >{{item.label}}</view>
+      </view>
+    </view>
+
+    <view class="animal-nav-row">
+      <button class="animal-btn-prev" disabled="{{current === 0}}" bindtap="goPrev">上一题</button>
+      <view class="animal-progress-text">已完成 {{answeredCount}}/{{total}}</view>
+      <button class="animal-btn-next" disabled="{{current >= total - 1}}" bindtap="goNext">下一题</button>
+    </view>
+
+    <button
+      class="animal-btn-submit {{canSubmit ? '' : 'animal-btn-disabled'}}"
+      disabled="{{!canSubmit}}"
+      bindtap="onSubmit"
+    >查看分析结果</button>
+
+    <view class="animal-tips">
+      <view class="animal-tips-title">作答提示</view>
+      <view wx:for="{{testInfo.instructions}}" wx:key="*this" class="animal-tips-item">• {{item}}</view>
+    </view>
+  </view>
+
+  <theme-switcher bindthemechange="onThemeChange"></theme-switcher>
+</view>

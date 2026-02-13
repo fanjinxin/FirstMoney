@@ -1,0 +1,7 @@
+<view class="scl90-radar-wrap">
+  <view class="scl90-radar-header">
+    <text class="scl90-radar-title">10 因子雷达图</text>
+    <view class="scl90-radar-tag">轮廓</view>
+  </view>
+  <canvas type="2d" id="{{canvasId}}" class="scl90-radar-canvas" style="width:100%;height:280px;"></canvas>
+</view>

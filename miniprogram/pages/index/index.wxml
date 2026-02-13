@@ -1,0 +1,83 @@
+<view class="page-wrap" style="{{themeStyle}}">
+  <nav-header currentPath="/"></nav-header>
+  <!-- Hero 区：严格还原 Web 版 section 结构 -->
+  <view class="hero-section">
+    <view class="hero-orb hero-orb-right"></view>
+    <view class="hero-orb hero-orb-left"></view>
+    <view class="hero-inner">
+      <view class="hero-grid">
+        <view class="hero-col-left">
+          <view class="hero-badge">
+            <view class="badge-dot"></view>
+            <text class="badge-text">轻量心理测评 · 即开即测</text>
+          </view>
+          <view class="hero-title">更酷的测评体验，快速获得多维度洞察</view>
+          <view class="hero-desc">更直观的流程、更清晰的反馈、更有节奏的体验感，帮助你专注于真实感受。测试结果将以图表与建议结合的方式呈现。</view>
+          <view class="hero-tags">
+            <text class="hero-tag">即时解析</text>
+            <text class="hero-tag">多维度雷达</text>
+            <text class="hero-tag">隐私友好</text>
+          </view>
+        </view>
+        <view class="hero-col-right">
+          <view class="hero-card">
+            <view class="hero-card-label">测评亮点</view>
+            <view class="hero-card-title">自动生成个性化建议</view>
+            <view class="hero-card-desc">根据作答节奏与内容趋势，输出更贴合的提示与行动建议。</view>
+          </view>
+          <view class="hero-card">
+            <view class="hero-card-label">报告格式</view>
+            <view class="hero-card-row">
+              <view class="hero-card-icon">📊</view>
+              <text class="hero-card-text">多维图表 + 可执行建议</text>
+            </view>
+            <view class="hero-progress-wrap">
+              <view class="hero-progress-bar"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 测评卡片网格：md:grid-cols-3 -->
+  <view class="test-grid">
+    <view 
+      wx:for="{{tests}}" 
+      wx:key="id"
+      class="test-card test-card-{{item.bgType}}"
+      data-id="{{item.id}}"
+      bindtap="onTestTap"
+    >
+      <view class="test-card-overlay"></view>
+      <view class="test-card-content">
+        <view class="test-card-header">
+          <view class="test-icon-wrap test-icon-{{item.iconBg}}">
+            <image wx:if="{{item.iconType === 'huolande'}}" class="test-icon-img" src="/assets/huolande-icon.png" mode="aspectFit"></image>
+            <image wx:else class="test-icon-img" src="/assets/icons/{{item.iconType}}.svg" mode="aspectFit"></image>
+          </view>
+          <view class="test-subtitle-tag">{{item.subtitle}}</view>
+        </view>
+        <view class="test-card-title">{{item.title}}</view>
+        <view class="test-card-desc">{{item.description}}</view>
+        <view class="test-meta-tag" wx:if="{{item.metaText}}">{{item.metaText}}</view>
+      </view>
+      <view class="test-card-footer">
+        <view class="test-action-link" catchtap="onTestTap" data-id="{{item.id}}">开始测评 →</view>
+        <view 
+          class="test-jump-btn"
+          data-id="{{item.id}}"
+          catchtap="onTestJump"
+        >测试：直接看结果</view>
+      </view>
+    </view>
+  </view>
+
+  <theme-switcher bindthemechange="onThemeChange"></theme-switcher>
+
+  <!-- Footer：严格还原 Layout footer -->
+  <view class="footer">
+    <view class="footer-title">免责声明</view>
+    <view class="footer-text">本网站所有测评均为自评工具，仅供自我探索与娱乐参考，不构成任何专业心理评估、临床诊断或医疗建议。测评题目与结果解释仅供学习交流，如有持续困扰请寻求专业心理咨询或医疗机构帮助。数据在本地处理，不上传服务器。</view>
+  </view>
+</view>

@@ -1,0 +1,13 @@
+<view class="scl90-pie-wrap">
+  <view class="scl90-pie-header">
+    <text class="scl90-pie-title">症状等级分布</text>
+    <view class="scl90-pie-tag">分布</view>
+  </view>
+  <canvas type="2d" id="{{canvasId}}" class="scl90-pie-canvas" style="width:100%;height:260px;"></canvas>
+  <view class="scl90-pie-legend">
+    <view wx:for="{{dataWithColors}}" wx:key="name" class="scl90-legend-item">
+      <view class="scl90-legend-dot" style="background:{{item.color}}"></view>
+      <text>{{item.name}}</text>
+    </view>
+  </view>
+</view>

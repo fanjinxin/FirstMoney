@@ -1,0 +1,101 @@
+/** 主题色：薄荷苏打 (Summer Mint)，含 rgb 用于 rgba 透明度 */
+page {
+  --xia-sky: #7FBFE1;
+  --xia-aqua: #68D4DB;
+  --xia-mint: #98E6E2;
+  --xia-cream: #F8F4E1;
+  --xia-haze: #CFEFF0;
+  --xia-deep: #0F4C5C;
+  --xia-teal: #2C6F7A;
+  --xia-deep-rgb: 15, 76, 92;
+  --xia-haze-rgb: 207, 239, 240;
+  --xia-sky-rgb: 127, 191, 225;
+  --xia-teal-rgb: 44, 111, 122;
+  --xia-cream-rgb: 248, 244, 225;
+  --xia-aqua-rgb: 104, 212, 219;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', STHeiti, 'Microsoft Yahei', sans-serif;
+  background: linear-gradient(135deg, rgba(248, 244, 225, 0.3) 0%, #FFFFFF 50%, rgba(207, 239, 240, 0.3) 100%);
+  color: var(--xia-deep);
+  min-height: 100vh;
+}
+
+/* 首页使用 page-wrap，其他页可用 container */
+.container {
+  box-sizing: border-box;
+  padding: 24rpx;
+  min-height: 100vh;
+}
+
+/* 卡片 */
+.card {
+  border-radius: 24rpx;
+  border: 2rpx solid var(--xia-haze);
+  background: #fff;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(15, 76, 92, 0.04);
+}
+
+/* 主按钮 */
+.btn-primary {
+  background: var(--xia-deep);
+  color: #fff;
+  border-radius: 24rpx;
+  padding: 28rpx;
+  font-weight: 600;
+  font-size: 28rpx;
+  text-align: center;
+}
+
+.btn-primary[disabled] {
+  background: var(--xia-haze);
+  color: #94a3b8;
+}
+
+/* 次要按钮 */
+.btn-secondary {
+  border: 2rpx solid var(--xia-haze);
+  color: var(--xia-deep);
+  border-radius: 999rpx;
+  padding: 20rpx 32rpx;
+  font-size: 28rpx;
+}
+
+/* 标题 */
+.section-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--xia-deep);
+  margin-bottom: 8rpx;
+}
+
+.section-subtitle {
+  font-size: 26rpx;
+  color: rgba(15, 76, 92, 0.6);
+}
+
+/* 标签 */
+.tag {
+  display: inline-block;
+  padding: 8rpx 20rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  background: rgba(15, 76, 92, 0.06);
+  color: rgba(15, 76, 92, 0.7);
+}
+
+/* 进度条 */
+.progress-wrap {
+  height: 16rpx;
+  background: rgba(207, 239, 240, 0.3);
+  border-radius: 999rpx;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: var(--xia-deep);
+  border-radius: 999rpx;
+  transition: width 0.3s ease;
+}
