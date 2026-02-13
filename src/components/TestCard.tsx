@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
+import { Flame } from 'lucide-react'
 import { fillSampleAnswers, isSampleData, clearSampleFlag } from '../utils/testSample'
 import { clearAnswers } from '../utils/storage'
 import { useBackdoor } from '../contexts/BackdoorContext'
@@ -14,6 +15,10 @@ type TestCardProps = {
   backgroundClass?: string
   duration?: string
   questionCount?: number
+  /** 是否显示首页热门标记 */
+  hot?: boolean
+  /** 使用人数文案，如 "12w+ 使用过" */
+  usageText?: string
   /** 测试阶段：结果页路径，与 testId 同时传入时显示「测试：直接看结果」按钮 */
   resultTo?: string
   /** 测试阶段：测评 id，用于填充示例答案 */
@@ -30,6 +35,8 @@ export default function TestCard({
   backgroundClass,
   duration,
   questionCount,
+  hot,
+  usageText,
   resultTo,
   testId,
 }: TestCardProps) {
@@ -86,17 +93,32 @@ export default function TestCard({
           >
             {icon}
           </div>
-          <div className="rounded-full bg-xia-deep/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-xia-deep/60 sm:px-3 sm:text-[11px]">
-            {subtitle}
+          <div className="flex items-center gap-2">
+            {hot && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-orange-500/25 to-red-500/25 px-2 py-1 text-orange-500">
+                <Flame className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4 animate-hot-flame" strokeWidth={2.5} />
+                <span className="text-[9px] font-bold uppercase tracking-wider sm:text-[10px]">hot</span>
+              </span>
+            )}
+            <span className="rounded-full bg-xia-deep/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-xia-deep/60 sm:px-3 sm:text-[11px]">
+              {subtitle}
+            </span>
           </div>
         </div>
         <div className="relative text-base font-semibold text-xia-deep sm:text-xl">{title}</div>
         <p className="mt-2 text-sm leading-relaxed text-xia-deep/80 sm:mt-3">{description}</p>
-        {metaText ? (
-          <div className="mt-3 inline-flex items-center rounded-full bg-xia-deep/5 px-3 py-1 text-xs font-semibold text-xia-deep/70 sm:mt-4">
-            {metaText}
-          </div>
-        ) : null}
+        <div className="mt-3 flex flex-wrap items-center gap-2 sm:mt-4">
+          {metaText ? (
+            <span className="inline-flex rounded-full bg-xia-deep/5 px-3 py-1 text-xs font-semibold text-xia-deep/70">
+              {metaText}
+            </span>
+          ) : null}
+          {usageText ? (
+            <span className="text-[11px] font-medium text-xia-deep/50 sm:text-xs">
+              {usageText}
+            </span>
+          ) : null}
+        </div>
       </Link>
       <div className="relative mt-auto flex flex-wrap items-center gap-2 pt-5 sm:gap-3 sm:pt-6">
         <Link

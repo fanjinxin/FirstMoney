@@ -99,6 +99,18 @@ body {
   animation: glow 6s ease-in-out infinite;
 }
 
+/* 火焰 hot 标记动画：轻微缩放 + 透明度变化，模拟火焰跳动 */
+@keyframes hotFlame {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  25% { transform: scale(1.15); opacity: 0.9; }
+  50% { transform: scale(0.95); opacity: 1; }
+  75% { transform: scale(1.08); opacity: 0.95; }
+}
+
+.animate-hot-flame {
+  animation: hotFlame 1.2s ease-in-out infinite;
+}
+
 /* 报告打印样式：仅打印报告内容，可“另存为 PDF” */
 @media print {
   body {

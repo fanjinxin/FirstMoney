@@ -44,11 +44,17 @@
             <image wx:if="{{item.iconType === 'huolande'}}" class="test-icon-img" src="/assets/huolande-icon.png" mode="aspectFit"></image>
             <image wx:else class="test-icon-img" src="/assets/icons/{{item.iconType}}.svg" mode="aspectFit"></image>
           </view>
-          <view class="test-subtitle-tag">{{item.subtitle}}</view>
+          <view class="test-subtitle-wrap">
+            <view wx:if="{{item.hot}}" class="test-hot-tag"><image class="test-hot-flame" src="/assets/icons/flame-hot.svg" mode="aspectFit" /><text class="test-hot-text">hot</text></view>
+            <view class="test-subtitle-tag">{{item.subtitle}}</view>
+          </view>
         </view>
         <view class="test-card-title">{{item.title}}</view>
         <view class="test-card-desc">{{item.description}}</view>
-        <view class="test-meta-tag" wx:if="{{item.metaText}}">{{item.metaText}}</view>
+        <view class="test-meta-row">
+          <view class="test-meta-tag" wx:if="{{item.metaText}}">{{item.metaText}}</view>
+          <text wx:if="{{item.usageText}}" class="test-usage-text">{{item.usageText}}</text>
+        </view>
       </view>
       <view class="test-card-footer">
         <view class="test-action-link" catchtap="onTestTap" data-id="{{item.id}}">开始测评 →</view>

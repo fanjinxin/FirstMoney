@@ -26,43 +26,19 @@ export interface AnimalResultData {
 const DIMS: AnimalDimension[] = ['E', 'A', 'C', 'N', 'O']
 const NEUTRAL = 5 // 未涉及的维度用 5 作为中性值
 
-/** 根据选项的维度分数构建完整画像（缺省维度填 5） */
-function optionProfile(score: Partial<Record<AnimalDimension, number>>): Record<AnimalDimension, number> {
-  const profile: Record<AnimalDimension, number> = { E: NEUTRAL, A: NEUTRAL, C: NEUTRAL, N: NEUTRAL, O: NEUTRAL }
-  DIMS.forEach(dim => {
-    if (score[dim] != null) profile[dim] = score[dim]!
-  })
-  return profile
-}
-
 /** 欧氏距离 */
 function euclidean(a: Record<AnimalDimension, number>, b: Record<AnimalDimension, number>): number {
   let sumSq = 0
   DIMS.forEach(dim => {
-    const d = a[dim] - b[dim]
+    const d = (a[dim] ?? 0) - (b[dim] ?? 0)
     sumSq += d * d
   })
   return Math.sqrt(sumSq)
 }
 
-/** 相似度：距离越小分数越高 */
-function similarity(distance: number): number {
-  return 1 / (1 + distance)
-}
-
-/** 选项区分度：与中性(5,5,5,5,5)距离越远，区分度越高；中性选项降权，避免主导结果 */
-function optionWeight(profile: Record<AnimalDimension, number>): number {
-  const centerDist = euclidean(profile, { E: 5, A: 5, C: 5, N: 5, O: 5 })
-  return Math.min(1.5, 0.5 + centerDist / 5) // 中性约 0.5x，极端约 1.5x
-}
-
 export function calculateAnimalResult(answers: Record<string | number, number>): AnimalResultData {
   const rawScores: Record<AnimalDimension, number> = { E: 0, A: 0, C: 0, N: 0, O: 0 }
   const maxScores: Record<AnimalDimension, number> = { E: 0, A: 0, C: 0, N: 0, O: 0 }
-
-  /** 每题选择向各动物累积的相似度（借鉴 PDP 的“每题计入类型”思路） */
-  const animalAffinity: Record<string, number> = {}
-  animalArchetypes.forEach(a => (animalAffinity[a.id] = 0))
 
   animalQuestions.forEach(q => {
     const maxOptionScores: Record<AnimalDimension, number> = { E: 0, A: 0, C: 0, N: 0, O: 0 }
@@ -74,21 +50,13 @@ export function calculateAnimalResult(answers: Record<string | number, number>):
     })
     DIMS.forEach(dim => (maxScores[dim] += maxOptionScores[dim]))
 
-    const idx = answers[q.id]
+    const idx = answers[q.id] ?? answers[String(q.id)]
     if (idx == null || !q.options[idx]) return
 
     const opt = q.options[idx]
     const score = opt.score
     DIMS.forEach(dim => {
       if (score[dim] != null) rawScores[dim] += score[dim]!
-    })
-
-    // 当前选项的维度画像；中性选项降权，使极端型动物（狮、猫、鹰等）有更多机会
-    const profile = optionProfile(score)
-    const weight = optionWeight(profile)
-    animalArchetypes.forEach(animal => {
-      const dist = euclidean(profile, animal.dimensions)
-      animalAffinity[animal.id] += weight * similarity(dist)
     })
   })
 
@@ -98,13 +66,14 @@ export function calculateAnimalResult(answers: Record<string | number, number>):
     normalizedScores[dim] = maxScores[dim] > 0 ? (rawScores[dim] / maxScores[dim]) * 10 : NEUTRAL
   })
 
-  // 主动物：累积相似度最高
-  const byAffinity = animalArchetypes
-    .map(a => ({ animal: a, affinity: animalAffinity[a.id] }))
-    .sort((a, b) => b.affinity - a.affinity)
+  // 主动物/次动物：基于用户五维分数与各动物原型的欧氏距离，选最近的 2 个
+  const userProfile: Record<AnimalDimension, number> = { ...normalizedScores }
+  const byDistance = animalArchetypes
+    .map(a => ({ animal: a, distance: euclidean(userProfile, a.dimensions) }))
+    .sort((a, b) => a.distance - b.distance)
 
-  const mainAnimal = byAffinity[0].animal
-  const secondaryAnimal = byAffinity[1].animal
+  const mainAnimal = byDistance[0].animal
+  const secondaryAnimal = byDistance[1].animal
 
   const dimensionLabels: Record<AnimalDimension, string> = {
     E: '外向性 (E)',

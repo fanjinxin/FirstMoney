@@ -6,14 +6,6 @@ const { animalQuestions, animalArchetypes } = require('../data/animal_sculpture'
 const DIMS = ['E', 'A', 'C', 'N', 'O'];
 const NEUTRAL = 5;
 
-function optionProfile(score) {
-  const profile = { E: NEUTRAL, A: NEUTRAL, C: NEUTRAL, N: NEUTRAL, O: NEUTRAL };
-  DIMS.forEach(dim => {
-    if (score[dim] != null) profile[dim] = score[dim];
-  });
-  return profile;
-}
-
 function euclidean(a, b) {
   let sumSq = 0;
   DIMS.forEach(dim => {
@@ -23,21 +15,9 @@ function euclidean(a, b) {
   return Math.sqrt(sumSq);
 }
 
-function similarity(distance) {
-  return 1 / (1 + distance);
-}
-
-function optionWeight(profile) {
-  const center = { E: 5, A: 5, C: 5, N: 5, O: 5 };
-  const centerDist = euclidean(profile, center);
-  return Math.min(1.5, 0.5 + centerDist / 5);
-}
-
 function calculateAnimalResult(answers) {
   const rawScores = { E: 0, A: 0, C: 0, N: 0, O: 0 };
   const maxScores = { E: 0, A: 0, C: 0, N: 0, O: 0 };
-  const animalAffinity = {};
-  animalArchetypes.forEach(a => { animalAffinity[a.id] = 0; });
 
   animalQuestions.forEach(q => {
     const maxOptionScores = { E: 0, A: 0, C: 0, N: 0, O: 0 };
@@ -49,20 +29,13 @@ function calculateAnimalResult(answers) {
     });
     DIMS.forEach(dim => { maxScores[dim] += maxOptionScores[dim]; });
 
-    const idx = answers[q.id];
+    const idx = answers[q.id] ?? answers[String(q.id)];
     if (idx == null || !q.options[idx]) return;
 
     const opt = q.options[idx];
     const score = opt.score || {};
     DIMS.forEach(dim => {
       if (score[dim] != null) rawScores[dim] += score[dim];
-    });
-
-    const profile = optionProfile(score);
-    const weight = optionWeight(profile);
-    animalArchetypes.forEach(animal => {
-      const dist = euclidean(profile, animal.dimensions);
-      animalAffinity[animal.id] += weight * similarity(dist);
     });
   });
 
@@ -71,12 +44,14 @@ function calculateAnimalResult(answers) {
     normalizedScores[dim] = maxScores[dim] > 0 ? (rawScores[dim] / maxScores[dim]) * 10 : NEUTRAL;
   });
 
-  const byAffinity = animalArchetypes
-    .map(a => ({ animal: a, affinity: animalAffinity[a.id] }))
-    .sort((a, b) => b.affinity - a.affinity);
+  // 主动物/次动物：基于用户五维分数与各动物原型的欧氏距离，选最近的 2 个
+  const userProfile = { ...normalizedScores };
+  const byDistance = animalArchetypes
+    .map(a => ({ animal: a, distance: euclidean(userProfile, a.dimensions) }))
+    .sort((a, b) => a.distance - b.distance);
 
-  const mainAnimal = byAffinity[0].animal;
-  const secondaryAnimal = byAffinity[1].animal;
+  const mainAnimal = byDistance[0].animal;
+  const secondaryAnimal = byDistance[1].animal;
 
   const dimensionLabels = { E: '外向性 (E)', A: '亲和性 (A)', C: '尽责性 (C)', N: '敏感性 (N)', O: '开放性 (O)' };
   const radarData = DIMS.map(dim => ({

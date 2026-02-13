@@ -30,24 +30,24 @@ type LayoutProps = {
 
 const navItems = [
   { name: '首页', path: '/' },
+  { name: 'MBTI', path: '/mbti' },
+  { name: '水果塑', path: '/fft' },
+  { name: '动物塑', path: '/animal' },
+  { name: '恋爱观', path: '/rvt' },
+  { name: '宜居城市', path: '/city' },
   { name: 'SCL-90', path: '/scl90' },
   { name: 'RPI', path: '/rpi' },
   { name: 'SRI', path: '/sri' },
-  { name: '动物塑', path: '/animal' },
-  { name: 'MBTI', path: '/mbti' },
   { name: 'AAT', path: '/aat' },
   { name: '心理年龄', path: '/psych-age' },
   { name: 'APT', path: '/apt' },
   { name: '霍兰德', path: '/hit' },
   { name: 'DTH', path: '/dth' },
   { name: '年上年下', path: '/tla' },
-  { name: '水果塑', path: '/fft' },
   { name: '病娇', path: '/ybt' },
-  { name: '恋爱观', path: '/rvt' },
   { name: '恋爱脑', path: '/lbt' },
   { name: 'MPT', path: '/mpt' },
   { name: 'VBT', path: '/vbt' },
-  { name: '宜居城市', path: '/city' },
 ]
 
 export default function Layout({ children }: LayoutProps) {

@@ -215,6 +215,57 @@
 .test-icon-cream { background: rgba(var(--xia-cream-rgb), 0.9); }
 .test-icon-deep { background: rgba(var(--xia-deep-rgb), 0.1); }
 
+.test-subtitle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.test-hot-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.25) 0%, rgba(239, 68, 68, 0.25) 100%);
+}
+
+.test-hot-flame {
+  width: 24rpx;
+  height: 24rpx;
+  animation: hotFlame 1.2s ease-in-out infinite;
+}
+
+.test-hot-text {
+  font-size: 18rpx;
+  font-weight: 700;
+  color: #f97316;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.test-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+
+.test-usage-text {
+  font-size: 22rpx;
+  font-weight: 500;
+  color: rgba(var(--xia-deep-rgb), 0.5);
+}
+
+@keyframes hotFlame {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  25% { transform: scale(1.15); opacity: 0.9; }
+  50% { transform: scale(0.95); opacity: 1; }
+  75% { transform: scale(1.08); opacity: 0.95; }
+}
+
 .test-subtitle-tag {
   padding: 12rpx 24rpx;
   border-radius: 999rpx;
@@ -243,7 +294,6 @@
 
 .test-meta-tag {
   display: inline-flex;
-  margin-top: 24rpx;
   padding: 12rpx 24rpx;
   border-radius: 999rpx;
   font-size: 22rpx;
