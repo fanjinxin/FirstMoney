@@ -19,6 +19,30 @@
   margin-bottom: 32rpx;
 }
 
+.scl90-header-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 24rpx;
+}
+
+.scl90-header-icon-wrap {
+  width: 72rpx;
+  height: 72rpx;
+  flex-shrink: 0;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.scl90-header-icon {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.test-icon-sky { background: rgba(var(--xia-sky-rgb), 0.2); }
+
 /* SectionHeader - 对应 SectionHeader.tsx */
 .section-header {
   margin-bottom: 16rpx;
@@ -100,29 +124,60 @@
   margin-bottom: 32rpx;
 }
 
-/* mt-4 grid gap-3 md:grid-cols-5 - 5 列选项 */
-.scl90-options-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 24rpx;
+/* MBTI 风格横向刻度：非常符合（症状重）左、不符合（无）右 */
+.scl90-likert-scale {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 12rpx;
 }
 
-.scl90-opt {
-  border-radius: 24rpx;
-  border: 2rpx solid rgba(var(--xia-deep-rgb), 0.15);
-  padding: 24rpx 16rpx;
-  font-size: 26rpx;
-  text-align: center;
-  background: #fff;
+.scl90-scale-lbl {
+  font-size: 22rpx;
+  font-weight: 600;
   color: var(--xia-deep);
-  transition: all 0.2s;
+  flex-shrink: 0;
+  max-width: 80rpx;
+}
+.scl90-scale-left { text-align: left; }
+.scl90-scale-right { text-align: right; }
+
+.scl90-scale-dots {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16rpx;
+  gap: 8rpx;
 }
 
-/* hover:border-xia-teal/50 - 选中态 border-xia-deep bg-xia-deep text-white */
-.scl90-opt-selected {
-  border-color: var(--xia-deep);
+.scl90-scale-dot {
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 4rpx solid rgba(var(--xia-deep-rgb), 0.2);
+  background: #fff;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+.scl90-scale-dot:nth-child(1),
+.scl90-scale-dot:nth-child(5) { width: 48rpx; height: 48rpx; min-width: 48rpx; min-height: 48rpx; }
+.scl90-scale-dot:nth-child(2),
+.scl90-scale-dot:nth-child(4) { width: 40rpx; height: 40rpx; min-width: 40rpx; min-height: 40rpx; }
+.scl90-scale-dot:nth-child(3) { width: 28rpx; height: 28rpx; min-width: 28rpx; min-height: 28rpx; }
+
+.scl90-scale-dot.selected {
   background: var(--xia-deep);
-  color: #fff;
+  border-color: var(--xia-deep);
+}
+
+.scl90-scale-dot:nth-child(1).selected { background: var(--xia-sky); border-color: var(--xia-sky); }
+.scl90-scale-dot:nth-child(5).selected { background: var(--xia-deep); border-color: var(--xia-deep); }
+
+.scl90-scale-hint {
+  font-size: 22rpx;
+  color: var(--xia-deep);
+  text-align: center;
+  margin-top: 8rpx;
 }
 
 /* nav-row: flex items-center justify-between */
@@ -132,7 +187,9 @@
   justify-content: space-between;
 }
 
-/* 上一题 - rounded-full border border-xia-haze px-4 py-2 text-sm text-xia-deep/80 */
+/* 上一题 - 描边样式 */
+.scl90-btn-prev, .scl90-btn-next { margin: 0; line-height: 1.4; }
+.scl90-btn-prev::after, .scl90-btn-next::after { border: none; }
 .scl90-btn-prev {
   border: 2rpx solid rgba(var(--xia-deep-rgb), 0.2);
   border-radius: 999rpx;
@@ -140,13 +197,8 @@
   font-size: 28rpx;
   color: var(--xia-deep);
   background: transparent;
-  margin: 0;
-  line-height: 1.4;
 }
-
-.scl90-btn-prev[disabled] {
-  opacity: 0.5;
-}
+.scl90-btn-prev[disabled] { opacity: 0.5; }
 
 /* 已完成 x/y - text-sm text-xia-teal/80 */
 .scl90-progress-text {

@@ -1,6 +1,7 @@
 const { getTestConfig } = require('../../data/index');
 const { TESTS } = require('../../data/tests');
 const { saveAnswers, loadAnswers, clearAnswers } = require('../../utils/storage');
+const { clearSampleFlag } = require('../../utils/testSample');
 const { THEMES, getThemeStyle } = require('../../data/themes');
 
 Page({
@@ -9,6 +10,7 @@ Page({
     themeStyle: '',
     config: null,
     questions: [],
+    scaleOptions: null,
     answers: {},
     current: 0,
     total: 0,
@@ -31,12 +33,16 @@ Page({
       return;
     }
     const questions = config.format === 'mbti' ? config.questions : config.questions;
+    let scaleOptions = null;
+    if (config.format !== 'mbti' && config.format !== 'choice' && config.options && config.options.length === 5) {
+      scaleOptions = [...config.options].sort((a, b) => (b.value - a.value));
+    }
     const stored = loadAnswers(testId) || {};
     const answeredCount = questions.filter(q => stored[q.id] !== undefined).length;
     const total = questions.length;
     const progress = total > 0 ? (answeredCount / total) * 100 : 0;
-    const current = Math.min(answeredCount > 0 ? questions.findIndex(q => stored[q.id] === undefined) : 0, total - 1);
-    if (current < 0) this.setData({ current: total - 1 });
+    let current = questions.findIndex(q => stored[q.id] === undefined);
+    if (current < 0) current = total - 1;
     const saved = wx.getStorageSync('app-theme-id') || 'summer-mint';
     const theme = THEMES.find(t => t.id === saved) || THEMES.find(t => t.id === 'summer-mint');
     this.setData({
@@ -44,21 +50,25 @@ Page({
       config,
       themeStyle: getThemeStyle(theme) || '',
       questions,
+      scaleOptions,
       answers: stored,
-      current: current < 0 ? total - 1 : current,
+      current,
       total,
-      currentQ: questions[current < 0 ? total - 1 : current],
+      currentQ: questions[current],
       answeredCount: Object.keys(stored).length,
       progress,
       canSubmit: Object.keys(stored).length === total
     });
   },
   onSelect(e) {
+    const { testId } = this.data;
+    clearSampleFlag(testId);
     let value = e.currentTarget.dataset.value;
-    if (this.data.config?.format === 'choice' && value !== undefined) {
-      value = typeof value === 'number' ? value : parseInt(String(value), 10);
+    if (value !== undefined && value !== '') {
+      const num = typeof value === 'number' ? value : parseInt(String(value), 10);
+      if (!isNaN(num)) value = num;
     }
-    const { currentQ, answers, questions, total, testId } = this.data;
+    const { currentQ, answers, questions, total } = this.data;
     const next = { ...answers, [currentQ.id]: value };
     saveAnswers(testId, next);
     const nextUnanswered = questions.findIndex((q, i) => i > this.data.current && next[q.id] === undefined);
@@ -86,6 +96,13 @@ Page({
     if (current >= total - 1) return;
     const next = current + 1;
     this.setData({ current: next, currentQ: questions[next] });
+  },
+
+  onOverviewTap(e) {
+    const index = e.currentTarget.dataset.index;
+    if (index == null) return;
+    const { questions } = this.data;
+    this.setData({ current: index, currentQ: questions[index] });
   },
   onRestart() {
     wx.showModal({

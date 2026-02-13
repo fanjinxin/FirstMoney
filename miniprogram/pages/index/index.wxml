@@ -53,10 +53,11 @@
       <view class="test-card-footer">
         <view class="test-action-link" catchtap="onTestTap" data-id="{{item.id}}">开始测评 →</view>
         <view 
+          wx:if="{{showBackdoorBtn}}"
           class="test-jump-btn"
           data-id="{{item.id}}"
           catchtap="onTestJump"
-        >测试：直接看结果</view>
+        >测试：直接查看结果</view>
       </view>
     </view>
   </view>
@@ -64,7 +65,7 @@
   <theme-switcher bindthemechange="onThemeChange"></theme-switcher>
 
   <!-- Footer：严格还原 Layout footer -->
-  <view class="footer">
+  <view class="footer" bindtap="onDisclaimerTap">
     <view class="footer-title">免责声明</view>
     <view class="footer-text">本网站所有测评均为自评工具，仅供自我探索与娱乐参考，不构成任何专业心理评估、临床诊断或医疗建议。测评题目与结果解释仅供学习交流，如有持续困扰请寻求专业心理咨询或医疗机构帮助。数据在本地处理，不上传服务器。</view>
   </view>

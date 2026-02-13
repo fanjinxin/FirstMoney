@@ -48,27 +48,50 @@
 .rpi-q-meta { font-size: 24rpx; color: rgba(var(--xia-deep-rgb), 0.6); margin-bottom: 16rpx; }
 .rpi-q-text { font-size: 32rpx; font-weight: 500; color: var(--xia-deep); line-height: 1.5; margin-bottom: 32rpx; }
 
-/* 5 列选项 */
-.rpi-options-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 24rpx; }
-.rpi-opt {
-  border-radius: 24rpx; border: 2rpx solid rgba(var(--xia-deep-rgb), 0.15);
-  padding: 24rpx 16rpx; font-size: 26rpx; text-align: center;
-  background: #fff; color: var(--xia-deep);
+/* MBTI 风格横向刻度：非常符合左、不符合右 */
+.rpi-likert-scale {
+  display: flex; align-items: center; gap: 16rpx; margin-bottom: 12rpx;
 }
-.rpi-opt-selected { border-color: var(--xia-deep); background: var(--xia-deep); color: #fff; }
+.rpi-scale-lbl {
+  font-size: 22rpx; font-weight: 600; color: var(--xia-deep); flex-shrink: 0; max-width: 80rpx;
+}
+.rpi-scale-left { text-align: left; }
+.rpi-scale-right { text-align: right; }
+.rpi-scale-dots {
+  flex: 1; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16rpx; gap: 8rpx;
+}
+.rpi-scale-dot {
+  flex-shrink: 0; border-radius: 50%;
+  border: 4rpx solid rgba(var(--xia-deep-rgb), 0.2); background: #fff; transition: all 0.2s;
+  box-sizing: border-box;
+}
+.rpi-scale-dot:nth-child(1),
+.rpi-scale-dot:nth-child(5) { width: 48rpx; height: 48rpx; min-width: 48rpx; min-height: 48rpx; }
+.rpi-scale-dot:nth-child(2),
+.rpi-scale-dot:nth-child(4) { width: 40rpx; height: 40rpx; min-width: 40rpx; min-height: 40rpx; }
+.rpi-scale-dot:nth-child(3) { width: 28rpx; height: 28rpx; min-width: 28rpx; min-height: 28rpx; }
+.rpi-scale-dot.selected {
+  background: var(--xia-deep); border-color: var(--xia-deep);
+}
+.rpi-scale-dot:nth-child(1).selected { background: var(--xia-sky); border-color: var(--xia-sky); }
+.rpi-scale-dot:nth-child(5).selected { background: var(--xia-deep); border-color: var(--xia-deep); }
+.rpi-scale-hint { font-size: 22rpx; color: var(--xia-deep); text-align: center; margin-top: 8rpx; }
 
 /* 导航 */
 .rpi-nav-row { display: flex; align-items: center; justify-content: space-between; }
+.rpi-btn-prev, .rpi-btn-next { margin: 0; line-height: 1.4; }
+.rpi-btn-prev::after, .rpi-btn-next::after { border: none; }
 .rpi-btn-prev {
   border: 2rpx solid rgba(var(--xia-deep-rgb), 0.2); border-radius: 999rpx;
   padding: 16rpx 32rpx; font-size: 28rpx; color: var(--xia-deep);
-  background: transparent; margin: 0;
+  background: transparent;
 }
 .rpi-btn-prev[disabled] { opacity: 0.5; }
 .rpi-progress-text { font-size: 28rpx; color: var(--xia-deep); }
 .rpi-btn-next {
   border: 2rpx solid var(--xia-deep); border-radius: 999rpx;
-  padding: 16rpx 32rpx; font-size: 28rpx; color: #fff; background: var(--xia-deep); margin: 0;
+  padding: 16rpx 32rpx; font-size: 28rpx; color: #fff; background: var(--xia-deep);
 }
 .rpi-btn-next[disabled] { opacity: 0.5; }
 

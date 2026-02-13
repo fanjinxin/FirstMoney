@@ -1,5 +1,7 @@
 const { loadAnswers, clearAnswers } = require('../../utils/storage');
 const { calculateResult, calculateRpiScores, MBTI_POLE_LABELS } = require('../../utils/scoring');
+const { RESULT_PAGE_TITLES } = require('../../data/tests');
+const { getShareCardData } = require('../../utils/share-card');
 const { sriTest } = require('../../data/sri');
 const { THEMES, getThemeStyle } = require('../../data/themes');
 const { drawRadar, drawBar, drawPie, drawRpiBar, drawSriBar, drawYBTBar, drawRVTBar, drawLBTBar, drawMPTBar, drawVBTBar, drawCityBar, drawFFTBar, drawHollandHexagon } = require('../../utils/chart-helper');
@@ -60,6 +62,9 @@ Page({
   },
   onLoad(options) {
     const testId = options.testId || '';
+    const navTitle = RESULT_PAGE_TITLES[testId] || '测评结果';
+    wx.setNavigationBarTitle({ title: navTitle });
+
     const saved = wx.getStorageSync('app-theme-id') || 'summer-mint';
     const theme = THEMES.find(t => t.id === saved) || THEMES.find(t => t.id === 'summer-mint');
 
@@ -1074,5 +1079,353 @@ Page({
         }
       }
     });
-  }
+  },
+  onShareTap() {
+    const { testId, result, scl90Report, rpiReport, lbtReport, sriReport, animalReport, mbtiReport, aatReport, psychAgeReport, cityReport, fftReport, ybtReport, rvtReport, mptReport, vbtReport, dthReport, tlaReport, hitReport, aptReport } = this.data;
+    if (!testId || !result) {
+      wx.showToast({ title: '暂无结果可分享', icon: 'none' });
+      return;
+    }
+    wx.showLoading({ title: '生成中...' });
+    const reports = {
+      scl90Report, rpiReport, lbtReport, sriReport, animalReport, mbtiReport,
+      aatReport, psychAgeReport, cityReport, fftReport, ybtReport, rvtReport,
+      mptReport, vbtReport, dthReport, tlaReport, hitReport, aptReport,
+    };
+    let cardData;
+    try {
+      cardData = getShareCardData(testId, result, reports);
+    } catch (e) {
+      wx.hideLoading();
+      wx.showToast({ title: '获取内容失败', icon: 'none' });
+      return;
+    }
+    const page = this;
+    wx.getImageInfo({
+      src: '/assets/share-qrcode.png',
+      success: (imgRes) => {
+        page._drawShareCanvas(cardData, imgRes.path);
+      },
+      fail: () => {
+        page._drawShareCanvas(cardData, '');
+      },
+    });
+  },
+  _drawShareCanvas(cardData, qrPath) {
+    const page = this;
+    const ctx = wx.createCanvasContext('shareCanvas', this);
+    const w = 600;
+    const h = 820;
+    const cardW = w - 80;
+    const cardX = 40;
+    const cardH = 540;
+    const qrY = 560;
+    const qrSize = 180;
+
+    ctx.setFillStyle('#fff');
+    ctx.fillRect(0, 0, w, h);
+
+    const wrapText = (text, maxChars) => {
+      if (!text) return [];
+      const str = String(text);
+      const lines = [];
+      for (let i = 0; i < str.length; i += maxChars) {
+        lines.push(str.slice(i, i + maxChars));
+      }
+      return lines;
+    };
+
+    const drawCardBg = () => {
+      ctx.setFillStyle('rgba(248, 250, 252, 1)');
+      ctx.fillRect(cardX, 30, cardW, cardH);
+      ctx.setStrokeStyle('rgba(0,0,0,0.06)');
+      ctx.setLineWidth(1);
+      ctx.strokeRect(cardX, 30, cardW, cardH);
+    };
+
+    const drawTitleBar = (titleText) => {
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(24);
+      ctx.setTextAlign('center');
+      ctx.fillText(titleText || '测评结果', w / 2, 65);
+    };
+
+    const drawQR = () => {
+      if (qrPath) {
+        ctx.drawImage(qrPath, (w - qrSize) / 2, qrY, qrSize, qrSize);
+      } else {
+        ctx.setFillStyle('#eee');
+        ctx.fillRect((w - qrSize) / 2, qrY, qrSize, qrSize);
+        ctx.setFillStyle('#999');
+        ctx.setFontSize(18);
+        ctx.fillText('扫码体验', w / 2, qrY + qrSize / 2 + 6);
+      }
+      ctx.setFillStyle('#999');
+      ctx.setFontSize(16);
+      ctx.fillText('喜欢就分享给朋友们吧', w / 2, qrY + qrSize + 32);
+    };
+
+    const layout = cardData.layout || 'generic';
+
+    if (layout === 'scl90') {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#2C6F7A');
+      ctx.setFontSize(20);
+      ctx.setTextAlign('left');
+      ctx.fillText(cardData.cardTitle || '心理健康画像', cardX + 24, 110);
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(26);
+      ctx.fillText(cardData.mainValue || '', cardX + 24, 150);
+      const descLines = wrapText(cardData.desc || '', 28);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(18);
+      descLines.slice(0, 4).forEach((line, i) => {
+        ctx.fillText(line, cardX + 24, 190 + i * 28);
+      });
+      ctx.setFillStyle('#2C6F7A');
+      ctx.setFontSize(16);
+      ctx.fillText(`${cardData.coreLabel || '核心结论'}：${cardData.coreValue || ''}`, cardX + 24, 300);
+      drawQR();
+    } else if (layout === 'rpi') {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#999');
+      ctx.setFontSize(14);
+      ctx.setTextAlign('left');
+      ctx.fillText(cardData.cardSub || '', cardX + 24, 105);
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(22);
+      ctx.fillText(cardData.cardTitle || '关系占有欲画像', cardX + 24, 135);
+      const descLines = wrapText(cardData.desc || '', 32);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(16);
+      descLines.slice(0, 3).forEach((line, i) => {
+        ctx.fillText(line, cardX + 24, 175 + i * 26);
+      });
+      (cardData.tags || []).forEach((tag, i) => {
+        ctx.setFillStyle('#2C6F7A');
+        ctx.setFontSize(15);
+        ctx.fillText(tag, cardX + 24, 270 + i * 28);
+      });
+      drawQR();
+    } else if (layout === 'sri') {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#999');
+      ctx.setFontSize(14);
+      ctx.setTextAlign('left');
+      ctx.fillText(cardData.cardSub || '', cardX + 24, 105);
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(20);
+      ctx.fillText(cardData.cardTitle || '', cardX + 24, 135);
+      const descLines = wrapText(cardData.desc || '', 32);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(16);
+      descLines.slice(0, 3).forEach((line, i) => {
+        ctx.fillText(line, cardX + 24, 175 + i * 26);
+      });
+      (cardData.tags || []).forEach((tag, i) => {
+        ctx.setFillStyle('#2C6F7A');
+        ctx.setFontSize(15);
+        ctx.fillText(tag, cardX + 24, 270 + i * 28);
+      });
+      drawQR();
+    } else if (layout === 'lbt') {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#888');
+      ctx.setFontSize(14);
+      ctx.setTextAlign('left');
+      ctx.fillText(cardData.meta || '', cardX + 24, 105);
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(22);
+      ctx.fillText(cardData.mainTitle || '', cardX + 24, 140);
+      ctx.setFillStyle('#2C6F7A');
+      ctx.setFontSize(16);
+      ctx.fillText(`${cardData.badgeLabel || '整体'} ${cardData.badgeValue || ''} ${cardData.badgePct || ''}`, cardX + 24, 175);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(15);
+      ctx.fillText(cardData.threeTypeTitle || '三维得分', cardX + 24, 210);
+      (cardData.threeType || []).forEach((item, i) => {
+        const x = cardX + 24 + (i % 3) * 175;
+        const y = 240 + Math.floor(i / 3) * 45;
+        ctx.setFillStyle(item.isHighest ? '#2C6F7A' : '#666');
+        ctx.fillText(`${item.name} ${item.percent}%`, x, y);
+      });
+      drawQR();
+    } else if (layout === 'mbti') {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#888');
+      ctx.setFontSize(14);
+      ctx.setTextAlign('center');
+      ctx.fillText(cardData.cardSub || '你的人格类型', w / 2, 105);
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(28);
+      ctx.fillText(`${cardData.typeCode || ''} · ${cardData.typeName || ''}`, w / 2, 145);
+      if (cardData.typeNameEn) {
+        ctx.setFillStyle('#666');
+        ctx.setFontSize(16);
+        ctx.fillText(cardData.typeNameEn, w / 2, 175);
+      }
+      if (cardData.slogan) {
+        ctx.setFillStyle('#2C6F7A');
+        ctx.setFontSize(18);
+        ctx.fillText(cardData.slogan, w / 2, 210);
+      }
+      const descLines = wrapText(cardData.desc || '', 28);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(16);
+      descLines.slice(0, 4).forEach((line, i) => {
+        ctx.fillText(line, w / 2, 250 + i * 24);
+      });
+      const strengthStr = (cardData.strengths || []).slice(0, 5).map(s => `#${s}`).join(' ');
+      if (strengthStr) {
+        ctx.setFillStyle('#2C6F7A');
+        ctx.setFontSize(14);
+        ctx.fillText(strengthStr, w / 2, 360);
+      }
+      drawQR();
+    } else if (layout === 'animal') {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#888');
+      ctx.setFontSize(14);
+      ctx.setTextAlign('center');
+      ctx.fillText(cardData.cardSub || '您的精神动物是', w / 2, 105);
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(28);
+      ctx.fillText(cardData.mainName || '', w / 2, 145);
+      const descLines = wrapText(cardData.mainDesc || '', 28);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(16);
+      descLines.slice(0, 4).forEach((line, i) => {
+        ctx.fillText(line, w / 2, 185 + i * 26);
+      });
+      const traitStr = (cardData.traits || []).slice(0, 6).map(t => `#${t}`).join(' ');
+      if (traitStr) {
+        ctx.setFillStyle('#2C6F7A');
+        ctx.setFontSize(14);
+        ctx.fillText(traitStr, w / 2, 300);
+      }
+      if (cardData.secondaryName) {
+        ctx.setFillStyle('#666');
+        ctx.setFontSize(14);
+        ctx.fillText(`潜在特质：${cardData.secondaryName}`, w / 2, 335);
+      }
+      drawQR();
+    } else if (layout === 'aat') {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#888');
+      ctx.setFontSize(14);
+      ctx.setTextAlign('left');
+      ctx.fillText(cardData.cardSub || '', cardX + 24, 105);
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(22);
+      ctx.fillText(cardData.cardTitle || '综合适应指数', cardX + 24, 140);
+      ctx.setFillStyle('#2C6F7A');
+      ctx.setFontSize(20);
+      ctx.fillText(`${cardData.totalPercent ?? 0}%`, cardX + 24, 180);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(16);
+      ctx.fillText(cardData.levelLabel || '', cardX + 100, 180);
+      const descLines = wrapText(cardData.levelDesc || '', 32);
+      ctx.setFontSize(15);
+      descLines.slice(0, 2).forEach((line, i) => {
+        ctx.fillText(line, cardX + 24, 220 + i * 24);
+      });
+      ctx.setFillStyle('#888');
+      ctx.fillText(cardData.meta || '', cardX + 24, 280);
+      (cardData.stats || []).forEach((s, i) => {
+        const baseY = 310 + i * 42;
+        ctx.setFillStyle('#666');
+        ctx.setFontSize(14);
+        ctx.fillText(s.label || '', cardX + 24, baseY);
+        ctx.fillText(`${s.value || ''} · ${s.hint || ''}`, cardX + 24, baseY + 22);
+      });
+      drawQR();
+    } else if (layout === 'psych-age') {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#888');
+      ctx.setFontSize(14);
+      ctx.setTextAlign('left');
+      ctx.fillText(cardData.cardSub || '心理年龄测验', cardX + 24, 105);
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(26);
+      ctx.fillText(cardData.mainValue || '', cardX + 24, 150);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(16);
+      ctx.fillText(cardData.mainLabel || '', cardX + 24, 190);
+      const descLines = wrapText(cardData.desc || '', 32);
+      ctx.setFontSize(15);
+      descLines.slice(0, 2).forEach((line, i) => {
+        ctx.fillText(line, cardX + 24, 230 + i * 26);
+      });
+      if (cardData.youngestDim || cardData.oldestDim) {
+        ctx.setFillStyle('#2C6F7A');
+        ctx.setFontSize(14);
+        ctx.fillText(`最年轻：${cardData.youngestDim || '-'}`, cardX + 24, 300);
+        ctx.fillText(`最成熟：${cardData.oldestDim || '-'}`, cardX + 24, 328);
+      }
+      drawQR();
+    } else if (layout === 'city') {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#888');
+      ctx.setFontSize(14);
+      ctx.setTextAlign('center');
+      ctx.fillText(cardData.cardSub || '', w / 2, 105);
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(22);
+      ctx.fillText(cardData.mainTitle || '', w / 2, 145);
+      const descLines = wrapText(cardData.mainDesc || '', 28);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(16);
+      descLines.slice(0, 3).forEach((line, i) => {
+        ctx.fillText(line, w / 2, 185 + i * 26);
+      });
+      if (cardData.focus || cardData.typicalCities) {
+        ctx.setFillStyle('#2C6F7A');
+        ctx.setFontSize(15);
+        ctx.fillText(cardData.focus || '', w / 2, 280);
+        ctx.fillText(cardData.typicalCities || '', w / 2, 308);
+      }
+      drawQR();
+    } else {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#2C6F7A');
+      ctx.setFontSize(24);
+      ctx.setTextAlign('center');
+      ctx.fillText(cardData.mainValue || cardData.summary || '查看完整报告', w / 2, 200);
+      const descLines = wrapText(cardData.desc || '', 28);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(18);
+      descLines.slice(0, 6).forEach((line, i) => {
+        ctx.fillText(line, w / 2, 260 + i * 28);
+      });
+      drawQR();
+    }
+
+    ctx.draw(false, () => {
+      wx.hideLoading();
+      setTimeout(() => {
+        wx.canvasToTempFilePath({
+          canvasId: 'shareCanvas',
+          success: (res) => {
+            wx.previewImage({
+              urls: [res.tempFilePath],
+              current: res.tempFilePath,
+            });
+          },
+          fail: (err) => {
+            wx.showToast({ title: '生成图片失败，请重试', icon: 'none' });
+          },
+        }, page);
+      }, 100);
+    });
+  },
 });

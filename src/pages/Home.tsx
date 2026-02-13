@@ -16,8 +16,10 @@ import { lbtQuestions } from '../data/lbt'
 import { mptQuestions } from '../data/mpt'
 import { vbtQuestions } from '../data/vbt'
 import { cityQuestions } from '../data/city'
-import { Brain, Heart, Key, Cat, Puzzle, BarChart2, BookOpen, Sparkles, Shield, Cherry, MapPin } from 'lucide-react'
+import { Heart, Key, Cat, Puzzle, BarChart2, BookOpen, Sparkles, Shield, Cherry, MapPin } from 'lucide-react'
 import huolandeIcon from '../assets/huolande/huolande-icon.png'
+import rpiIcon from '../assets/icons/rpi.svg'
+import scl90Icon from '../assets/icons/scl90.svg'
 
 export default function Home() {
   // 首页测评卡片：统一结构（title / subtitle / description / to / icon / iconBg / duration / questionCount / backgroundClass），新测评按此格式添加即可
@@ -30,7 +32,7 @@ export default function Home() {
       to: '/scl90',
       resultTo: '/scl90/result',
       testId: 'scl90' as const,
-      icon: <Brain className="animate-float" />,
+      icon: <img src="/icons/target.svg" alt="SCL-90" className="animate-float h-full w-full object-contain" />,
       iconBg: 'bg-xia-sky/20',
       duration: '约15-20分钟',
       questionCount: scl90Test.questions.length,
@@ -44,7 +46,7 @@ export default function Home() {
       to: '/rpi',
       resultTo: '/rpi/result',
       testId: 'rpi' as const,
-      icon: <Heart className="animate-float" />,
+      icon: <img src={rpiIcon} alt="RPI" className="animate-float h-6 w-6 sm:h-7 sm:w-7 object-contain" />,
       iconBg: 'bg-xia-mint/20',
       duration: '约10-15分钟',
       questionCount: rpiTest.questions.length,
@@ -54,11 +56,11 @@ export default function Home() {
       title: 'SRI 性压抑指数测试',
       subtitle: '亲密表达评估',
       description:
-        '评估在性与亲密表达上的压抑程度与自我接纳水平，关注态度、表达与舒适度，适用于想了解自身亲密表达与自我理解的成年人。',
+        '评估个体在性与亲密议题上压抑自身感受与欲望的程度，涵盖欲望表达、观念冲突、情绪紧张、行为抑制四个维度。结果仅供自我觉察与沟通参考。',
       to: '/sri',
       resultTo: '/sri/result',
       testId: 'sri' as const,
-      icon: <Key className="animate-float" />,
+      icon: <img src="/icons/sri.svg" alt="SRI" className="animate-float h-full w-full object-contain" />,
       iconBg: 'bg-xia-cream',
       duration: '约15-25分钟',
       questionCount: sriTest.questions.length,
@@ -110,11 +112,11 @@ export default function Home() {
       title: '心理年龄测验',
       subtitle: '心理特征年龄倾向',
       description:
-        '从行动决断、言语认知、活动性格、目标情绪、兴趣学习、身心状态、心理韧性七个维度，评估心理特征所呈现的年龄倾向，可与实际年龄对照，促进自我觉察。',
+        '本测验从行动决断、言语认知、活动性格、目标情绪、兴趣学习、身心状态、心理韧性七个维度，评估你的心理特征所呈现的年龄倾向。结果可与实际年龄对照，帮助自我觉察。',
       to: '/psych-age',
       resultTo: '/psych-age/result',
       testId: 'psych-age' as const,
-      icon: <Sparkles className="animate-float" />,
+      icon: <img src="/icons/psych-age.svg" alt="心理年龄" className="animate-float h-full w-full object-contain" />,
       iconBg: 'bg-xia-aqua/20',
       duration: '约5-8分钟',
       questionCount: psychAgeQuestions.length,
@@ -218,7 +220,7 @@ export default function Home() {
       to: '/lbt',
       resultTo: '/lbt/result',
       testId: 'lbt' as const,
-      icon: <Heart className="animate-float" />,
+      icon: <img src={scl90Icon} alt="恋爱脑" className="animate-float h-full w-full object-contain" />,
       iconBg: 'bg-xia-mint/20',
       duration: '约3-5分钟',
       questionCount: lbtQuestions.length,

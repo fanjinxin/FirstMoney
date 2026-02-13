@@ -9,39 +9,69 @@
     </view>
     <view class="animal-desc">{{testInfo.description}}</view>
 
-    <view class="animal-progress-wrap">
-      <view class="animal-progress-bar" style="width: {{progress}}%"></view>
-    </view>
+    <!-- grid: 左列 2fr + 右列 1fr，与 Web 一致 -->
+    <view class="animal-grid">
+      <view class="animal-left">
+        <view class="animal-progress-wrap">
+          <view class="animal-progress-bar" style="width: {{progress}}%"></view>
+        </view>
 
-    <view class="animal-question-card" wx:if="{{currentQ}}">
-      <view class="animal-q-meta">题目 {{current + 1}}/{{total}}</view>
-      <view class="animal-q-text">{{currentQ.text}}</view>
-      <view class="animal-options">
-        <view
-          wx:for="{{currentQ.options}}"
-          wx:key="label"
-          class="animal-opt {{answers[currentQ.id] === index ? 'animal-opt-selected' : ''}}"
-          data-value="{{index}}"
-          bindtap="onSelect"
-        >{{item.label}}</view>
+        <view class="animal-question-card" wx:if="{{currentQ}}">
+          <view class="animal-q-meta">题目 {{current + 1}}/{{total}}</view>
+          <view class="animal-q-text">{{currentQ.text}}</view>
+          <view class="animal-options">
+            <view
+              wx:for="{{currentQ.options}}"
+              wx:key="label"
+              class="animal-opt {{answers[currentQ.id] == index ? 'animal-opt-selected' : ''}}"
+              data-value="{{index}}"
+              bindtap="onSelect"
+            >{{item.label}}</view>
+          </view>
+        </view>
+
+        <view class="animal-nav-row">
+          <button class="animal-btn-prev" disabled="{{current === 0}}" bindtap="goPrev">上一题</button>
+          <view class="animal-progress-text">已完成 {{answeredCount}}/{{total}}</view>
+          <button class="animal-btn-next" disabled="{{current >= total - 1}}" bindtap="goNext">下一题</button>
+        </view>
+
+        <button
+          class="animal-btn-submit {{canSubmit ? '' : 'animal-btn-disabled'}}"
+          disabled="{{!canSubmit}}"
+          bindtap="onSubmit"
+        >查看分析结果</button>
       </view>
-    </view>
 
-    <view class="animal-nav-row">
-      <button class="animal-btn-prev" disabled="{{current === 0}}" bindtap="goPrev">上一题</button>
-      <view class="animal-progress-text">已完成 {{answeredCount}}/{{total}}</view>
-      <button class="animal-btn-next" disabled="{{current >= total - 1}}" bindtap="goNext">下一题</button>
-    </view>
+      <view class="animal-right">
+        <view class="animal-tips">
+          <view class="animal-tips-title">作答提示</view>
+          <view wx:for="{{testInfo.instructions}}" wx:key="*this" class="animal-tips-item">• {{item}}</view>
+        </view>
 
-    <button
-      class="animal-btn-submit {{canSubmit ? '' : 'animal-btn-disabled'}}"
-      disabled="{{!canSubmit}}"
-      bindtap="onSubmit"
-    >查看分析结果</button>
-
-    <view class="animal-tips">
-      <view class="animal-tips-title">作答提示</view>
-      <view wx:for="{{testInfo.instructions}}" wx:key="*this" class="animal-tips-item">• {{item}}</view>
+        <!-- 题目总览 - 与 Web QuestionOverview 一致 -->
+        <view class="animal-overview-card">
+          <view class="animal-overview-header">
+            <text class="animal-overview-title">题目总览</text>
+            <text class="animal-overview-count">已答 {{answeredCount}}/{{total}}</text>
+          </view>
+          <view class="animal-overview-legend">
+            <view class="animal-legend-item"><view class="animal-legend-dot animal-dot-answered"></view><text>已作答</text></view>
+            <view class="animal-legend-item"><view class="animal-legend-dot animal-dot-unanswered"></view><text>未作答</text></view>
+            <view class="animal-legend-item"><view class="animal-legend-dot animal-dot-current"></view><text>当前题</text></view>
+          </view>
+          <view class="animal-overview-grid">
+            <view
+              wx:for="{{questions}}"
+              wx:for-item="q"
+              wx:key="id"
+              class="animal-overview-btn {{current === index ? 'animal-overview-current' : (answers[q.id] !== undefined ? 'animal-overview-answered' : 'animal-overview-unanswered')}}"
+              data-index="{{index}}"
+              bindtap="onOverviewTap"
+            >{{index + 1}}</view>
+          </view>
+        </view>
+      </view>
     </view>
   </view>
 

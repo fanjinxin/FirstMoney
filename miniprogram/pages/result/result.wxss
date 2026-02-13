@@ -2178,3 +2178,14 @@
 .lbt-footer-links { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 16rpx 32rpx; margin-top: 24rpx; }
 .lbt-footer-link { font-size: 28rpx; font-weight: 500; color: var(--xia-teal); text-decoration: underline; }
 .lbt-footer-dot { font-size: 24rpx; color: rgba(var(--xia-deep-rgb), 0.3); }
+
+/* ========== 分享引导 ========== */
+.result-share-wrap { margin-top: 48rpx; padding: 48rpx 32rpx; border-radius: 24rpx; border: 2rpx solid rgba(var(--xia-deep-rgb), 0.1); background: rgba(var(--xia-cream-rgb), 0.3); }
+.result-share-inner { display: flex; flex-direction: column; align-items: center; gap: 24rpx; }
+.result-share-text { font-size: 28rpx; font-weight: 500; color: var(--xia-deep); }
+.result-share-row { display: flex; flex-direction: row; align-items: center; justify-content: center; flex-wrap: wrap; gap: 32rpx; }
+.result-share-qrcode { width: 256rpx; height: 256rpx; }
+.result-share-btn { padding: 20rpx 48rpx; font-size: 28rpx; font-weight: 600; color: #fff; background: var(--xia-teal); border: none; border-radius: 999rpx; }
+.result-share-btn::after { border: none; }
+.result-share-btn-hidden { display: none !important; }
+.share-canvas-hidden { position: fixed; left: 0; top: 0; width: 600px; height: 820px; opacity: 0; pointer-events: none; z-index: -1; }

@@ -5,6 +5,7 @@ import QuestionOverview from '../../components/QuestionOverview'
 import SectionHeader from '../../components/SectionHeader'
 import { hitQuestions, HIT_TEST_ID } from '../../data/hit'
 import { loadAnswers, saveAnswers, clearAnswers } from '../../utils/storage'
+import { clearSampleFlag } from '../../utils/testSample'
 
 const OPTIONS = ['是', '否']
 
@@ -49,6 +50,7 @@ export default function HITTest() {
   const progress = total > 0 ? (answeredCount / total) * 100 : 0
 
   const handleSelect = (optionIndex: number) => {
+    clearSampleFlag('hit')
     const next = { ...answers, [String(currentQuestion.id)]: optionIndex }
     setAnswers(next)
     saveAnswers(HIT_TEST_ID, next)

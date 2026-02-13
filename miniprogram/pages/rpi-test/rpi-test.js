@@ -4,6 +4,7 @@
  */
 const { rpiTest } = require('../../data/rpi');
 const { loadAnswers, saveAnswers } = require('../../utils/storage');
+const { clearSampleFlag } = require('../../utils/testSample');
 const { THEMES, getThemeStyle } = require('../../data/themes');
 
 const STORAGE_KEYS = { self: 'rpi-self', partner: 'rpi-partner' };
@@ -29,7 +30,8 @@ Page({
     this.refreshByPerspective('self');
     const saved = wx.getStorageSync('app-theme-id') || 'summer-mint';
     const theme = THEMES.find(t => t.id === saved) || THEMES[2];
-    this.setData({ test: rpiTest, themeStyle: getThemeStyle(theme) || '' });
+    const scaleOptions = [...rpiTest.options].sort((a, b) => b.value - a.value);
+    this.setData({ test: rpiTest, scaleOptions, themeStyle: getThemeStyle(theme) || '' });
   },
 
   refreshByPerspective(perspective) {
@@ -74,6 +76,7 @@ Page({
   },
 
   onSelect(e) {
+    clearSampleFlag('rpi');
     const value = e.currentTarget.dataset.value;
     const { currentQ, answers, perspective } = this.data;
     const storageKey = STORAGE_KEYS[perspective];

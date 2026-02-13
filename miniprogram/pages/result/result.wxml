@@ -1996,6 +1996,18 @@
       </view>
     </view>
   </view>
+
+  <!-- 分享引导：所有结果页底部 -->
+  <canvas canvas-id="shareCanvas" class="share-canvas-hidden" style="width: 600px; height: 820px;" />
+  <view class="result-share-wrap">
+    <view class="result-share-inner">
+      <text class="result-share-text">喜欢就分享给朋友们吧</text>
+      <view class="result-share-row">
+        <image class="result-share-qrcode" src="/assets/share-qrcode.png" mode="aspectFit" />
+        <button class="result-share-btn result-share-btn-hidden" hover-class="none" catchtap="onShareTap">点击截图分享</button>
+      </view>
+    </view>
+  </view>
   </view>
   <theme-switcher bindthemechange="onThemeChange"></theme-switcher>
 </view>

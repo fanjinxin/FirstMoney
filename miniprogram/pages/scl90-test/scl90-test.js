@@ -2,7 +2,9 @@
  * SCL-90 选择页面 - 逐行移植自 src/pages/scl90/SCL90Test.tsx
  */
 const { scl90Test } = require('../../data/scl90');
+const { TESTS } = require('../../data/tests');
 const { loadAnswers, saveAnswers } = require('../../utils/storage');
+const { clearSampleFlag } = require('../../utils/testSample');
 const { THEMES, getThemeStyle } = require('../../data/themes');
 
 Page({
@@ -37,9 +39,13 @@ Page({
 
     const saved = wx.getStorageSync('app-theme-id') || 'summer-mint';
     const theme = THEMES.find((t) => t.id === saved) || THEMES[2];
+    const cardMeta = TESTS.find((t) => t.id === 'scl90');
+    const testWithIcon = cardMeta ? { ...scl90Test, iconType: cardMeta.iconType, iconBg: cardMeta.iconBg } : scl90Test;
+    const scaleOptions = [...scl90Test.options].sort((a, b) => b.value - a.value);
 
     this.setData({
-      test: scl90Test,
+      test: testWithIcon,
+      scaleOptions,
       questions,
       answers: stored,
       current,
@@ -53,6 +59,7 @@ Page({
   },
 
   onSelect(e) {
+    clearSampleFlag('scl90');
     const value = e.currentTarget.dataset.value;
     const { currentQ, answers, questions, total } = this.data;
     const next = { ...answers, [currentQ.id]: Number(value) };

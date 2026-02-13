@@ -6,6 +6,7 @@ import QuestionView from '../../components/QuestionView'
 import SectionHeader from '../../components/SectionHeader'
 import { scl90Test } from '../../data/scl90'
 import { loadAnswers, saveAnswers } from '../../utils/storage'
+import { clearSampleFlag } from '../../utils/testSample'
 
 export default function SCL90Test() {
   const navigate = useNavigate()
@@ -20,6 +21,7 @@ export default function SCL90Test() {
   const progress = (answeredCount / total) * 100
 
   const handleSelect = (value: number) => {
+    clearSampleFlag('scl90')
     const next = { ...answers, [currentQuestion.id]: value }
     setAnswers(next)
     saveAnswers(scl90Test.id, next)

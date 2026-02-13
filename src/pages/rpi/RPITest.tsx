@@ -6,6 +6,7 @@ import QuestionView from '../../components/QuestionView'
 import SectionHeader from '../../components/SectionHeader'
 import { rpiTest } from '../../data/rpi'
 import { loadAnswers, saveAnswers } from '../../utils/storage'
+import { clearSampleFlag } from '../../utils/testSample'
 
 type Perspective = 'self' | 'partner'
 
@@ -32,6 +33,7 @@ export default function RPITest() {
   const progress = (answeredCount / total) * 100
 
   const handleSelect = (value: number) => {
+    clearSampleFlag('rpi')
     const next = { ...stateAnswers, [currentQuestion.id]: value }
     setStateAnswers(next)
     saveAnswers(`${rpiTest.id}-${perspective}`, next)

@@ -1,5 +1,6 @@
 const { TESTS } = require('../../data/tests');
-const { fillSampleAnswers } = require('../../utils/testSample');
+const { fillSampleAnswers, isSampleData, clearSampleFlag } = require('../../utils/testSample');
+const { clearAnswers } = require('../../utils/storage');
 const { THEMES, getThemeStyle } = require('../../data/themes');
 
 function processTests(tests) {
@@ -23,6 +24,8 @@ Page({
     tests: [],
     themeStyle: '',
     currentPath: '/',
+    disclaimerTapCount: 0,
+    showBackdoorBtn: false,
   },
   onLoad() {
     const saved = wx.getStorageSync('app-theme-id') || 'summer-mint';
@@ -56,6 +59,19 @@ Page({
   onTestTap(e) {
     const id = e.currentTarget.dataset.id;
     if (!id) return;
+    if (isSampleData(id)) {
+      clearSampleFlag(id);
+      if (id === 'scl90') {
+        clearAnswers('scl90');
+      } else if (id === 'rpi') {
+        clearAnswers('rpi-self');
+        clearAnswers('rpi-partner');
+      } else if (id === 'animal') {
+        clearAnswers('animal-sculpture');
+      } else {
+        clearAnswers(id);
+      }
+    }
     if (id === 'scl90') {
       wx.navigateTo({ url: '/pages/scl90-test/scl90-test' });
     } else if (id === 'rpi') {
@@ -67,6 +83,13 @@ Page({
         url: `/pages/test/test?testId=${id}`
       });
     }
+  },
+  onDisclaimerTap() {
+    const count = (this.data.disclaimerTapCount || 0) + 1;
+    this.setData({
+      disclaimerTapCount: count,
+      showBackdoorBtn: count >= 20,
+    });
   },
   onTestJump(e) {
     const id = e.currentTarget.dataset.id;

@@ -3,6 +3,7 @@
  */
 const { animalQuestions } = require('../../data/animal_sculpture');
 const { loadAnswers, saveAnswers, clearAnswers } = require('../../utils/storage');
+const { clearSampleFlag } = require('../../utils/testSample');
 const { THEMES, getThemeStyle } = require('../../data/themes');
 
 const ANIMAL_STORAGE_KEY = 'animal-sculpture';
@@ -64,6 +65,7 @@ Page({
   },
 
   onSelect(e) {
+    clearSampleFlag('animal');
     const value = e.currentTarget.dataset.value;
     const { currentQ, answers, questions, total } = this.data;
     const next = { ...answers, [currentQ.id]: Number(value) };
@@ -98,6 +100,13 @@ Page({
     if (current >= total - 1) return;
     const next = current + 1;
     this.setData({ current: next, currentQ: questions[next] });
+  },
+
+  onOverviewTap(e) {
+    const index = e.currentTarget.dataset.index;
+    if (index == null) return;
+    const { questions } = this.data;
+    this.setData({ current: index, currentQ: questions[index] });
   },
 
   onRestart() {

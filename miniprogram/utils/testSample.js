@@ -4,6 +4,28 @@
  */
 const { saveAnswers } = require('./storage');
 
+const SAMPLE_FLAG_PREFIX = 'psych-tests:isSample:';
+
+function setSampleFlag(testId) {
+  try {
+    wx.setStorageSync(SAMPLE_FLAG_PREFIX + testId, true);
+  } catch (e) {}
+}
+
+function isSampleData(testId) {
+  try {
+    return !!wx.getStorageSync(SAMPLE_FLAG_PREFIX + testId);
+  } catch (e) {
+    return false;
+  }
+}
+
+function clearSampleFlag(testId) {
+  try {
+    wx.removeStorageSync(SAMPLE_FLAG_PREFIX + testId);
+  } catch (e) {}
+}
+
 function randomBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -13,6 +35,7 @@ function fillSampleAnswers(testId) {
     const answers = {};
     for (let i = 1; i <= 90; i++) answers['s' + i] = randomBetween(1, 4);
     saveAnswers('scl90', answers);
+    setSampleFlag(testId);
     return;
   }
 
@@ -20,6 +43,7 @@ function fillSampleAnswers(testId) {
     const answers = {};
     for (let i = 1; i <= 60; i++) answers[i] = randomBetween(0, 2);
     saveAnswers('animal-sculpture', answers);
+    setSampleFlag(testId);
     return;
   }
 
@@ -32,6 +56,7 @@ function fillSampleAnswers(testId) {
     }
     saveAnswers('rpi-self', selfAnswers);
     saveAnswers('rpi-partner', partnerAnswers);
+    setSampleFlag(testId);
     return;
   }
 
@@ -39,6 +64,7 @@ function fillSampleAnswers(testId) {
     const answers = {};
     for (let i = 1; i <= 48; i++) answers['sri-' + i] = randomBetween(1, 5);
     saveAnswers('sri', answers);
+    setSampleFlag(testId);
     return;
   }
 
@@ -46,6 +72,7 @@ function fillSampleAnswers(testId) {
     const answers = {};
     for (let i = 1; i <= 90; i++) answers['mbti-' + i] = randomBetween(0, 4);
     saveAnswers('mbti', answers);
+    setSampleFlag(testId);
     return;
   }
 
@@ -53,6 +80,7 @@ function fillSampleAnswers(testId) {
     const answers = {};
     for (let i = 1; i <= 118; i++) answers[String(i)] = randomBetween(0, 2);
     saveAnswers('aat', answers);
+    setSampleFlag(testId);
     return;
   }
 
@@ -60,6 +88,7 @@ function fillSampleAnswers(testId) {
     const answers = {};
     for (let i = 1; i <= 30; i++) answers[String(i)] = randomBetween(0, 2);
     saveAnswers('psych-age', answers);
+    setSampleFlag(testId);
     return;
   }
 
@@ -67,6 +96,7 @@ function fillSampleAnswers(testId) {
     const answers = {};
     for (let i = 1; i <= 60; i++) answers[String(i)] = randomBetween(1, 5);
     saveAnswers('apt', answers);
+    setSampleFlag(testId);
     return;
   }
 
@@ -74,6 +104,7 @@ function fillSampleAnswers(testId) {
     const answers = {};
     for (let i = 1; i <= 90; i++) answers[String(i)] = randomBetween(0, 1);
     saveAnswers('hit', answers);
+    setSampleFlag(testId);
     return;
   }
 
@@ -81,6 +112,7 @@ function fillSampleAnswers(testId) {
     const answers = {};
     for (let i = 1; i <= 70; i++) answers[String(i)] = randomBetween(1, 5);
     saveAnswers('dth', answers);
+    setSampleFlag(testId);
     return;
   }
 
@@ -88,6 +120,7 @@ function fillSampleAnswers(testId) {
     const answers = {};
     for (let i = 1; i <= 52; i++) answers[String(i)] = randomBetween(1, 5);
     saveAnswers('tla', answers);
+    setSampleFlag(testId);
     return;
   }
 
@@ -95,6 +128,7 @@ function fillSampleAnswers(testId) {
     const answers = {};
     for (let i = 1; i <= 54; i++) answers[String(i)] = randomBetween(0, 2);
     saveAnswers('fft', answers);
+    setSampleFlag(testId);
     return;
   }
 
@@ -102,6 +136,7 @@ function fillSampleAnswers(testId) {
     const answers = {};
     for (let i = 1; i <= 40; i++) answers[String(i)] = randomBetween(1, 5);
     saveAnswers('ybt', answers);
+    setSampleFlag(testId);
     return;
   }
 
@@ -109,6 +144,7 @@ function fillSampleAnswers(testId) {
     const answers = {};
     for (let i = 1; i <= 36; i++) answers[String(i)] = randomBetween(1, 5);
     saveAnswers('rvt', answers);
+    setSampleFlag(testId);
     return;
   }
 
@@ -116,6 +152,7 @@ function fillSampleAnswers(testId) {
     const answers = {};
     for (let i = 1; i <= 20; i++) answers[String(i)] = randomBetween(1, 5);
     saveAnswers('lbt', answers);
+    setSampleFlag(testId);
     return;
   }
 
@@ -123,6 +160,7 @@ function fillSampleAnswers(testId) {
     const answers = {};
     for (let i = 1; i <= 68; i++) answers[String(i)] = randomBetween(1, 5);
     saveAnswers('mpt', answers);
+    setSampleFlag(testId);
     return;
   }
 
@@ -130,6 +168,7 @@ function fillSampleAnswers(testId) {
     const answers = {};
     for (let i = 1; i <= 40; i++) answers[String(i)] = randomBetween(1, 5);
     saveAnswers('vbt', answers);
+    setSampleFlag(testId);
     return;
   }
 
@@ -137,8 +176,9 @@ function fillSampleAnswers(testId) {
     const answers = {};
     for (let i = 1; i <= 45; i++) answers[String(i)] = randomBetween(1, 5);
     saveAnswers('city', answers);
+    setSampleFlag(testId);
     return;
   }
 }
 
-module.exports = { fillSampleAnswers };
+module.exports = { fillSampleAnswers, isSampleData, clearSampleFlag };

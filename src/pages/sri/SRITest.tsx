@@ -6,6 +6,7 @@ import QuestionView from '../../components/QuestionView'
 import SectionHeader from '../../components/SectionHeader'
 import { sriTest } from '../../data/sri'
 import { loadAnswers, saveAnswers } from '../../utils/storage'
+import { clearSampleFlag } from '../../utils/testSample'
 
 export default function SRITest() {
   const navigate = useNavigate()
@@ -20,6 +21,7 @@ export default function SRITest() {
   const progress = (answeredCount / total) * 100
 
   const handleSelect = (value: number) => {
+    clearSampleFlag('sri')
     const next = { ...answers, [currentQuestion.id]: value }
     setAnswers(next)
     saveAnswers(sriTest.id, next)
