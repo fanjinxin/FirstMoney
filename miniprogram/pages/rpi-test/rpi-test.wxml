@@ -1,7 +1,5 @@
 <!-- RPI 答题页 - 移植自 RPITest.tsx，双视角 -->
 <view class="page-wrap rpi-page" style="{{themeStyle}}">
-  <nav-header currentPath="/rpi"></nav-header>
-
   <view class="rpi-main" wx:if="{{test}}">
     <view class="rpi-header-block">
       <view class="section-header">

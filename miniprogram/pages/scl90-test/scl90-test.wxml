@@ -1,7 +1,5 @@
 <!-- SCL-90 选择页面 - 逐行移植自 src/pages/scl90/SCL90Test.tsx -->
 <view class="page-wrap scl90-page" style="{{themeStyle}}">
-  <nav-header currentPath="/scl90"></nav-header>
-
   <!-- space-y-8 主容器 -->
   <view class="scl90-main" wx:if="{{test}}">
     <!-- space-y-4: SectionHeader + 描述 -->

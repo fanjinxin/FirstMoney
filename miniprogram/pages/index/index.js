@@ -22,6 +22,7 @@ Page({
   data: {
     tests: [],
     themeStyle: '',
+    currentPath: '/',
   },
   onLoad() {
     const saved = wx.getStorageSync('app-theme-id') || 'summer-mint';
@@ -29,6 +30,23 @@ Page({
     this.setData({
       tests: processTests(TESTS),
       themeStyle: getThemeStyle(theme) || '',
+    });
+  },
+  onNavTabChange(e) {
+    const { path } = e.detail || {};
+    this.setData({ currentPath: path });
+    if (path === '/') {
+      wx.pageScrollTo({ scrollTop: 0, duration: 300 });
+      return;
+    }
+    const testId = path.replace('/', '');
+    const query = wx.createSelectorQuery();
+    query.selectViewport().scrollOffset();
+    query.select(`#section-${testId}`).boundingClientRect();
+    query.exec((res) => {
+      if (!res || !res[0] || !res[1]) return;
+      const scrollTop = res[0].scrollTop + res[1].top;
+      wx.pageScrollTo({ scrollTop, duration: 300 });
     });
   },
   onThemeChange(e) {

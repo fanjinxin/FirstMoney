@@ -1,5 +1,4 @@
 <view class="page-wrap" style="{{themeStyle}}" wx:if="{{config}}">
-  <nav-header currentPath="/{{testId}}"></nav-header>
   <view class="header card">
     <view class="header-row">
       <view>
@@ -95,10 +94,8 @@
 </view>
 
 <view class="page-wrap" style="{{themeStyle}}" wx:else>
-  <nav-header currentPath="/"></nav-header>
   <view class="empty">
     <text>暂无该测评，敬请期待</text>
-    <navigator url="/pages/index/index" class="empty-link">返回首页</navigator>
   </view>
   <theme-switcher bindthemechange="onThemeChange"></theme-switcher>
 </view>

@@ -1,11 +1,5 @@
 <view class="page-wrap" style="{{themeStyle}}" wx:if="{{result}}">
-  <nav-header currentPath="/{{testId}}"></nav-header>
   <view class="container">
-  <view class="actions">
-    <navigator url="/pages/index/index" class="link">← 返回首页</navigator>
-    <view class="retake" bindtap="onRetake">重新测试</view>
-  </view>
-
   <!-- SCL90 完整报告 - 移植自 SCL90Result.tsx -->
   <view wx:if="{{testId === 'scl90' && scl90Report}}" class="scl90-report-wrap">
     <view class="scl90-report-paper">
@@ -91,7 +85,7 @@
           <view class="scl90-section-desc">通过图表快速了解十因子整体轮廓、症状分布与因子强弱排序。</view>
           <view class="scl90-charts-row">
             <view class="scl90-chart-left"><canvas canvas-id="result-radar" class="result-chart-canvas" style="width:100%;height:280px;"></canvas></view>
-            <view class="scl90-chart-right"><canvas canvas-id="result-pie" class="result-chart-canvas" style="width:100%;height:260px;"></canvas><view class="scl90-pie-legend"><view wx:for="{{scl90Report.symptomDist}}" wx:key="name" class="scl90-legend-item"><view class="scl90-legend-dot" style="background:{{['#7FBFE1','#68D4DB','#98E6E2','#2C6F7A','#0F4C5C'][index % 5]}}"></view><text>{{item.name}}</text></view></view></view>
+            <view class="scl90-chart-right"><canvas canvas-id="result-pie" class="result-chart-canvas" style="width:100%;height:260px;"></canvas><view class="scl90-pie-legend"><view wx:for="{{scl90Report.symptomDist}}" wx:key="name" class="scl90-legend-item"><view class="scl90-legend-dot" style="background:{{(chartColors && chartColors.palette && chartColors.palette[index % 5]) || ['#7FBFE1','#68D4DB','#98E6E2','#2C6F7A','#0F4C5C'][index % 5]}}"></view><text>{{item.name}}</text></view></view></view>
           </view>
           <view class="scl90-bar-wrap"><canvas canvas-id="result-bar" class="result-chart-canvas" style="width:100%;height:400px;"></canvas></view>
         </view>
@@ -195,7 +189,6 @@
         <view class="scl90-footer-text">3. 本报告不能替代精神科医师、心理治疗师或心理咨询师的专业面诊评估。</view>
         <view class="scl90-footer-text">4. 若出现自伤、自杀想法或严重情绪失控等紧急状况，请立即拨打心理援助热线或前往最近的医疗机构急诊。</view>
         <view class="scl90-footer-meta">报告生成时间：{{scl90Report.formatDate}} · SCL-90 心理健康筛查评估</view>
-        <view class="scl90-footer-links"><navigator url="/pages/scl90-test/scl90-test" class="scl90-footer-link">返回测试</navigator><navigator url="/pages/index/index" class="scl90-footer-link">返回首页</navigator></view>
       </view>
     </view>
   </view>
@@ -294,7 +287,6 @@
       <view class="aat-footer">
         <view class="aat-footer-text">报告生成时间：{{aatReport.formatDate}} · AAT 学习适应性测验</view>
         <view class="aat-footer-note">本测验仅供自我觉察与学习参考，不构成专业评估。结果仅供参考，不用于区分优劣。如有学习困扰，建议寻求专业辅导。</view>
-        <view class="aat-footer-links"><navigator url="/pages/test/test?testId=aat" class="aat-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="aat-footer-link">返回首页</navigator></view>
       </view>
     </view>
   </view>
@@ -371,7 +363,6 @@
       </view>
       <view class="psych-age-footer">
         <view class="psych-age-footer-text">报告生成时间：{{psychAgeReport.formatDate}} · 心理年龄测验</view>
-        <view class="psych-age-footer-links"><navigator url="/pages/test/test?testId=psych-age" class="psych-age-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="psych-age-footer-link">返回首页</navigator></view>
       </view>
     </view>
   </view>
@@ -439,7 +430,6 @@
       </view>
       <view class="apt-footer">
         <view class="apt-footer-text">报告生成时间：{{aptReport.formatDate}} · APT 天赋潜能评估</view>
-        <view class="apt-footer-links"><navigator url="/pages/test/test?testId=apt" class="apt-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="apt-footer-link">返回首页</navigator></view>
       </view>
     </view>
   </view>
@@ -518,7 +508,6 @@
       </view>
       <view class="hit-footer">
         <view class="hit-footer-text">报告生成时间：{{hitReport.formatDate}} · HIT 霍兰德职业兴趣测试</view>
-        <view class="hit-footer-links"><navigator url="/pages/test/test?testId=hit" class="hit-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="hit-footer-link">返回首页</navigator></view>
       </view>
     </view>
   </view>
@@ -584,7 +573,6 @@
       </view>
       <view class="dth-footer">
         <view class="dth-footer-text">报告生成时间：{{dthReport.formatDate}} · DTH 黑暗三角人格测试</view>
-        <view class="dth-footer-links"><navigator url="/pages/test/test?testId=dth" class="dth-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="dth-footer-link">返回首页</navigator></view>
       </view>
     </view>
   </view>
@@ -650,10 +638,6 @@
       </view>
       <view class="tla-footer">
         <view class="tla-footer-text">报告生成时间：{{tlaReport.formatDate}} · 年上年下恋爱测试</view>
-        <view class="tla-footer-links">
-          <navigator url="/pages/test/test?testId=tla" class="tla-footer-btn">返回测验</navigator>
-          <navigator url="/pages/index/index" class="tla-footer-link">返回首页</navigator>
-        </view>
       </view>
     </view>
   </view>
@@ -741,11 +725,6 @@
 
       <view class="fft-footer">
         <view class="fft-footer-text">报告生成时间：{{fftReport.formatDate}}</view>
-        <view class="fft-footer-links">
-          <navigator url="/pages/test/test?testId=fft" class="fft-footer-link">返回测验</navigator>
-          <text class="fft-footer-dot">·</text>
-          <navigator url="/pages/index/index" class="fft-footer-link">返回首页</navigator>
-        </view>
       </view>
     </view>
   </view>
@@ -847,11 +826,6 @@
 
       <view class="ybt-footer">
         <view class="ybt-footer-text">报告生成时间：{{ybtReport.formatDate}}</view>
-        <view class="ybt-footer-links">
-          <navigator url="/pages/test/test?testId=ybt" class="ybt-footer-link">返回病娇测试</navigator>
-          <text class="ybt-footer-dot">·</text>
-          <navigator url="/pages/index/index" class="ybt-footer-link">返回首页</navigator>
-        </view>
       </view>
     </view>
   </view>
@@ -975,11 +949,6 @@
 
       <view class="rvt-footer">
         <view class="rvt-footer-text">报告生成时间：{{rvtReport.formatDate}}</view>
-        <view class="rvt-footer-links">
-          <navigator url="/pages/test/test?testId=rvt" class="rvt-footer-link">返回恋爱观测试</navigator>
-          <text class="rvt-footer-dot">·</text>
-          <navigator url="/pages/index/index" class="rvt-footer-link">返回首页</navigator>
-        </view>
       </view>
     </view>
   </view>
@@ -1173,11 +1142,6 @@
 
       <view class="mpt-footer">
         <view class="mpt-footer-text">报告生成时间：{{mptReport.formatDate}}</view>
-        <view class="mpt-footer-links">
-          <navigator url="/pages/test/test?testId=mpt" class="mpt-footer-link">返回亲密关系偏好测试</navigator>
-          <text class="mpt-footer-dot">·</text>
-          <navigator url="/pages/index/index" class="mpt-footer-link">返回首页</navigator>
-        </view>
       </view>
     </view>
   </view>
@@ -1316,11 +1280,6 @@
       </view>
       <view class="vbt-footer">
         <view class="vbt-footer-text">报告生成时间：{{vbtReport.formatDate}}</view>
-        <view class="vbt-footer-links">
-          <navigator url="/pages/test/test?testId=vbt" class="vbt-footer-link">返回易被欺负测试</navigator>
-          <text class="vbt-footer-dot">·</text>
-          <navigator url="/pages/index/index" class="vbt-footer-link">返回首页</navigator>
-        </view>
       </view>
     </view>
   </view>
@@ -1455,11 +1414,6 @@
       </view>
       <view class="city-footer">
         <view class="city-footer-text">报告生成时间：{{cityReport.formatDate}}</view>
-        <view class="city-footer-links">
-          <navigator url="/pages/test/test?testId=city" class="city-footer-link">返回宜居城市测试</navigator>
-          <text class="city-footer-dot">·</text>
-          <navigator url="/pages/index/index" class="city-footer-link">返回首页</navigator>
-        </view>
       </view>
     </view>
   </view>
@@ -1568,11 +1522,6 @@
 
       <view class="lbt-footer">
         <view class="lbt-footer-text">报告生成时间：{{lbtReport.formatDate}}</view>
-        <view class="lbt-footer-links">
-          <navigator url="/pages/test/test?testId=lbt" class="lbt-footer-link">返回恋爱脑测试</navigator>
-          <text class="lbt-footer-dot">·</text>
-          <navigator url="/pages/index/index" class="lbt-footer-link">返回首页</navigator>
-        </view>
       </view>
     </view>
   </view>
@@ -1705,7 +1654,6 @@
       <view class="mbti-footer">
         <view class="mbti-footer-text">报告生成时间：{{mbtiReport.formatDate}} · MBTI 16型人格测试</view>
         <view class="mbti-footer-note">本测试基于荣格心理学理论，结果仅供自我了解与娱乐参考，不构成专业诊断。</view>
-        <view class="mbti-footer-links"><navigator url="/pages/test/test?testId=mbti" class="mbti-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="mbti-footer-link">返回首页</navigator></view>
       </view>
     </view>
   </view>
@@ -1830,7 +1778,6 @@
         <view class="rpi-footer-title">声明</view>
         <view class="rpi-footer-text">本报告依据自评/为伴侣评结果生成，仅供关系沟通与自我觉察参考，不构成任何临床诊断。数据在本地处理，不上传服务器。</view>
         <view class="rpi-footer-meta">{{rpiReport.formatDate}} · RPI 恋爱占有欲指数</view>
-        <view class="rpi-footer-links"><navigator url="/pages/rpi-test/rpi-test" class="rpi-footer-link">返回测试</navigator><navigator url="/pages/index/index" class="rpi-footer-link">返回首页</navigator></view>
       </view>
     </view>
   </view>
@@ -1951,7 +1898,6 @@
         <view class="sri-footer-title">声明</view>
         <view class="sri-footer-text">本报告依据自评结果生成，仅供自我探索与沟通参考，不构成任何临床诊断。数据在本地处理，不上传服务器。</view>
         <view class="sri-footer-meta">{{sriReport.formatDate}} · SRI 性压抑指数</view>
-        <view class="sri-footer-links"><navigator url="/pages/test/test?testId=sri" class="sri-footer-link">返回测试</navigator><navigator url="/pages/index/index" class="sri-footer-link">返回首页</navigator></view>
       </view>
     </view>
   </view>
@@ -2044,7 +1990,6 @@
       <view class="animal-footer">
         <view class="animal-footer-meta">{{animalReport.formatDate}} · 动物塑性格测试</view>
         <view class="animal-footer-text">本测试基于FFM五因素模型与动物心理学趣味映射，结果仅供娱乐与参考。</view>
-        <view class="animal-footer-links"><navigator url="/pages/animal-test/animal-test" class="animal-footer-link">返回测验</navigator><navigator url="/pages/index/index" class="animal-footer-link">返回首页</navigator></view>
       </view>
     </view>
   </view>
@@ -2053,10 +1998,8 @@
 </view>
 
 <view class="page-wrap" style="{{themeStyle}}" wx:else>
-  <nav-header currentPath="/"></nav-header>
   <view class="empty">
     <text>请先完成测评</text>
-    <navigator url="/pages/index/index" class="link">返回首页</navigator>
   </view>
   <theme-switcher bindthemechange="onThemeChange"></theme-switcher>
 </view>

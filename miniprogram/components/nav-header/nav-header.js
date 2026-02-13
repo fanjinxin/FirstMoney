@@ -1,6 +1,9 @@
 Component({
   properties: {
     currentPath: { type: String, value: '' },
+    sticky: { type: Boolean, value: false },
+    /** 首页模式：点击 tab 时触发 tabchange 并滚动到对应卡片，不跳转 */
+    indexMode: { type: Boolean, value: false },
   },
   data: {
     navItems: [
@@ -29,6 +32,10 @@ Component({
     onNavTap(e) {
       const item = e.currentTarget.dataset.item;
       if (!item) return;
+      if (this.properties.indexMode) {
+        this.triggerEvent('tabchange', { path: item.path, testId: item.testId });
+        return;
+      }
       if (item.path === '/') {
         wx.redirectTo({ url: '/pages/index/index' });
       } else if (item.testId === 'scl90') {

@@ -1,6 +1,4 @@
 <view class="page-wrap animal-page" style="{{themeStyle}}">
-  <nav-header currentPath="/animal"></nav-header>
-
   <view class="animal-main">
     <view class="animal-header-block">
       <view class="section-header">

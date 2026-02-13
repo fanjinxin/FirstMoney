@@ -1,42 +1,29 @@
 <view class="page-wrap" style="{{themeStyle}}">
-  <nav-header currentPath="/"></nav-header>
-  <!-- Hero 区：严格还原 Web 版 section 结构 -->
-  <view class="hero-section">
-    <view class="hero-orb hero-orb-right"></view>
-    <view class="hero-orb hero-orb-left"></view>
-    <view class="hero-inner">
-      <view class="hero-grid">
-        <view class="hero-col-left">
-          <view class="hero-badge">
-            <view class="badge-dot"></view>
-            <text class="badge-text">轻量心理测评 · 即开即测</text>
-          </view>
-          <view class="hero-title">更酷的测评体验，快速获得多维度洞察</view>
-          <view class="hero-desc">更直观的流程、更清晰的反馈、更有节奏的体验感，帮助你专注于真实感受。测试结果将以图表与建议结合的方式呈现。</view>
-          <view class="hero-tags">
-            <text class="hero-tag">即时解析</text>
-            <text class="hero-tag">多维度雷达</text>
-            <text class="hero-tag">隐私友好</text>
-          </view>
-        </view>
-        <view class="hero-col-right">
-          <view class="hero-card">
-            <view class="hero-card-label">测评亮点</view>
-            <view class="hero-card-title">自动生成个性化建议</view>
-            <view class="hero-card-desc">根据作答节奏与内容趋势，输出更贴合的提示与行动建议。</view>
-          </view>
-          <view class="hero-card">
-            <view class="hero-card-label">报告格式</view>
-            <view class="hero-card-row">
-              <view class="hero-card-icon">📊</view>
-              <text class="hero-card-text">多维图表 + 可执行建议</text>
-            </view>
-            <view class="hero-progress-wrap">
-              <view class="hero-progress-bar"></view>
-            </view>
-          </view>
-        </view>
+  <nav-header currentPath="{{currentPath}}" sticky="{{true}}" indexMode="{{true}}" bindtabchange="onNavTabChange"></nav-header>
+  <!-- Hero 介绍区：简约但有设计感 -->
+  <view class="hero-intro" id="section-hero">
+    <view class="hero-divider hero-divider-top">
+      <view class="hero-divider-line"></view>
+      <view class="hero-divider-icon"></view>
+      <view class="hero-divider-line"></view>
+    </view>
+    <view class="hero-title">更酷的测评体验，<text class="hero-title-accent">快速获得</text>多维度洞察</view>
+    <view class="hero-desc">更直观的流程、更清晰的反馈、更有节奏的体验感，帮助你专注于真实感受。测试结果将以图表与建议结合的方式呈现。</view>
+    <view class="hero-feature">
+      <view class="hero-feature-main">
+        <view class="hero-feature-icon hero-highlight-icon-chart"></view>
+        <text class="hero-feature-text">自动生成个性化建议 · 多维图表 + 可执行建议</text>
       </view>
+      <view class="hero-feature-tags">
+        <view class="hero-feature-tag">即时解析</view>
+        <view class="hero-feature-tag">多维度雷达</view>
+        <view class="hero-feature-tag">隐私友好</view>
+      </view>
+    </view>
+    <view class="hero-divider hero-divider-bottom">
+      <view class="hero-divider-line"></view>
+      <view class="hero-divider-icon"></view>
+      <view class="hero-divider-line"></view>
     </view>
   </view>
 
@@ -45,6 +32,7 @@
     <view 
       wx:for="{{tests}}" 
       wx:key="id"
+      id="section-{{item.id}}"
       class="test-card test-card-{{item.bgType}}"
       data-id="{{item.id}}"
       bindtap="onTestTap"
