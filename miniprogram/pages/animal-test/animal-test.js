@@ -33,7 +33,17 @@ Page({
     themeStyle: '',
   },
 
+  onShareAppMessage() {
+    return { title: '人格动物塑测试 - 心理测评中心', path: '/pages/animal-test/animal-test' };
+  },
+  onShareTimeline() {
+    return { title: '人格动物塑测试 - 心理测评中心' };
+  },
+  onShow() {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
+  },
   onLoad() {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     const stored = loadAnswers(ANIMAL_STORAGE_KEY) ?? {};
     const questions = animalQuestions;
     const total = questions.length;

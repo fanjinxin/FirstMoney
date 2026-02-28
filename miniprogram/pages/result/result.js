@@ -60,7 +60,20 @@ Page({
     cityReport: null,
     chartColors: null,
   },
+  onShareAppMessage() {
+    const { testId } = this.data;
+    const title = RESULT_PAGE_TITLES[testId] || '测评结果 - 心理测评中心';
+    return { title, path: `/pages/result/result?testId=${testId || ''}` };
+  },
+  onShareTimeline() {
+    const { testId } = this.data;
+    return { title: RESULT_PAGE_TITLES[testId] || '测评结果 - 心理测评中心' };
+  },
+  onShow() {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
+  },
   onLoad(options) {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     const testId = options.testId || '';
     const navTitle = RESULT_PAGE_TITLES[testId] || '测评结果';
     wx.setNavigationBarTitle({ title: navTitle });

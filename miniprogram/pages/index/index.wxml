@@ -57,7 +57,10 @@
         </view>
       </view>
       <view class="test-card-footer">
-        <view class="test-action-link" catchtap="onTestTap" data-id="{{item.id}}">开始测评 →</view>
+        <view class="test-footer-actions">
+          <view class="test-action-link" catchtap="onTestTap" data-id="{{item.id}}">开始测评 →</view>
+          <button class="test-share-btn" open-type="share" data-id="{{item.id}}" catchtap="onShareBtnTap">分享</button>
+        </view>
         <view 
           wx:if="{{showBackdoorBtn}}"
           class="test-jump-btn"

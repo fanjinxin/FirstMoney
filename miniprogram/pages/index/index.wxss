@@ -306,11 +306,16 @@
 .test-card-footer {
   position: relative;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
   gap: 24rpx;
   margin-top: 40rpx;
   padding-top: 32rpx;
+}
+
+.test-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 32rpx;
 }
 
 .test-action-link {
@@ -318,6 +323,25 @@
   font-weight: 500;
   color: var(--xia-deep);
   text-decoration: underline;
+}
+
+.test-share-btn {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: rgba(var(--xia-deep-rgb), 0.6);
+  background: transparent;
+  padding: 8rpx 16rpx;
+  border: none;
+  border-radius: 8rpx;
+  line-height: 1.2;
+}
+
+.test-share-btn::after {
+  border: none;
+}
+
+.test-share-btn:active {
+  color: var(--xia-teal);
 }
 
 .test-jump-btn {

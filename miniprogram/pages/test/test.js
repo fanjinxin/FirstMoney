@@ -5,6 +5,17 @@ const { clearSampleFlag } = require('../../utils/testSample');
 const { THEMES, getThemeStyle } = require('../../data/themes');
 
 Page({
+  onShareAppMessage() {
+    const { testId } = this.data;
+    const card = TESTS.find((t) => t.id === testId);
+    const title = card ? `${card.title} - 心理测评中心` : (testId ? '测评 - 心理测评中心' : '心理测评中心');
+    return { title, path: `/pages/test/test?testId=${testId || ''}` };
+  },
+  onShareTimeline() {
+    const { testId } = this.data;
+    const card = TESTS.find((t) => t.id === testId);
+    return { title: card ? `${card.title} - 心理测评中心` : (testId ? '测评 - 心理测评中心' : '心理测评中心') };
+  },
   data: {
     testId: '',
     themeStyle: '',
@@ -19,7 +30,11 @@ Page({
     progress: 0,
     canSubmit: false
   },
+  onShow() {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
+  },
   onLoad(options) {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     const testId = options.testId || '';
     let config = getTestConfig(testId);
     const cardMeta = TESTS.find(t => t.id === testId);

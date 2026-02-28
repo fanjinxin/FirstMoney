@@ -26,7 +26,17 @@ Page({
     themeStyle: '',
   },
 
+  onShareAppMessage() {
+    return { title: 'RPI 恋爱占有欲指数测试 - 心理测评中心', path: '/pages/rpi-test/rpi-test' };
+  },
+  onShareTimeline() {
+    return { title: 'RPI 恋爱占有欲指数测试 - 心理测评中心' };
+  },
+  onShow() {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
+  },
   onLoad() {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     this.refreshByPerspective('self');
     const saved = wx.getStorageSync('app-theme-id') || 'summer-mint';
     const theme = THEMES.find(t => t.id === saved) || THEMES[2];

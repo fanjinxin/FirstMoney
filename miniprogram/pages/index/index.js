@@ -3,6 +3,8 @@ const { fillSampleAnswers, isSampleData, clearSampleFlag } = require('../../util
 const { clearAnswers } = require('../../utils/storage');
 const { THEMES, getThemeStyle } = require('../../data/themes');
 
+let _shareTargetId = '';
+
 function processTests(tests) {
   return tests.map(t => {
     const total = t.questionCount || 0;
@@ -27,13 +29,43 @@ Page({
     disclaimerTapCount: 0,
     showBackdoorBtn: false,
   },
+  onShareBtnTap(e) {
+    _shareTargetId = e.currentTarget.dataset.id || '';
+  },
+  onShareAppMessage() {
+    const id = _shareTargetId || '';
+    _shareTargetId = '';
+    if (id) {
+      const card = TESTS.find((t) => t.id === id);
+      const title = card ? `${card.title} - 心理测评中心` : '心理测评中心';
+      let path = '/pages/index/index';
+      if (id === 'scl90') path = '/pages/scl90-test/scl90-test';
+      else if (id === 'rpi') path = '/pages/rpi-test/rpi-test';
+      else if (id === 'animal') path = '/pages/animal-test/animal-test';
+      else path = `/pages/test/test?testId=${id}`;
+      return { title, path };
+    }
+    return { title: '心理测评中心 - 更酷的测评体验，快速获得多维度洞察', path: '/pages/index/index' };
+  },
+  onShareTimeline() {
+    const id = _shareTargetId || '';
+    if (id) {
+      const card = TESTS.find((t) => t.id === id);
+      return { title: card ? `${card.title} - 心理测评中心` : '心理测评中心' };
+    }
+    return { title: '心理测评中心 - 更酷的测评体验，快速获得多维度洞察' };
+  },
   onLoad() {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     const saved = wx.getStorageSync('app-theme-id') || 'summer-mint';
     const theme = THEMES.find(t => t.id === saved) || THEMES.find(t => t.id === 'summer-mint');
     this.setData({
       tests: processTests(TESTS),
       themeStyle: getThemeStyle(theme) || '',
     });
+  },
+  onShow() {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
   },
   onNavTabChange(e) {
     const { path } = e.detail || {};

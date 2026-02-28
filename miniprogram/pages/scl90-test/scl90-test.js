@@ -21,7 +21,17 @@ Page({
     themeStyle: '',
   },
 
+  onShareAppMessage() {
+    return { title: 'SCL-90 心理健康自评量表 - 心理测评中心', path: '/pages/scl90-test/scl90-test' };
+  },
+  onShareTimeline() {
+    return { title: 'SCL-90 心理健康自评量表 - 心理测评中心' };
+  },
+  onShow() {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
+  },
   onLoad() {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     const stored = loadAnswers(scl90Test.id) ?? {};
     const questions = scl90Test.questions;
     const total = questions.length;
