@@ -1,5 +1,6 @@
 /** 主题色：薄荷苏打 (Summer Mint)，含 rgb 用于 rgba 透明度 */
 page {
+  overflow-x: hidden;
   --xia-sky: #7FBFE1;
   --xia-aqua: #68D4DB;
   --xia-mint: #98E6E2;

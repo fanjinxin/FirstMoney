@@ -3,6 +3,7 @@
  */
 const { animalQuestions } = require('../../data/animal_sculpture');
 const { loadAnswers, saveAnswers, clearAnswers } = require('../../utils/storage');
+const { clearSampleFlag } = require('../../utils/testSample');
 const { THEMES, getThemeStyle } = require('../../data/themes');
 
 const ANIMAL_STORAGE_KEY = 'animal-sculpture';
@@ -32,7 +33,17 @@ Page({
     themeStyle: '',
   },
 
+  onShareAppMessage() {
+    return { title: '人格动物塑测试 - 心理测评中心', path: '/pages/animal-test/animal-test' };
+  },
+  onShareTimeline() {
+    return { title: '人格动物塑测试 - 心理测评中心' };
+  },
+  onShow() {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
+  },
   onLoad() {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     const stored = loadAnswers(ANIMAL_STORAGE_KEY) ?? {};
     const questions = animalQuestions;
     const total = questions.length;
@@ -64,6 +75,7 @@ Page({
   },
 
   onSelect(e) {
+    clearSampleFlag('animal');
     const value = e.currentTarget.dataset.value;
     const { currentQ, answers, questions, total } = this.data;
     const next = { ...answers, [currentQ.id]: Number(value) };
@@ -98,6 +110,13 @@ Page({
     if (current >= total - 1) return;
     const next = current + 1;
     this.setData({ current: next, currentQ: questions[next] });
+  },
+
+  onOverviewTap(e) {
+    const index = e.currentTarget.dataset.index;
+    if (index == null) return;
+    const { questions } = this.data;
+    this.setData({ current: index, currentQ: questions[index] });
   },
 
   onRestart() {

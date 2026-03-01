@@ -5,6 +5,7 @@ import QuestionOverview from '../../components/QuestionOverview'
 import SectionHeader from '../../components/SectionHeader'
 import { fftQuestions, FFT_TEST_ID } from '../../data/fft'
 import { loadAnswers, saveAnswers, clearAnswers } from '../../utils/storage'
+import { clearSampleFlag } from '../../utils/testSample'
 
 export default function FFTTest() {
   const navigate = useNavigate()
@@ -29,6 +30,7 @@ export default function FFTTest() {
   const progress = total > 0 ? (answeredCount / total) * 100 : 0
 
   const handleSelect = (optionIndex: number) => {
+    clearSampleFlag('fft')
     const next = { ...answers, [String(currentQuestion.id)]: optionIndex }
     setAnswers(next)
     saveAnswers(FFT_TEST_ID, next)

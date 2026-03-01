@@ -1,6 +1,5 @@
 {
   "usingComponents": {
-    "nav-header": "/components/nav-header/nav-header",
     "theme-switcher": "/components/theme-switcher/theme-switcher"
   },
   "navigationBarTitleText": "测评"

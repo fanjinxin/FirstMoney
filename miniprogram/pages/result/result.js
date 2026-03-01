@@ -1,8 +1,10 @@
 const { loadAnswers, clearAnswers } = require('../../utils/storage');
 const { calculateResult, calculateRpiScores, MBTI_POLE_LABELS } = require('../../utils/scoring');
+const { RESULT_PAGE_TITLES } = require('../../data/tests');
+const { getShareCardData } = require('../../utils/share-card');
 const { sriTest } = require('../../data/sri');
 const { THEMES, getThemeStyle } = require('../../data/themes');
-const { drawRadar, drawBar, drawPie, drawRpiBar, drawSriBar, drawFFTBar, drawHollandHexagon } = require('../../utils/chart-helper');
+const { drawRadar, drawBar, drawPie, drawRpiBar, drawSriBar, drawYBTBar, drawRVTBar, drawLBTBar, drawMPTBar, drawVBTBar, drawCityBar, drawFFTBar, drawHollandHexagon } = require('../../utils/chart-helper');
 
 function hexToRgb(hex) {
   const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -43,6 +45,7 @@ Page({
     mbtiInsight: null,
     mbtiPoleLabels: null,
     mbtiReport: null,
+    mbtiAvatarSrc: '',
     aatReport: null,
     psychAgeReport: null,
     aptReport: null,
@@ -57,8 +60,24 @@ Page({
     cityReport: null,
     chartColors: null,
   },
+  onShareAppMessage() {
+    const { testId } = this.data;
+    const title = RESULT_PAGE_TITLES[testId] || '测评结果 - 心理测评中心';
+    return { title, path: `/pages/result/result?testId=${testId || ''}` };
+  },
+  onShareTimeline() {
+    const { testId } = this.data;
+    return { title: RESULT_PAGE_TITLES[testId] || '测评结果 - 心理测评中心' };
+  },
+  onShow() {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
+  },
   onLoad(options) {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     const testId = options.testId || '';
+    const navTitle = RESULT_PAGE_TITLES[testId] || '测评结果';
+    wx.setNavigationBarTitle({ title: navTitle });
+
     const saved = wx.getStorageSync('app-theme-id') || 'summer-mint';
     const theme = THEMES.find(t => t.id === saved) || THEMES.find(t => t.id === 'summer-mint');
 
@@ -211,28 +230,53 @@ Page({
 
     let lbtReport = null;
     if (testId === 'lbt' && result && result.dimensionScores) {
-      const { LBT_PROFILES, LBT_LEVEL_LABELS, LBT_DIMENSION_BY_LEVEL, LBT_DIMENSION_INSIGHTS, LBT_RELATIONSHIP_TIPS, getLBTProfileKey } = require('../../data/lbt_insights');
+      const {
+        LBT_PROFILES,
+        LBT_LEVEL_LABELS,
+        LBT_DIMENSION_BY_LEVEL,
+        LBT_DIMENSION_INSIGHTS,
+        LBT_RELATIONSHIP_TIPS,
+        getLBTProfileKey,
+      } = require('../../data/lbt_insights');
+      const SUBJECT_SHORT = { depend: '情感依赖', prioritize: '优先倾斜', balance: '理性平衡' };
+      const DIM_ICONS = { depend: '/assets/icons/heart-filled.svg', prioritize: '/assets/icons/heart.svg', balance: '/assets/icons/compass.svg' };
       const profileKey = getLBTProfileKey(result.levelKey || 'moderate', result.dimensionScores);
       const profile = LBT_PROFILES[profileKey] || LBT_PROFILES.balanced;
-      const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
-      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
-        id: d.id, name: d.name, score: d.percent, level: d.level === 'high' ? 'moderate' : 'mild'
+      const dependPriMax = Math.max(...(result.dimensionScores || []).filter(x => x.id !== 'balance').map(x => x.percent), 0);
+      const radarData = (result.dimensionScores || []).map(d => ({ name: SUBJECT_SHORT[d.id] || d.name, score: d.percent }));
+      const barChartData = (result.dimensionScores || []).map(d => ({
+        id: d.id,
+        name: d.name,
+        score: d.percent,
+        level: LBT_LEVEL_LABELS[d.level],
+      }));
+      const threeTypeGrid = (result.dimensionScores || []).map(d => ({
+        id: d.id,
+        nameShort: SUBJECT_SHORT[d.id] || d.name,
+        percent: d.percent,
+        icon: DIM_ICONS[d.id],
+        isHighest: d.id !== 'balance' && d.percent === dependPriMax,
       }));
       const dimensionList = (result.dimensionScores || []).map(d => ({
         ...d,
         levelLabel: LBT_LEVEL_LABELS[d.level] || '',
-        levelHint: LBT_DIMENSION_BY_LEVEL[d.id]?.[d.level] || '',
+        levelConclusion: LBT_DIMENSION_BY_LEVEL[d.id]?.[d.level] || '',
         dimInsight: LBT_DIMENSION_INSIGHTS[d.id] || '',
+        barColorTeal: d.id === 'balance' && d.level === 'high',
+        dimIcon: DIM_ICONS[d.id],
       }));
-      const tips = LBT_RELATIONSHIP_TIPS[profileKey] || [];
       lbtReport = {
         formatDate: formatDate(),
         profile,
+        percent: result.percent,
+        levelLabel: result.level,
+        totalScore: result.totalScore,
+        maxTotalScore: result.maxTotalScore,
+        threeTypeGrid,
         radarData,
         barChartData,
         dimensionList,
-        tips,
-        levelLabel: result.level,
+        relationshipTips: LBT_RELATIONSHIP_TIPS[profileKey] || [],
       };
     }
 
@@ -569,124 +613,288 @@ Page({
 
     let ybtReport = null;
     if (testId === 'ybt' && result && result.dimensionScores) {
-      const { YBT_PROFILES, YBT_DIMENSION_INSIGHTS, getYBTProfileKey } = require('../../data/ybt_insights');
+      const {
+        YBT_PROFILES,
+        YBT_LEVEL_LABELS,
+        YBT_DIMENSION_INSIGHTS,
+        YBT_DIMENSION_BY_LEVEL,
+        YBT_RELATIONSHIP_TIPS,
+        getYBTProfileKey,
+      } = require('../../data/ybt_insights');
+      const PROFILE_IMAGES = {
+        gentle: '/assets/bingjiao/wenhe.jpg',
+        possessive: '/assets/bingjiao/zhanyouxing.jpg',
+        controlling: '/assets/bingjiao/kongzhixing.jpg',
+        dependent: '/assets/bingjiao/yilaixing.jpg',
+        extreme_risk: '/assets/bingjiao/qianzaibinjiaoqinxiao.jpg',
+        extreme_only: '/assets/bingjiao/jingjuexing.jpg',
+        balanced: '/assets/bingjiao/junhengxin.jpg',
+      };
+      const DIMENSION_IMAGES = {
+        possess: '/assets/bingjiao/zhanyouyu.jpg',
+        control: '/assets/bingjiao/kongzhiyu.jpg',
+        depend: '/assets/bingjiao/yilaidu.jpg',
+        extreme: '/assets/bingjiao/jiduanqinxiang.jpg',
+      };
       const profileKey = getYBTProfileKey(result.dimensionScores);
       const profile = YBT_PROFILES[profileKey] || YBT_PROFILES.balanced;
+      const sorted = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent);
+      const dominant = sorted[0];
+      const isRiskProfile = profileKey === 'extreme_risk' || profileKey === 'extreme_only';
       const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
-      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
-        id: d.id, name: d.name, score: d.percent, level: d.level === 'high' ? 'moderate' : d.level === 'low' ? 'normal' : 'mild'
+      const barChartData = sorted.map(d => ({
+        id: d.id,
+        name: d.name,
+        score: d.percent,
+        level: YBT_LEVEL_LABELS[d.level],
       }));
-      const dimensionList = (result.dimensionScores || []).map(d => ({ ...d, levelLabel: d.level === 'high' ? '偏高' : d.level === 'low' ? '偏低' : '适中' }));
+      const dimensionList = (result.dimensionScores || []).map(d => ({
+        ...d,
+        levelLabel: YBT_LEVEL_LABELS[d.level] || '',
+        levelConclusion: (YBT_DIMENSION_BY_LEVEL[d.id] || {})[d.level] || '',
+        isDominant: dominant && d.id === dominant.id,
+        dimImage: DIMENSION_IMAGES[d.id],
+      }));
       ybtReport = {
         formatDate: formatDate(),
         profile,
+        profileImage: PROFILE_IMAGES[profileKey] || PROFILE_IMAGES.balanced,
+        isRiskProfile,
+        avgPercent: result.avgPercent,
+        totalScore: result.totalScore,
+        maxTotalScore: result.maxTotalScore,
         radarData,
         barChartData,
         dimInsights: YBT_DIMENSION_INSIGHTS,
+        dimByLevel: YBT_DIMENSION_BY_LEVEL,
         dimensionList,
+        relationshipTips: YBT_RELATIONSHIP_TIPS[profileKey] || YBT_RELATIONSHIP_TIPS.balanced,
       };
     }
 
     let rvtReport = null;
     if (testId === 'rvt' && result && result.primaryType) {
-      const { RVT_PROFILES, RVT_DIMENSION_INSIGHTS } = require('../../data/rvt_insights');
-      const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
-      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
-        id: d.id, name: d.name, score: d.percent, level: d.id === result.primaryType.id ? 'normal' : 'mild'
+      const {
+        RVT_PROFILES,
+        RVT_LEVEL_LABELS,
+        RVT_DIMENSION_INSIGHTS,
+        RVT_DIMENSION_BY_LEVEL,
+        RVT_RELATIONSHIP_TIPS,
+        RVT_SUBJECT_SHORT,
+        RVT_DIMENSION_ICONS,
+        getRVTProfileKey,
+      } = require('../../data/rvt_insights');
+      const profileKey = getRVTProfileKey(result.primaryType, result.secondaryType);
+      const profile = RVT_PROFILES[profileKey] || RVT_PROFILES.balanced;
+      const sorted = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent);
+      const dominant = sorted[0];
+      const radarData = (result.dimensionScores || []).map(d => ({ name: RVT_SUBJECT_SHORT[d.id] || d.name, score: d.percent }));
+      const barChartData = sorted.map(d => ({
+        id: d.id,
+        name: d.name,
+        score: d.percent,
+        level: RVT_LEVEL_LABELS[d.level],
       }));
-      const primaryProfile = RVT_PROFILES[result.primaryType.id] || RVT_PROFILES.balanced;
-      const dimensionList = (result.dimensionScores || []).map(d => ({
-        ...d,
+      const sixTypeGrid = (result.dimensionScores || []).map(d => ({
+        id: d.id,
+        nameShort: RVT_SUBJECT_SHORT[d.id] || d.name,
+        percent: d.percent,
+        icon: RVT_DIMENSION_ICONS[d.id],
         isPrimary: d.id === result.primaryType.id,
         isSecondary: result.secondaryType && d.id === result.secondaryType.id,
       }));
+      const dimensionList = (result.dimensionScores || []).map(d => ({
+        ...d,
+        levelLabel: RVT_LEVEL_LABELS[d.level] || '',
+        levelConclusion: RVT_DIMENSION_BY_LEVEL[d.id]?.[d.level] || '',
+        dimInsight: RVT_DIMENSION_INSIGHTS[d.id] || '',
+        isDominant: dominant && d.id === dominant.id,
+        dimIcon: RVT_DIMENSION_ICONS[d.id],
+      }));
       rvtReport = {
         formatDate: formatDate(),
-        primaryProfile,
+        primaryType: result.primaryType,
+        secondaryType: result.secondaryType,
+        profileKey,
+        profile,
+        primaryIcon: RVT_DIMENSION_ICONS[result.primaryType.id],
+        thirdName: sorted[2] ? sorted[2].name : null,
+        sixTypeGrid,
         radarData,
         barChartData,
-        dimInsights: RVT_DIMENSION_INSIGHTS,
         dimensionList,
+        relationshipTips: RVT_RELATIONSHIP_TIPS[profileKey] || [],
       };
     }
 
     let mptReport = null;
     if (testId === 'mpt' && result && result.primaryType) {
-      const { MPT_PROFILES, MPT_LEVEL_LABELS, MPT_DIMENSION_BY_LEVEL, MPT_SCORE_PATTERN_INSIGHTS, MPT_DIMENSION_INSIGHTS, getMPTProfileKey } = require('../../data/mpt_insights');
+      const {
+        MPT_PROFILES,
+        MPT_LEVEL_LABELS,
+        MPT_DIMENSION_BY_LEVEL,
+        MPT_DIMENSION_BY_LEVEL_EXTENDED,
+        MPT_SCORE_PATTERN_INSIGHTS,
+        MPT_GROWTH_DIRECTIONS,
+        MPT_CAUTIONS,
+        MPT_PARTNER_MATCH,
+        MPT_DIMENSION_INSIGHTS,
+        MPT_RELATIONSHIP_TIPS,
+        MPT_SUBJECT_SHORT,
+        MPT_DIMENSION_ICONS,
+        getMPTProfileKey,
+        getComboInsight,
+      } = require('../../data/mpt_insights');
       const profileKey = getMPTProfileKey(result.primaryType, result.secondaryType);
-      const primaryProfile = MPT_PROFILES[profileKey] || MPT_PROFILES.balanced;
-      const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
-      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
-        id: d.id, name: d.name, score: d.percent, level: d.id === result.primaryType.id ? 'normal' : 'mild'
+      const profile = MPT_PROFILES[profileKey] || MPT_PROFILES.balanced;
+      const sorted = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent);
+      const dominant = sorted[0];
+      const radarData = (result.dimensionScores || []).map(d => ({ name: MPT_SUBJECT_SHORT[d.id] || d.name, score: d.percent }));
+      const barChartData = sorted.map(d => ({
+        id: d.id,
+        name: d.name,
+        score: d.percent,
+        level: MPT_LEVEL_LABELS[d.level],
       }));
       const patternInfo = MPT_SCORE_PATTERN_INSIGHTS[result.scorePattern] || MPT_SCORE_PATTERN_INSIGHTS.distinct;
-      const dimensionList = (result.dimensionScores || []).map(d => ({
-        ...d,
-        levelLabel: MPT_LEVEL_LABELS[d.level] || '',
-        levelHint: MPT_DIMENSION_BY_LEVEL[d.id]?.[d.level] || '',
-        dimInsight: MPT_DIMENSION_INSIGHTS[d.id] || '',
+      const fourTypeGrid = (result.dimensionScores || []).map(d => ({
+        id: d.id,
+        nameShort: MPT_SUBJECT_SHORT[d.id] || d.name,
+        percent: d.percent,
+        icon: MPT_DIMENSION_ICONS[d.id],
         isPrimary: d.id === result.primaryType.id,
         isSecondary: result.secondaryType && d.id === result.secondaryType.id,
       }));
+      const comboInsight = result.secondaryType ? getComboInsight(result.primaryType.id, result.secondaryType.id) : null;
+      const primaryExtended = MPT_DIMENSION_BY_LEVEL_EXTENDED[result.primaryType.id]?.[result.primaryType.level] || null;
+      const dimensionList = (result.dimensionScores || []).map(d => ({
+        ...d,
+        levelLabel: MPT_LEVEL_LABELS[d.level] || '',
+        levelConclusion: MPT_DIMENSION_BY_LEVEL[d.id]?.[d.level] || '',
+        dimInsight: MPT_DIMENSION_INSIGHTS[d.id] || '',
+        extendedSuggestion: MPT_DIMENSION_BY_LEVEL_EXTENDED[d.id]?.[d.level]?.suggestion || null,
+        dimIcon: MPT_DIMENSION_ICONS[d.id],
+        isDominant: dominant && d.id === dominant.id,
+      }));
+      const growthInfo = MPT_GROWTH_DIRECTIONS[profileKey] || null;
+      const cautionsInfo = MPT_CAUTIONS[profileKey] || null;
+      const partnerMatchInfo = MPT_PARTNER_MATCH[profileKey] || null;
       mptReport = {
         formatDate: formatDate(),
-        primaryProfile,
+        primaryType: result.primaryType,
+        secondaryType: result.secondaryType,
+        profileKey,
+        profile,
+        primaryIcon: MPT_DIMENSION_ICONS[result.primaryType.id],
+        thirdName: sorted[2] ? sorted[2].name : null,
+        fourTypeGrid,
         patternInfo,
+        comboInsight,
+        primaryExtended,
         radarData,
         barChartData,
         dimensionList,
+        relationshipTips: MPT_RELATIONSHIP_TIPS[profileKey] || [],
+        growthInfo,
+        cautionsInfo,
+        partnerMatchInfo,
       };
     }
 
     let vbtReport = null;
     if (testId === 'vbt' && result && result.profileKey) {
-      const { VBT_PROFILES, VBT_DIMENSION_BY_LEVEL, VBT_VULNERABILITY_ZONE_INSIGHTS, VBT_DIMENSION_INSIGHTS, VBT_SELF_PROTECTION_TIPS, getLevelLabel } = require('../../data/vbt_insights');
+      const { VBT_PROFILES, VBT_LEVEL_LABELS, VBT_DIMENSION_BY_LEVEL, VBT_DIMENSION_EXTENDED, VBT_VULNERABILITY_ZONE_INSIGHTS, VBT_DIMENSION_INSIGHTS, VBT_SELF_PROTECTION_TIPS, VBT_GROWTH_DIRECTIONS, VBT_CAUTIONS, VBT_SUBJECT_SHORT, VBT_DIMENSION_ICONS, getLevelLabel } = require('../../data/vbt_insights');
       const profile = VBT_PROFILES[result.profileKey] || VBT_PROFILES.robust;
       const zoneInfo = VBT_VULNERABILITY_ZONE_INSIGHTS[result.vulnerabilityZone] || VBT_VULNERABILITY_ZONE_INSIGHTS.mid;
-      const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
-      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
-        id: d.id, name: d.name, score: d.percent, level: d.id === 'sensitive' ? (d.level === 'high' ? 'moderate' : d.level === 'low' ? 'normal' : 'mild') : (d.level === 'high' ? 'normal' : d.level === 'low' ? 'mild' : 'mild')
-      }));
-      const dimensionList = (result.dimensionScores || []).map(d => ({
-        ...d,
-        levelLabel: getLevelLabel(d.id, d.level),
-        levelHint: VBT_DIMENSION_BY_LEVEL[d.id]?.[d.level] || '',
-        dimInsight: VBT_DIMENSION_INSIGHTS[d.id] || '',
-        isWeakest: result.weakestDimension && d.id === result.weakestDimension.id,
-      }));
+      const protectDims = (result.dimensionScores || []).filter(d => d.id !== 'sensitive');
+      const radarData = (result.dimensionScores || []).map(d => ({ name: VBT_SUBJECT_SHORT[d.id] || d.name, score: d.percent }));
+      const barChartData = protectDims.map(d => ({ name: d.name, score: d.percent, level: VBT_LEVEL_LABELS[d.level] }));
+      const zoneColorMap = { low: 'vbt-zone-low', low_mid: 'vbt-zone-low-mid', mid: 'vbt-zone-mid', mid_high: 'vbt-zone-mid-high', high: 'vbt-zone-high' };
+      const fourTypeGrid = (result.dimensionScores || []).map(d => {
+        const isWeak = (d.id !== 'sensitive' && d.percent < 50) || (d.id === 'sensitive' && d.percent >= 65);
+        const isStrong = d.id !== 'sensitive' && d.percent >= 70;
+        return { id: d.id, nameShort: VBT_SUBJECT_SHORT[d.id] || d.name, percent: d.percent, icon: VBT_DIMENSION_ICONS[d.id], isStrong, isWeak };
+      });
+      const dimensionList = (result.dimensionScores || []).map(d => {
+        const isProtectDim = d.id !== 'sensitive';
+        const isWeak = isProtectDim ? d.percent < 50 : d.percent >= 65;
+        const ext = VBT_DIMENSION_EXTENDED[d.id]?.[d.level];
+        let barColorClass = 'vbt-bar-teal';
+        if (isProtectDim) {
+          barColorClass = d.percent >= 70 ? 'vbt-bar-teal' : d.percent < 50 ? 'vbt-bar-sky' : 'vbt-bar-aqua';
+        } else {
+          barColorClass = d.percent >= 65 ? 'vbt-bar-sky' : 'vbt-bar-teal';
+        }
+        return {
+          ...d,
+          levelLabel: getLevelLabel(d.id, d.level),
+          levelConclusion: VBT_DIMENSION_BY_LEVEL[d.id]?.[d.level] || '',
+          extendedSuggestion: ext?.suggestion || '',
+          dimInsight: VBT_DIMENSION_INSIGHTS[d.id] || '',
+          dimIcon: VBT_DIMENSION_ICONS[d.id],
+          isWeak,
+          isProtectDim,
+          barColorClass,
+        };
+      });
       const tips = VBT_SELF_PROTECTION_TIPS[result.profileKey] || [];
+      const growthInfo = VBT_GROWTH_DIRECTIONS[result.profileKey] || null;
+      const cautionsInfo = VBT_CAUTIONS[result.profileKey] ? { points: VBT_CAUTIONS[result.profileKey] } : null;
+      const weakestExt = result.weakestDimension && result.weakestDimension.id !== 'sensitive'
+        ? VBT_DIMENSION_EXTENDED[result.weakestDimension.id]?.[result.weakestDimension.level]
+        : null;
       vbtReport = {
         formatDate: formatDate(),
         profile,
         zoneInfo,
+        zoneColorClass: zoneColorMap[result.vulnerabilityZone] || 'vbt-zone-mid',
         vulnerabilityIndex: result.vulnerabilityIndex,
+        primaryIcon: '/assets/icons/shield.svg',
         radarData,
         barChartData,
+        fourTypeGrid,
         dimensionList,
         tips,
+        growthInfo,
+        cautionsInfo,
+        weakestDimension: result.weakestDimension,
+        weakestExtended: weakestExt,
       };
     }
 
     let cityReport = null;
     if (testId === 'city' && result && result.topCities) {
-      const { CITY_PROFILES, CITY_LEVEL_LABELS, CITY_DIMENSION_BY_LEVEL, CITY_DIMENSION_INSIGHTS } = require('../../data/city_insights');
+      const { CITY_PROFILES, CITY_LEVEL_LABELS, CITY_DIMENSION_BY_LEVEL, CITY_DIMENSION_INSIGHTS, CITY_METHODOLOGY, CITY_SUBJECT_SHORT, CITY_DIMENSION_ICONS } = require('../../data/city_insights');
       const profile = CITY_PROFILES[result.profileKey] || CITY_PROFILES.balanced;
-      const radarData = (result.dimensionScores || []).map(d => ({ name: d.name, score: d.percent }));
-      const barChartData = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent).map(d => ({
-        id: d.id, name: d.name, score: d.percent, level: d.level === 'high' ? 'normal' : 'mild'
+      const dimOrder = ['climate', 'pace', 'culture', 'cost', 'social'];
+      const radarData = (result.dimensionScores || []).map(d => ({ name: CITY_SUBJECT_SHORT[d.id] || d.name, score: d.percent }));
+      const sorted = [...(result.dimensionScores || [])].sort((a, b) => b.percent - a.percent);
+      const barChartData = sorted.map(d => ({ name: d.name, score: d.percent, level: CITY_LEVEL_LABELS[d.level] }));
+      const fourTypeGrid = (result.dimensionScores || []).map(d => ({
+        id: d.id, nameShort: CITY_SUBJECT_SHORT[d.id] || d.name, percent: d.percent, icon: CITY_DIMENSION_ICONS[d.id],
       }));
       const dimensionList = (result.dimensionScores || []).map(d => ({
         ...d,
         levelLabel: CITY_LEVEL_LABELS[d.level] || '',
-        levelHint: CITY_DIMENSION_BY_LEVEL[d.id]?.[d.level] || '',
+        levelConclusion: CITY_DIMENSION_BY_LEVEL[d.id]?.[d.level] || '',
         dimInsight: CITY_DIMENSION_INSIGHTS[d.id] || '',
+        dimIcon: CITY_DIMENSION_ICONS[d.id],
       }));
-      const topCities = (result.topCities || []).map(m => ({ city: m.city, matchPercent: m.matchPercent, matchReason: m.matchReason }));
+      const topCities = (result.topCities || []).map(m => ({
+        city: m.city,
+        matchPercent: m.matchPercent,
+        matchReason: m.matchReason,
+        dimensionMatch: m.dimensionMatch || {},
+        dimMatchList: dimOrder.map(id => ({ id, name: CITY_SUBJECT_SHORT[id], percent: Math.round(m.dimensionMatch?.[id] ?? 0) })),
+      }));
       cityReport = {
         formatDate: formatDate(),
         profile,
         suggestedType: result.suggestedType,
+        primaryIcon: '/assets/icons/mappin.svg',
         topCities,
+        fourTypeGrid,
+        methodology: CITY_METHODOLOGY,
         radarData,
         barChartData,
         dimensionList,
@@ -755,7 +963,8 @@ Page({
       };
     }
 
-    this.setData({ testId, result, themeStyle: getThemeStyle(theme) || '', scl90Report, sriReport, rpiReport, lbtReport, animalReport, mbtiInsight, mbtiPoleLabels, mbtiReport, aatReport, psychAgeReport, aptReport, hitReport, dthReport, tlaReport, fftReport, ybtReport, rvtReport, mptReport, vbtReport, cityReport, chartColors: buildChartColors(theme) }, () => {
+    const mbtiAvatarSrc = (testId === 'mbti' && result?.type) ? `/assets/mbti/${result.type.toLowerCase()}.svg` : '';
+    this.setData({ testId, result, mbtiAvatarSrc, themeStyle: getThemeStyle(theme) || '', scl90Report, sriReport, rpiReport, lbtReport, animalReport, mbtiInsight, mbtiPoleLabels, mbtiReport, aatReport, psychAgeReport, aptReport, hitReport, dthReport, tlaReport, fftReport, ybtReport, rvtReport, mptReport, vbtReport, cityReport, chartColors: buildChartColors(theme) }, () => {
       this.scheduleChartsDraw();
     });
   },
@@ -798,28 +1007,43 @@ Page({
       drawFFTBar(page, 'result-bar', r.barChartData, 100);
     } else if (testId === 'ybt' && this.data.ybtReport) {
       const r = this.data.ybtReport;
-      drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
-      drawBar(page, 'result-bar', r.barChartData, chartColors, 100);
+      const ybtChartColors = {
+        fillRgba: 'rgba(190, 18, 60, 0.25)',
+        textColor: '#2C6F7A',
+        strokeRgba: 'rgba(190, 18, 60, 0.5)',
+      };
+      drawRadar(page, 'result-radar', r.radarData, ybtChartColors, 100);
+      drawYBTBar(page, 'ybt-bar', r.barChartData, 100);
     } else if (testId === 'rvt' && this.data.rvtReport) {
       const r = this.data.rvtReport;
-      drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
-      drawBar(page, 'result-bar', r.barChartData, chartColors, 100);
+      const rvtChartColors = {
+        fillRgba: 'rgba(190, 18, 60, 0.25)',
+        textColor: '#2C6F7A',
+        strokeRgba: 'rgba(190, 18, 60, 0.5)',
+      };
+      drawRadar(page, 'result-radar', r.radarData, rvtChartColors, 100);
+      drawRVTBar(page, 'result-bar', r.barChartData, 100);
     } else if (testId === 'mpt' && this.data.mptReport) {
       const r = this.data.mptReport;
       drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
-      drawBar(page, 'result-bar', r.barChartData, chartColors, 100);
+      drawMPTBar(page, 'mpt-bar', r.barChartData, 100);
     } else if (testId === 'vbt' && this.data.vbtReport) {
       const r = this.data.vbtReport;
       drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
-      drawBar(page, 'result-bar', r.barChartData, chartColors, 100);
+      drawVBTBar(page, 'vbt-bar', r.barChartData, 100);
     } else if (testId === 'city' && this.data.cityReport) {
       const r = this.data.cityReport;
       drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
-      drawBar(page, 'result-bar', r.barChartData, chartColors, 100);
+      drawCityBar(page, 'city-bar', r.barChartData, 100);
     } else if (testId === 'lbt' && this.data.lbtReport) {
       const r = this.data.lbtReport;
-      drawRadar(page, 'result-radar', r.radarData, chartColors, 100);
-      drawBar(page, 'result-bar', r.barChartData, chartColors, 100);
+      const lbtChartColors = {
+        fillRgba: 'rgba(219, 39, 119, 0.25)',
+        textColor: '#2C6F7A',
+        strokeRgba: 'rgba(219, 39, 119, 0.5)',
+      };
+      drawRadar(page, 'result-radar', r.radarData, lbtChartColors, 100);
+      drawLBTBar(page, 'lbt-bar', r.barChartData, 100);
     } else if (testId === 'mbti' && this.data.mbtiReport) {
       const r = this.data.mbtiReport;
       drawRadar(page, 'result-radar', r.radarData, chartColors, r.radarMaxValue || 10);
@@ -868,5 +1092,353 @@ Page({
         }
       }
     });
-  }
+  },
+  onShareTap() {
+    const { testId, result, scl90Report, rpiReport, lbtReport, sriReport, animalReport, mbtiReport, aatReport, psychAgeReport, cityReport, fftReport, ybtReport, rvtReport, mptReport, vbtReport, dthReport, tlaReport, hitReport, aptReport } = this.data;
+    if (!testId || !result) {
+      wx.showToast({ title: '暂无结果可分享', icon: 'none' });
+      return;
+    }
+    wx.showLoading({ title: '生成中...' });
+    const reports = {
+      scl90Report, rpiReport, lbtReport, sriReport, animalReport, mbtiReport,
+      aatReport, psychAgeReport, cityReport, fftReport, ybtReport, rvtReport,
+      mptReport, vbtReport, dthReport, tlaReport, hitReport, aptReport,
+    };
+    let cardData;
+    try {
+      cardData = getShareCardData(testId, result, reports);
+    } catch (e) {
+      wx.hideLoading();
+      wx.showToast({ title: '获取内容失败', icon: 'none' });
+      return;
+    }
+    const page = this;
+    wx.getImageInfo({
+      src: '/assets/share-qrcode.png',
+      success: (imgRes) => {
+        page._drawShareCanvas(cardData, imgRes.path);
+      },
+      fail: () => {
+        page._drawShareCanvas(cardData, '');
+      },
+    });
+  },
+  _drawShareCanvas(cardData, qrPath) {
+    const page = this;
+    const ctx = wx.createCanvasContext('shareCanvas', this);
+    const w = 600;
+    const h = 820;
+    const cardW = w - 80;
+    const cardX = 40;
+    const cardH = 540;
+    const qrY = 560;
+    const qrSize = 180;
+
+    ctx.setFillStyle('#fff');
+    ctx.fillRect(0, 0, w, h);
+
+    const wrapText = (text, maxChars) => {
+      if (!text) return [];
+      const str = String(text);
+      const lines = [];
+      for (let i = 0; i < str.length; i += maxChars) {
+        lines.push(str.slice(i, i + maxChars));
+      }
+      return lines;
+    };
+
+    const drawCardBg = () => {
+      ctx.setFillStyle('rgba(248, 250, 252, 1)');
+      ctx.fillRect(cardX, 30, cardW, cardH);
+      ctx.setStrokeStyle('rgba(0,0,0,0.06)');
+      ctx.setLineWidth(1);
+      ctx.strokeRect(cardX, 30, cardW, cardH);
+    };
+
+    const drawTitleBar = (titleText) => {
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(24);
+      ctx.setTextAlign('center');
+      ctx.fillText(titleText || '测评结果', w / 2, 65);
+    };
+
+    const drawQR = () => {
+      if (qrPath) {
+        ctx.drawImage(qrPath, (w - qrSize) / 2, qrY, qrSize, qrSize);
+      } else {
+        ctx.setFillStyle('#eee');
+        ctx.fillRect((w - qrSize) / 2, qrY, qrSize, qrSize);
+        ctx.setFillStyle('#999');
+        ctx.setFontSize(18);
+        ctx.fillText('扫码体验', w / 2, qrY + qrSize / 2 + 6);
+      }
+      ctx.setFillStyle('#999');
+      ctx.setFontSize(16);
+      ctx.fillText('喜欢就分享给朋友们吧', w / 2, qrY + qrSize + 32);
+    };
+
+    const layout = cardData.layout || 'generic';
+
+    if (layout === 'scl90') {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#2C6F7A');
+      ctx.setFontSize(20);
+      ctx.setTextAlign('left');
+      ctx.fillText(cardData.cardTitle || '心理健康画像', cardX + 24, 110);
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(26);
+      ctx.fillText(cardData.mainValue || '', cardX + 24, 150);
+      const descLines = wrapText(cardData.desc || '', 28);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(18);
+      descLines.slice(0, 4).forEach((line, i) => {
+        ctx.fillText(line, cardX + 24, 190 + i * 28);
+      });
+      ctx.setFillStyle('#2C6F7A');
+      ctx.setFontSize(16);
+      ctx.fillText(`${cardData.coreLabel || '核心结论'}：${cardData.coreValue || ''}`, cardX + 24, 300);
+      drawQR();
+    } else if (layout === 'rpi') {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#999');
+      ctx.setFontSize(14);
+      ctx.setTextAlign('left');
+      ctx.fillText(cardData.cardSub || '', cardX + 24, 105);
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(22);
+      ctx.fillText(cardData.cardTitle || '关系占有欲画像', cardX + 24, 135);
+      const descLines = wrapText(cardData.desc || '', 32);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(16);
+      descLines.slice(0, 3).forEach((line, i) => {
+        ctx.fillText(line, cardX + 24, 175 + i * 26);
+      });
+      (cardData.tags || []).forEach((tag, i) => {
+        ctx.setFillStyle('#2C6F7A');
+        ctx.setFontSize(15);
+        ctx.fillText(tag, cardX + 24, 270 + i * 28);
+      });
+      drawQR();
+    } else if (layout === 'sri') {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#999');
+      ctx.setFontSize(14);
+      ctx.setTextAlign('left');
+      ctx.fillText(cardData.cardSub || '', cardX + 24, 105);
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(20);
+      ctx.fillText(cardData.cardTitle || '', cardX + 24, 135);
+      const descLines = wrapText(cardData.desc || '', 32);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(16);
+      descLines.slice(0, 3).forEach((line, i) => {
+        ctx.fillText(line, cardX + 24, 175 + i * 26);
+      });
+      (cardData.tags || []).forEach((tag, i) => {
+        ctx.setFillStyle('#2C6F7A');
+        ctx.setFontSize(15);
+        ctx.fillText(tag, cardX + 24, 270 + i * 28);
+      });
+      drawQR();
+    } else if (layout === 'lbt') {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#888');
+      ctx.setFontSize(14);
+      ctx.setTextAlign('left');
+      ctx.fillText(cardData.meta || '', cardX + 24, 105);
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(22);
+      ctx.fillText(cardData.mainTitle || '', cardX + 24, 140);
+      ctx.setFillStyle('#2C6F7A');
+      ctx.setFontSize(16);
+      ctx.fillText(`${cardData.badgeLabel || '整体'} ${cardData.badgeValue || ''} ${cardData.badgePct || ''}`, cardX + 24, 175);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(15);
+      ctx.fillText(cardData.threeTypeTitle || '三维得分', cardX + 24, 210);
+      (cardData.threeType || []).forEach((item, i) => {
+        const x = cardX + 24 + (i % 3) * 175;
+        const y = 240 + Math.floor(i / 3) * 45;
+        ctx.setFillStyle(item.isHighest ? '#2C6F7A' : '#666');
+        ctx.fillText(`${item.name} ${item.percent}%`, x, y);
+      });
+      drawQR();
+    } else if (layout === 'mbti') {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#888');
+      ctx.setFontSize(14);
+      ctx.setTextAlign('center');
+      ctx.fillText(cardData.cardSub || '你的人格类型', w / 2, 105);
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(28);
+      ctx.fillText(`${cardData.typeCode || ''} · ${cardData.typeName || ''}`, w / 2, 145);
+      if (cardData.typeNameEn) {
+        ctx.setFillStyle('#666');
+        ctx.setFontSize(16);
+        ctx.fillText(cardData.typeNameEn, w / 2, 175);
+      }
+      if (cardData.slogan) {
+        ctx.setFillStyle('#2C6F7A');
+        ctx.setFontSize(18);
+        ctx.fillText(cardData.slogan, w / 2, 210);
+      }
+      const descLines = wrapText(cardData.desc || '', 28);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(16);
+      descLines.slice(0, 4).forEach((line, i) => {
+        ctx.fillText(line, w / 2, 250 + i * 24);
+      });
+      const strengthStr = (cardData.strengths || []).slice(0, 5).map(s => `#${s}`).join(' ');
+      if (strengthStr) {
+        ctx.setFillStyle('#2C6F7A');
+        ctx.setFontSize(14);
+        ctx.fillText(strengthStr, w / 2, 360);
+      }
+      drawQR();
+    } else if (layout === 'animal') {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#888');
+      ctx.setFontSize(14);
+      ctx.setTextAlign('center');
+      ctx.fillText(cardData.cardSub || '您的精神动物是', w / 2, 105);
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(28);
+      ctx.fillText(cardData.mainName || '', w / 2, 145);
+      const descLines = wrapText(cardData.mainDesc || '', 28);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(16);
+      descLines.slice(0, 4).forEach((line, i) => {
+        ctx.fillText(line, w / 2, 185 + i * 26);
+      });
+      const traitStr = (cardData.traits || []).slice(0, 6).map(t => `#${t}`).join(' ');
+      if (traitStr) {
+        ctx.setFillStyle('#2C6F7A');
+        ctx.setFontSize(14);
+        ctx.fillText(traitStr, w / 2, 300);
+      }
+      if (cardData.secondaryName) {
+        ctx.setFillStyle('#666');
+        ctx.setFontSize(14);
+        ctx.fillText(`潜在特质：${cardData.secondaryName}`, w / 2, 335);
+      }
+      drawQR();
+    } else if (layout === 'aat') {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#888');
+      ctx.setFontSize(14);
+      ctx.setTextAlign('left');
+      ctx.fillText(cardData.cardSub || '', cardX + 24, 105);
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(22);
+      ctx.fillText(cardData.cardTitle || '综合适应指数', cardX + 24, 140);
+      ctx.setFillStyle('#2C6F7A');
+      ctx.setFontSize(20);
+      ctx.fillText(`${cardData.totalPercent ?? 0}%`, cardX + 24, 180);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(16);
+      ctx.fillText(cardData.levelLabel || '', cardX + 100, 180);
+      const descLines = wrapText(cardData.levelDesc || '', 32);
+      ctx.setFontSize(15);
+      descLines.slice(0, 2).forEach((line, i) => {
+        ctx.fillText(line, cardX + 24, 220 + i * 24);
+      });
+      ctx.setFillStyle('#888');
+      ctx.fillText(cardData.meta || '', cardX + 24, 280);
+      (cardData.stats || []).forEach((s, i) => {
+        const baseY = 310 + i * 42;
+        ctx.setFillStyle('#666');
+        ctx.setFontSize(14);
+        ctx.fillText(s.label || '', cardX + 24, baseY);
+        ctx.fillText(`${s.value || ''} · ${s.hint || ''}`, cardX + 24, baseY + 22);
+      });
+      drawQR();
+    } else if (layout === 'psych-age') {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#888');
+      ctx.setFontSize(14);
+      ctx.setTextAlign('left');
+      ctx.fillText(cardData.cardSub || '心理年龄测验', cardX + 24, 105);
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(26);
+      ctx.fillText(cardData.mainValue || '', cardX + 24, 150);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(16);
+      ctx.fillText(cardData.mainLabel || '', cardX + 24, 190);
+      const descLines = wrapText(cardData.desc || '', 32);
+      ctx.setFontSize(15);
+      descLines.slice(0, 2).forEach((line, i) => {
+        ctx.fillText(line, cardX + 24, 230 + i * 26);
+      });
+      if (cardData.youngestDim || cardData.oldestDim) {
+        ctx.setFillStyle('#2C6F7A');
+        ctx.setFontSize(14);
+        ctx.fillText(`最年轻：${cardData.youngestDim || '-'}`, cardX + 24, 300);
+        ctx.fillText(`最成熟：${cardData.oldestDim || '-'}`, cardX + 24, 328);
+      }
+      drawQR();
+    } else if (layout === 'city') {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#888');
+      ctx.setFontSize(14);
+      ctx.setTextAlign('center');
+      ctx.fillText(cardData.cardSub || '', w / 2, 105);
+      ctx.setFillStyle('#1a3a3a');
+      ctx.setFontSize(22);
+      ctx.fillText(cardData.mainTitle || '', w / 2, 145);
+      const descLines = wrapText(cardData.mainDesc || '', 28);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(16);
+      descLines.slice(0, 3).forEach((line, i) => {
+        ctx.fillText(line, w / 2, 185 + i * 26);
+      });
+      if (cardData.focus || cardData.typicalCities) {
+        ctx.setFillStyle('#2C6F7A');
+        ctx.setFontSize(15);
+        ctx.fillText(cardData.focus || '', w / 2, 280);
+        ctx.fillText(cardData.typicalCities || '', w / 2, 308);
+      }
+      drawQR();
+    } else {
+      drawCardBg();
+      drawTitleBar(cardData.title);
+      ctx.setFillStyle('#2C6F7A');
+      ctx.setFontSize(24);
+      ctx.setTextAlign('center');
+      ctx.fillText(cardData.mainValue || cardData.summary || '查看完整报告', w / 2, 200);
+      const descLines = wrapText(cardData.desc || '', 28);
+      ctx.setFillStyle('#555');
+      ctx.setFontSize(18);
+      descLines.slice(0, 6).forEach((line, i) => {
+        ctx.fillText(line, w / 2, 260 + i * 28);
+      });
+      drawQR();
+    }
+
+    ctx.draw(false, () => {
+      wx.hideLoading();
+      setTimeout(() => {
+        wx.canvasToTempFilePath({
+          canvasId: 'shareCanvas',
+          success: (res) => {
+            wx.previewImage({
+              urls: [res.tempFilePath],
+              current: res.tempFilePath,
+            });
+          },
+          fail: (err) => {
+            wx.showToast({ title: '生成图片失败，请重试', icon: 'none' });
+          },
+        }, page);
+      }, 100);
+    });
+  },
 });

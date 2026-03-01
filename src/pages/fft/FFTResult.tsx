@@ -19,7 +19,6 @@ import { calculateFFTResult } from '../../utils/fft_scoring'
 import { loadAnswers } from '../../utils/storage'
 import { FFT_TEST_ID } from '../../data/fft'
 import { FFT_FRUIT_INSIGHTS, FFT_FRUIT_EMOJI } from '../../data/fft_insights'
-
 const FRUIT_COLORS: Record<string, string> = {
   apple: '#e74c3c',
   grape: '#9b59b6',

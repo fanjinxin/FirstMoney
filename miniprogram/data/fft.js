@@ -77,7 +77,7 @@ const fftTest = {
   subtitle: '九型水果人格',
   description: '通过 54 道情境选择题，探索你的水果人格类型。苹果、葡萄、草莓、橙子、柠檬、香蕉、梨、樱桃、柚子代表不同性格倾向。',
   instructions: ['每题三选一，选择最符合你的选项', '无对错之分，凭第一直觉作答'],
-  format: 'choice',
+  format: 'choice-buttons',
   questions: fftQuestions.map(q => ({ id: String(q.id), text: q.text, options: q.options, scores: q.scores })),
 };
 

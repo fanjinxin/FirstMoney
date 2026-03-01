@@ -5,6 +5,7 @@ import QuestionOverview from '../../components/QuestionOverview'
 import SectionHeader from '../../components/SectionHeader'
 import { dthQuestions, DTH_TEST_ID } from '../../data/dth'
 import { loadAnswers, saveAnswers, clearAnswers } from '../../utils/storage'
+import { clearSampleFlag } from '../../utils/testSample'
 
 const OPTIONS = ['完全不同意', '不太同意', '一般', '比较同意', '完全同意']
 
@@ -49,6 +50,7 @@ export default function DTHTest() {
   const progress = total > 0 ? (answeredCount / total) * 100 : 0
 
   const handleSelect = (optionIndex: number) => {
+    clearSampleFlag('dth')
     const next = { ...answers, [String(currentQuestion.id)]: optionIndex }
     setAnswers(next)
     saveAnswers(DTH_TEST_ID, next)

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { clearSampleFlag } from '../utils/testSample'
 import ProgressBar from './ProgressBar'
 import QuestionOverview from './QuestionOverview'
 import SectionHeader from './SectionHeader'
@@ -55,6 +56,7 @@ export default function StandardTest({
   const progress = total > 0 ? (answeredCount / total) * 100 : 0
 
   const handleSelect = (optionIndex: number) => {
+    clearSampleFlag(config.testId)
     const next = { ...answers, [String(currentQuestion.id)]: optionIndex }
     setAnswers(next)
     saveAnswers(config.testId, next)
@@ -101,28 +103,49 @@ export default function StandardTest({
               题目 {current + 1}/{total}
             </div>
             <div className="mt-2 text-base font-medium text-xia-deep sm:text-lg">{currentQuestion.text}</div>
-            <div className="mt-4 grid gap-3">
-              {config.options.map((opt, index) => {
-                const isSelected = answers[String(currentQuestion.id)] === index
-                return (
-                  <button
-                    key={index}
-                    onClick={() => handleSelect(index)}
-                    className={`group flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left text-sm transition-all duration-200 sm:text-base ${
-                      isSelected
-                        ? 'border-xia-deep bg-xia-deep text-white shadow-md'
-                        : 'border-xia-haze/50 bg-white hover:border-xia-deep/30 hover:bg-xia-cream/20 text-xia-deep'
-                    }`}
-                  >
-                    <span className="font-medium">{opt}</span>
-                    {isSelected && (
-                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                  </button>
-                )
-              })}
+            <div className="mt-4">
+              <div className="flex items-center gap-4">
+                <span className="shrink-0 max-w-[120px] text-left text-xs font-semibold text-xia-deep sm:text-sm">
+                  {config.options[0]}
+                </span>
+                <div className="flex flex-1 items-center justify-between gap-4 px-2">
+                  {config.options.map((opt, index) => {
+                    const isSelected = answers[String(currentQuestion.id)] === index
+                    const dotSize =
+                      config.options.length === 3
+                        ? index === 0 || index === 2
+                          ? 'h-10 w-10 sm:h-12 sm:w-12'
+                          : 'h-6 w-6 sm:h-8 sm:w-8'
+                        : config.options.length === 5
+                          ? index === 0 || index === 4
+                            ? 'h-10 w-10 sm:h-12 sm:w-12'
+                            : index === 1 || index === 3
+                              ? 'h-8 w-8 sm:h-10 sm:w-10'
+                              : 'h-5 w-5 sm:h-7 sm:w-7'
+                          : 'h-10 w-10 sm:h-12 sm:w-12'
+                    return (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => handleSelect(index)}
+                        className={`shrink-0 rounded-full border-2 transition-all ${dotSize} ${
+                          isSelected
+                            ? index === 0
+                              ? 'border-xia-sky bg-xia-sky'
+                              : 'border-xia-deep bg-xia-deep'
+                            : 'border-xia-haze/50 bg-white hover:border-xia-teal/50'
+                        }`}
+                      />
+                    )
+                  })}
+                </div>
+                <span className="shrink-0 max-w-[120px] text-right text-xs font-semibold text-xia-deep sm:text-sm">
+                  {config.options[config.options.length - 1]}
+                </span>
+              </div>
+              <p className="mt-2 text-center text-xs text-xia-deep/70">
+                从左到右：{config.options[0]} → {config.options[config.options.length - 1]}
+              </p>
             </div>
           </div>
           <div className="flex items-center justify-between">
