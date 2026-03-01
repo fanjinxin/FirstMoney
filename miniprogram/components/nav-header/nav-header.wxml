@@ -1,11 +1,11 @@
-<view class="nav-header">
+<view class="nav-header {{sticky ? 'nav-header-sticky' : ''}}">
   <view class="nav-inner">
-    <view class="nav-logo" bindtap="onNavTap" data-item="{{navItems[0]}}">心理测评中心</view>
     <scroll-view class="nav-scroll" scroll-x enhanced show-scrollbar="{{false}}">
       <view class="nav-list">
         <view 
           wx:for="{{navItems}}" 
           wx:key="path"
+          id="nav-{{item.path === '/' ? 'home' : item.testId}}"
           class="nav-item {{currentPath === item.path ? 'active' : ''}} {{item.path === '/' ? 'home' : ''}}"
           data-item="{{item}}"
           bindtap="onNavTap"

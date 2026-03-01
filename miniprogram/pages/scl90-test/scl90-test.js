@@ -2,7 +2,9 @@
  * SCL-90 选择页面 - 逐行移植自 src/pages/scl90/SCL90Test.tsx
  */
 const { scl90Test } = require('../../data/scl90');
-const { loadAnswers, saveAnswers } = require('../../utils/storage');
+const { TESTS } = require('../../data/tests');
+const { loadAnswers, saveAnswers, clearAnswers } = require('../../utils/storage');
+const { clearSampleFlag } = require('../../utils/testSample');
 const { THEMES, getThemeStyle } = require('../../data/themes');
 
 Page({
@@ -19,7 +21,17 @@ Page({
     themeStyle: '',
   },
 
+  onShareAppMessage() {
+    return { title: 'SCL-90 心理健康自评量表 - 心理测评中心', path: '/pages/scl90-test/scl90-test' };
+  },
+  onShareTimeline() {
+    return { title: 'SCL-90 心理健康自评量表 - 心理测评中心' };
+  },
+  onShow() {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
+  },
   onLoad() {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     const stored = loadAnswers(scl90Test.id) ?? {};
     const questions = scl90Test.questions;
     const total = questions.length;
@@ -37,9 +49,13 @@ Page({
 
     const saved = wx.getStorageSync('app-theme-id') || 'summer-mint';
     const theme = THEMES.find((t) => t.id === saved) || THEMES[2];
+    const cardMeta = TESTS.find((t) => t.id === 'scl90');
+    const testWithIcon = cardMeta ? { ...scl90Test, iconType: cardMeta.iconType, iconBg: cardMeta.iconBg } : scl90Test;
+    const scaleOptions = [...scl90Test.options].sort((a, b) => b.value - a.value);
 
     this.setData({
-      test: scl90Test,
+      test: testWithIcon,
+      scaleOptions,
       questions,
       answers: stored,
       current,
@@ -53,6 +69,7 @@ Page({
   },
 
   onSelect(e) {
+    clearSampleFlag('scl90');
     const value = e.currentTarget.dataset.value;
     const { currentQ, answers, questions, total } = this.data;
     const next = { ...answers, [currentQ.id]: Number(value) };
@@ -86,6 +103,18 @@ Page({
     });
   },
 
+  onRestart() {
+    wx.showModal({
+      title: '确认',
+      content: '确定要重新开始吗？当前的作答进度将被清空。',
+      success: (res) => {
+        if (res.confirm) {
+          clearAnswers(scl90Test.id);
+          this.onLoad();
+        }
+      },
+    });
+  },
   goPrev() {
     const { current, questions } = this.data;
     if (current <= 0) return;

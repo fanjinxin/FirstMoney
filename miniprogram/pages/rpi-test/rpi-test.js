@@ -3,7 +3,8 @@
  * 双视角：自我 / 伴侣，各自 20 题，存储为 rpi-self / rpi-partner
  */
 const { rpiTest } = require('../../data/rpi');
-const { loadAnswers, saveAnswers } = require('../../utils/storage');
+const { loadAnswers, saveAnswers, clearAnswers } = require('../../utils/storage');
+const { clearSampleFlag } = require('../../utils/testSample');
 const { THEMES, getThemeStyle } = require('../../data/themes');
 
 const STORAGE_KEYS = { self: 'rpi-self', partner: 'rpi-partner' };
@@ -25,11 +26,22 @@ Page({
     themeStyle: '',
   },
 
+  onShareAppMessage() {
+    return { title: 'RPI 恋爱占有欲指数测试 - 心理测评中心', path: '/pages/rpi-test/rpi-test' };
+  },
+  onShareTimeline() {
+    return { title: 'RPI 恋爱占有欲指数测试 - 心理测评中心' };
+  },
+  onShow() {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
+  },
   onLoad() {
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     this.refreshByPerspective('self');
     const saved = wx.getStorageSync('app-theme-id') || 'summer-mint';
     const theme = THEMES.find(t => t.id === saved) || THEMES[2];
-    this.setData({ test: rpiTest, themeStyle: getThemeStyle(theme) || '' });
+    const scaleOptions = [...rpiTest.options].sort((a, b) => b.value - a.value);
+    this.setData({ test: rpiTest, scaleOptions, themeStyle: getThemeStyle(theme) || '' });
   },
 
   refreshByPerspective(perspective) {
@@ -67,6 +79,19 @@ Page({
     });
   },
 
+  onRestart() {
+    wx.showModal({
+      title: '确认',
+      content: '确定要重新开始吗？自我视角和伴侣视角的作答进度都将被清空。',
+      success: (res) => {
+        if (res.confirm) {
+          clearAnswers('rpi-self');
+          clearAnswers('rpi-partner');
+          this.refreshByPerspective('self');
+        }
+      },
+    });
+  },
   onSwitchPerspective(e) {
     const p = e.currentTarget.dataset.perspective;
     if (p === this.data.perspective) return;
@@ -74,6 +99,7 @@ Page({
   },
 
   onSelect(e) {
+    clearSampleFlag('rpi');
     const value = e.currentTarget.dataset.value;
     const { currentQ, answers, perspective } = this.data;
     const storageKey = STORAGE_KEYS[perspective];

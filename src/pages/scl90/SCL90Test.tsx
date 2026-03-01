@@ -5,7 +5,8 @@ import QuestionOverview from '../../components/QuestionOverview'
 import QuestionView from '../../components/QuestionView'
 import SectionHeader from '../../components/SectionHeader'
 import { scl90Test } from '../../data/scl90'
-import { loadAnswers, saveAnswers } from '../../utils/storage'
+import { loadAnswers, saveAnswers, clearAnswers } from '../../utils/storage'
+import { clearSampleFlag } from '../../utils/testSample'
 
 export default function SCL90Test() {
   const navigate = useNavigate()
@@ -20,6 +21,7 @@ export default function SCL90Test() {
   const progress = (answeredCount / total) * 100
 
   const handleSelect = (value: number) => {
+    clearSampleFlag('scl90')
     const next = { ...answers, [currentQuestion.id]: value }
     setAnswers(next)
     saveAnswers(scl90Test.id, next)
@@ -57,12 +59,25 @@ export default function SCL90Test() {
   const goNext = () => setCurrent((prev) => Math.min(total - 1, prev + 1))
   const goPrev = () => setCurrent((prev) => Math.max(0, prev - 1))
 
+  const handleRestart = () => {
+    if (window.confirm('确定要重新开始吗？当前的作答进度将被清空。')) {
+      clearAnswers(scl90Test.id)
+      setAnswers({})
+      setCurrent(0)
+    }
+  }
+
   const canSubmit = answeredCount === total
 
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="space-y-4">
-        <SectionHeader title={scl90Test.title} description={scl90Test.subtitle} />
+        <div className="flex items-start justify-between">
+          <SectionHeader title={scl90Test.title} description={scl90Test.subtitle} />
+          <button onClick={handleRestart} className="text-xs text-xia-deep/50 hover:text-xia-teal underline px-2 py-1">
+            重新开始
+          </button>
+        </div>
         <p className="text-sm text-xia-deep/80">{scl90Test.description}</p>
       </div>
 

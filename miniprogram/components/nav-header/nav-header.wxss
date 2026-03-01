@@ -4,19 +4,14 @@
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
 }
 
-.nav-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 24rpx;
-  padding: 24rpx 32rpx;
+.nav-header-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.nav-logo {
-  font-size: 36rpx;
-  font-weight: 600;
-  color: var(--xia-deep);
-  letter-spacing: -0.02em;
-  flex-shrink: 0;
+.nav-inner {
+  padding: 24rpx 32rpx;
 }
 
 .nav-scroll {

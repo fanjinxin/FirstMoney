@@ -5,6 +5,7 @@ import QuestionOverview from '../../components/QuestionOverview'
 import SectionHeader from '../../components/SectionHeader'
 import { mbtiQuestions, MBTI_SCALE_OPTIONS } from '../../data/mbti'
 import { loadAnswers, saveAnswers, clearAnswers } from '../../utils/storage'
+import { clearSampleFlag } from '../../utils/testSample'
 
 const TEST_INFO = {
   title: 'MBTI 16型人格测试',
@@ -43,6 +44,7 @@ export default function MBTITest() {
   const progress = (answeredCount / total) * 100
 
   const handleSelect = (value: number) => {
+    clearSampleFlag('mbti')
     const next = { ...answers, [currentQuestion.id]: value }
     setAnswers(next)
     saveAnswers('mbti', next)

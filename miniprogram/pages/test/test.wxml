@@ -1,8 +1,11 @@
 <view class="page-wrap" style="{{themeStyle}}" wx:if="{{config}}">
-  <nav-header currentPath="/{{testId}}"></nav-header>
   <view class="header card">
     <view class="header-row">
-      <view>
+      <view class="test-header-icon-wrap test-icon-{{config.iconBg}}" wx:if="{{config.iconType}}">
+        <image wx:if="{{config.iconType === 'huolande'}}" class="test-header-icon" src="/assets/huolande-icon.png" mode="aspectFit"></image>
+        <image wx:else class="test-header-icon" src="/assets/icons/{{config.iconType}}.svg" mode="aspectFit"></image>
+      </view>
+      <view class="test-header-text">
         <view class="section-title">{{config.title}}</view>
         <view class="section-subtitle">{{config.subtitle}}</view>
       </view>
@@ -15,30 +18,72 @@
     <view class="progress-bar" style="width: {{progress}}%"></view>
   </view>
 
-  <!-- 三选项（AAT 等 choice 格式） -->
-  <view class="question-card card" wx:if="{{config.format === 'choice' && currentQ}}">
+  <!-- 选项按钮列表（霍兰德 是/否、水果塑等）：还原为带文案的按钮 -->
+  <view class="question-card card" wx:if="{{(config.format === 'choice' && currentQ.options.length === 2) || config.format === 'choice-buttons'}}">
     <view class="q-meta">题目 {{current + 1}}/{{total}}</view>
     <view class="q-text">{{currentQ.text}}</view>
-    <view class="options-grid options-choice">
+    <view class="options-grid options-choice-two">
       <view 
         wx:for="{{currentQ.options}}" 
         wx:key="*this"
-        class="opt-btn {{answers[currentQ.id] === index ? 'selected' : ''}}"
-        data-value="{{index}}"
+        wx:for-index="optIndex"
+        class="opt-btn {{answers[currentQ.id] == optIndex ? 'selected' : ''}}"
+        data-value="{{optIndex}}"
         bindtap="onSelect"
       >{{item}}</view>
     </view>
   </view>
 
-  <!-- 标准选项（5选1） -->
-  <view class="question-card card" wx:if="{{config.format !== 'mbti' && config.format !== 'choice' && currentQ}}">
+  <!-- 三选项（AAT、心理年龄等 choice 格式）：MBTI 风格横向刻度 -->
+  <view class="question-card card" wx:if="{{config.format === 'choice' && currentQ.options.length >= 3}}">
+    <view class="q-meta">题目 {{current + 1}}/{{total}}</view>
+    <view class="q-text">{{currentQ.text}}</view>
+    <view class="choice-scale">
+      <text class="scale-lbl scale-lbl-left">{{currentQ.options[0]}}</text>
+      <view class="choice-scale-dots">
+        <view 
+          wx:for="{{currentQ.options}}" 
+          wx:key="*this"
+          wx:for-index="optIndex"
+          class="scale-dot {{answers[currentQ.id] == optIndex ? 'selected' : ''}}"
+          data-value="{{optIndex}}"
+          bindtap="onSelect"
+        ></view>
+      </view>
+      <text class="scale-lbl scale-lbl-right">{{currentQ.options[currentQ.options.length - 1]}}</text>
+    </view>
+    <view class="scale-hint">从左到右：{{currentQ.options[0]}} → {{currentQ.options[currentQ.options.length - 1]}}</view>
+  </view>
+
+  <!-- 标准 5 点量表：MBTI 风格横向刻度，非常符合左、不符合右 -->
+  <view class="question-card card" wx:if="{{config.format !== 'mbti' && config.format !== 'choice' && scaleOptions && scaleOptions.length === 5 && currentQ}}">
+    <view class="q-meta">题目 {{current + 1}}/{{total}}</view>
+    <view class="q-text">{{currentQ.text}}</view>
+    <view class="likert-scale">
+      <text class="scale-lbl scale-lbl-left">{{scaleOptions[0].label}}</text>
+      <view class="scale-dots">
+        <view 
+          wx:for="{{scaleOptions}}" 
+          wx:key="value"
+          class="scale-dot {{answers[currentQ.id] == item.value ? 'selected' : ''}}"
+          data-value="{{item.value}}"
+          bindtap="onSelect"
+        ></view>
+      </view>
+      <text class="scale-lbl scale-lbl-right">{{scaleOptions[4].label}}</text>
+    </view>
+    <view class="scale-hint">从左到右：{{scaleOptions[0].label}} → {{scaleOptions[4].label}}</view>
+  </view>
+
+  <!-- 非 5 点标准选项（备用，排除 choice/choice-buttons 已处理的格式） -->
+  <view class="question-card card" wx:if="{{config.format !== 'mbti' && config.format !== 'choice' && config.format !== 'choice-buttons' && (!scaleOptions || scaleOptions.length !== 5) && currentQ}}">
     <view class="q-meta">题目 {{current + 1}}/{{total}}</view>
     <view class="q-text">{{currentQ.text}}</view>
     <view class="options-grid">
       <view 
         wx:for="{{config.options}}" 
         wx:key="value"
-        class="opt-btn {{answers[currentQ.id] === item.value ? 'selected' : ''}}"
+        class="opt-btn {{answers[currentQ.id] == item.value ? 'selected' : ''}}"
         data-value="{{item.value}}"
         bindtap="onSelect"
       >{{item.label}}</view>
@@ -65,7 +110,7 @@
         <view 
           wx:for="{{config.scaleOptions}}" 
           wx:key="value"
-          class="scale-dot {{answers[currentQ.id] === item.value ? 'selected' : ''}}"
+          class="scale-dot {{answers[currentQ.id] == item.value ? 'selected' : ''}}"
           data-value="{{item.value}}"
           bindtap="onSelect"
         ></view>
@@ -76,9 +121,9 @@
   </view>
 
   <view class="nav-row">
-    <button class="btn-secondary" disabled="{{current === 0}}" bindtap="goPrev">上一题</button>
+    <button class="test-btn-prev" disabled="{{current === 0}}" bindtap="goPrev">上一题</button>
     <view class="progress-text">已完成 {{answeredCount}}/{{total}}</view>
-    <button class="btn-secondary" disabled="{{current >= total - 1}}" bindtap="goNext">下一题</button>
+    <button class="test-btn-next" disabled="{{current >= total - 1}}" bindtap="goNext">下一题</button>
   </view>
 
   <button 
@@ -91,14 +136,36 @@
     <view class="tips-title">作答提示</view>
     <view wx:for="{{config.instructions}}" wx:key="*this" class="tips-item">• {{item}}</view>
   </view>
+
+  <!-- 题目总览：与 Web QuestionOverview 一致，展示已答/未答/当前题 -->
+  <view class="test-overview-card">
+    <view class="test-overview-header">
+      <text class="test-overview-title">题目总览</text>
+      <text class="test-overview-count">已答 {{answeredCount}}/{{total}}</text>
+    </view>
+    <view class="test-overview-legend">
+      <view class="test-legend-item"><view class="test-legend-dot test-dot-answered"></view><text>已作答</text></view>
+      <view class="test-legend-item"><view class="test-legend-dot test-dot-unanswered"></view><text>未作答</text></view>
+      <view class="test-legend-item"><view class="test-legend-dot test-dot-current"></view><text>当前题</text></view>
+    </view>
+    <view class="test-overview-grid">
+      <view
+        wx:for="{{questions}}"
+        wx:for-item="q"
+        wx:key="id"
+        class="test-overview-btn {{current === index ? 'test-overview-current' : (answers[q.id] !== undefined ? 'test-overview-answered' : 'test-overview-unanswered')}}"
+        data-index="{{index}}"
+        bindtap="onOverviewTap"
+      >{{index + 1}}</view>
+    </view>
+  </view>
+
   <theme-switcher bindthemechange="onThemeChange"></theme-switcher>
 </view>
 
 <view class="page-wrap" style="{{themeStyle}}" wx:else>
-  <nav-header currentPath="/"></nav-header>
   <view class="empty">
     <text>暂无该测评，敬请期待</text>
-    <navigator url="/pages/index/index" class="empty-link">返回首页</navigator>
   </view>
   <theme-switcher bindthemechange="onThemeChange"></theme-switcher>
 </view>

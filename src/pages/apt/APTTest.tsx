@@ -5,6 +5,7 @@ import QuestionOverview from '../../components/QuestionOverview'
 import SectionHeader from '../../components/SectionHeader'
 import { aptQuestions, APT_TEST_ID } from '../../data/apt'
 import { loadAnswers, saveAnswers, clearAnswers } from '../../utils/storage'
+import { clearSampleFlag } from '../../utils/testSample'
 
 const OPTIONS = ['完全不符合', '不太符合', '一般', '比较符合', '完全符合']
 
@@ -49,6 +50,7 @@ export default function APTTest() {
   const progress = total > 0 ? (answeredCount / total) * 100 : 0
 
   const handleSelect = (optionIndex: number) => {
+    clearSampleFlag('apt')
     const next = { ...answers, [String(currentQuestion.id)]: optionIndex }
     setAnswers(next)
     saveAnswers(APT_TEST_ID, next)
@@ -101,28 +103,43 @@ export default function APTTest() {
             <div className="mt-2 text-base font-medium text-xia-deep sm:text-lg">
               {currentQuestion.text}
             </div>
-            <div className="mt-4 grid gap-3">
-              {OPTIONS.map((opt, index) => {
-                const isSelected = answers[String(currentQuestion.id)] === index
-                return (
-                  <button
-                    key={index}
-                    onClick={() => handleSelect(index)}
-                    className={`group flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left text-sm transition-all duration-200 sm:text-base ${
-                      isSelected
-                        ? 'border-xia-deep bg-xia-deep text-white shadow-md'
-                        : 'border-xia-haze/50 bg-white hover:border-xia-deep/30 hover:bg-xia-cream/20 text-xia-deep'
-                    }`}
-                  >
-                    <span className="font-medium">{opt}</span>
-                    {isSelected && (
-                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                  </button>
-                )
-              })}
+            <div className="mt-4">
+              <div className="flex items-center gap-4">
+                <span className="shrink-0 max-w-[100px] text-left text-xs font-semibold text-xia-deep sm:text-sm">
+                  {OPTIONS[4]}
+                </span>
+                <div className="flex flex-1 items-center justify-between gap-2 px-2">
+                  {[4, 3, 2, 1, 0].map((idx) => {
+                    const isSelected = answers[String(currentQuestion.id)] === idx
+                    const dotSize =
+                      idx === 4 || idx === 0
+                        ? 'h-10 w-10 sm:h-12 sm:w-12'
+                        : idx === 3 || idx === 1
+                          ? 'h-8 w-8 sm:h-10 sm:w-10'
+                          : 'h-5 w-5 sm:h-7 sm:w-7'
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handleSelect(idx)}
+                        className={`shrink-0 rounded-full border-2 transition-all ${dotSize} ${
+                          isSelected
+                            ? idx === 4
+                              ? 'border-xia-sky bg-xia-sky'
+                              : 'border-xia-deep bg-xia-deep'
+                            : 'border-xia-haze/50 bg-white hover:border-xia-teal/50'
+                        }`}
+                      />
+                    )
+                  })}
+                </div>
+                <span className="shrink-0 max-w-[100px] text-right text-xs font-semibold text-xia-deep sm:text-sm">
+                  {OPTIONS[0]}
+                </span>
+              </div>
+              <p className="mt-2 text-center text-xs text-xia-deep/70">
+                从左到右：{OPTIONS[4]} → {OPTIONS[0]}
+              </p>
             </div>
           </div>
           <div className="flex items-center justify-between">

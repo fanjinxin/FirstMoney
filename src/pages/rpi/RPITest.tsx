@@ -5,7 +5,8 @@ import QuestionOverview from '../../components/QuestionOverview'
 import QuestionView from '../../components/QuestionView'
 import SectionHeader from '../../components/SectionHeader'
 import { rpiTest } from '../../data/rpi'
-import { loadAnswers, saveAnswers } from '../../utils/storage'
+import { loadAnswers, saveAnswers, clearAnswers } from '../../utils/storage'
+import { clearSampleFlag } from '../../utils/testSample'
 
 type Perspective = 'self' | 'partner'
 
@@ -32,6 +33,7 @@ export default function RPITest() {
   const progress = (answeredCount / total) * 100
 
   const handleSelect = (value: number) => {
+    clearSampleFlag('rpi')
     const next = { ...stateAnswers, [currentQuestion.id]: value }
     setStateAnswers(next)
     saveAnswers(`${rpiTest.id}-${perspective}`, next)
@@ -78,10 +80,24 @@ export default function RPITest() {
     setStateAnswers(stored)
   }
 
+  const handleRestart = () => {
+    if (window.confirm('确定要重新开始吗？自我视角和伴侣视角的作答进度都将被清空。')) {
+      clearAnswers('rpi-self')
+      clearAnswers('rpi-partner')
+      setStateAnswers({})
+      setCurrent(0)
+    }
+  }
+
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="space-y-4">
-        <SectionHeader title={rpiTest.title} description={rpiTest.subtitle} />
+        <div className="flex items-start justify-between">
+          <SectionHeader title={rpiTest.title} description={rpiTest.subtitle} />
+          <button onClick={handleRestart} className="text-xs text-xia-deep/50 hover:text-xia-teal underline px-2 py-1">
+            重新开始
+          </button>
+        </div>
         <p className="text-sm text-xia-deep/80">{rpiTest.description}</p>
       </div>
 
